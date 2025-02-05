@@ -11,7 +11,14 @@ class ReceptionsController < ApplicationController
     @reception = Reception.new
     @reception.fecha = Date.today
     @reception.hora = Time.current
+  
+    # Precargar sectores y variedades
+    @sectors = Sector.includes(:varieties).all
+    @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
+      hash[sector.id] = sector.varieties.select(:id, :nombre, :color)
+    end
   end
+  
 
   def create
     @reception = Reception.new(reception_params)
@@ -24,7 +31,7 @@ class ReceptionsController < ApplicationController
     if @reception.save
       redirect_to @reception, notice: 'Recepción creada exitosamente.'
     else
-      Rails.logger.debug "Errores: #{@reception.errors.full_messages}"
+      Rails.logger.debug "Errores: #{@reception.xaerrors.full_messages}"
       render :new, status: :unprocessable_entity
     end
   end

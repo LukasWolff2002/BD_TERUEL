@@ -120,28 +120,12 @@
 </div>
 
 <script>
- // Función de inicialización
-function initVarieties() {
-  console.log("initVarieties llamada");
+  window.varietiesBySector = <%= raw @varieties_by_sector.to_json %>;
+</script>
 
-  const sectorSelect = document.getElementById("sector-select");
-  const varietySelect = document.getElementById("variety-select");
-  const colorField = document.getElementById("color-field");
 
-  if (!sectorSelect || !varietySelect || !colorField) {
-    console.log("No se han encontrado uno o más elementos requeridos");
-    return;
-  }
-
-  // Evita duplicados en los listeners
-  sectorSelect.removeEventListener("change", onSectorChange);
-  varietySelect.removeEventListener("change", onVarietyChange);
-
-  // Asigna eventos
-  sectorSelect.addEventListener("change", onSectorChange, { once: true });
-  varietySelect.addEventListener("change", onVarietyChange, { once: true });
-}
-
+<script>
+// Función que se ejecuta al cambiar el sector
 function onSectorChange() {
   const sectorId = this.value;
   console.log("Sector seleccionado:", sectorId);
@@ -151,42 +135,12 @@ function onSectorChange() {
     return;
   }
 
-  fetch(`${window.location.origin}/sectors/${sectorId}/varieties`)
-    .then(response => {
-      console.log("Respuesta recibida:", response);
-      if (!response.ok) {
-        return response.text().then(text => {
-          throw new Error("Respuesta del servidor no OK: " + text);
-        });
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("Variedades recibidas (crudo):", data);
-      
-      // Verificar si la respuesta es un string en lugar de un array
-      if (typeof data === "string") {
-        try {
-          data = JSON.parse(data);
-        } catch (e) {
-          console.error("Error al parsear JSON:", e);
-          throw new Error("El servidor devolvió un string en lugar de un array.");
-        }
-      }
+  // Obtener variedades desde la variable global en lugar de hacer fetch
+  const varieties = window.varietiesBySector[sectorId] || [];
+  console.log("Variedades disponibles:", varieties);
 
-      if (!Array.isArray(data)) {
-        console.error("Error: la respuesta del servidor no es un array", data);
-        throw new Error("El servidor no devolvió un array de variedades.");
-      }
-
-      updateVarieties(data);
-    })
-    .catch(error => {
-      console.error("Error al hacer fetch de variedades:", error);
-      clearVarieties();
-    });
+  updateVarieties(varieties);
 }
-
 
 // Función que se ejecuta al cambiar la variedad
 function onVarietyChange() {
@@ -199,21 +153,11 @@ function onVarietyChange() {
     return;
   }
 
-  fetch(`${window.location.origin}/varieties/${varietyId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Respuesta del servidor no OK");
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("Detalle de la variedad:", data);
-      colorField.value = data.color || "";
-    })
-    .catch(error => {
-      console.error("Error al hacer fetch de la variedad:", error);
-      colorField.value = "";
-    });
+  // Buscar el color de la variedad seleccionada en la variable global
+  const sectorId = document.getElementById("sector-select").value;
+  const variety = (window.varietiesBySector[sectorId] || []).find(v => v.id == varietyId);
+  
+  colorField.value = variety ? variety.color : "";
 }
 
 // Actualiza el select de variedades
@@ -228,7 +172,7 @@ function updateVarieties(varieties) {
     varietySelect.appendChild(option);
   });
 
-  varietySelect.disabled = false;
+  varietySelect.disabled = varieties.length === 0;
 }
 
 // Limpia el select de variedades
@@ -241,23 +185,16 @@ function clearVarieties() {
   colorField.value = "";
 }
 
-// Agrega listeners según el estado de carga de la página
-function attachListeners() {
-  console.log("attachListeners ejecutado");
-  initVarieties();
-}
-
-// Si la página aún está cargando
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", attachListeners);
-} else {
-  attachListeners();
-}
-
-// Para navegaciones con Turbo (Rails 7)
-document.addEventListener("turbo:load", function () {
-  console.log("turbo:load activado");
-  attachListeners();
+// Inicialización
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("sector-select").addEventListener("change", onSectorChange);
+  document.getElementById("variety-select").addEventListener("change", onVarietyChange);
 });
 
-</script> 
+// Para Turbo en Rails 7
+document.addEventListener("turbo:load", function () {
+  document.getElementById("sector-select").addEventListener("change", onSectorChange);
+  document.getElementById("variety-select").addEventListener("change", onVarietyChange);
+});
+
+</script>
