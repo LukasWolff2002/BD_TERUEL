@@ -45,8 +45,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   create_table "harvests", force: :cascade do |t|
     t.date "fecha"
     t.time "hora"
-    t.string "sector"
-    t.string "variedad"
+    t.bigint "user_id", null: false
+    t.bigint "sector_id", null: false
+    t.bigint "variety_id", null: false
     t.string "volante_rut"
     t.string "volante_nombre"
     t.string "encargado_cosecha"
@@ -56,13 +57,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.decimal "kilos_por_caja", precision: 5, scale: 2
     t.string "calidad"
     t.decimal "kilos_tomates", precision: 8, scale: 2
-    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cosechero_rut"], name: "index_harvests_on_cosechero_rut"
     t.index ["fecha"], name: "index_harvests_on_fecha"
-    t.index ["sector"], name: "index_harvests_on_sector"
+    t.index ["sector_id"], name: "index_harvests_on_sector_id"
     t.index ["user_id"], name: "index_harvests_on_user_id"
+    t.index ["variety_id"], name: "index_harvests_on_variety_id"
     t.index ["volante_rut"], name: "index_harvests_on_volante_rut"
   end
 
@@ -188,7 +189,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "harvests", "sectors"
   add_foreign_key "harvests", "users"
+  add_foreign_key "harvests", "varieties"
   add_foreign_key "images", "receptions"
   add_foreign_key "inventorie_histories", "inventories", column: "inventorie_id"
   add_foreign_key "inventorie_histories", "users"

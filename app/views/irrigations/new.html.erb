@@ -38,12 +38,10 @@
             </div>
           </div>
 
-          <div class="col-md-4">
-            <div class="form-group mb-3">
-              <%= f.label :encargado_de_riego_id, "Encargado de Riego", class: "form-label" %>
-              <%= f.collection_select :encargado_de_riego_id, User.all, :id, :nombre_completo, 
-                  { prompt: "Seleccionar encargado" }, { class: "form-select", required: true } %>
-            </div>
+          <div class="mb-3">
+            <%= f.label :evaluador, "Encargado de Riego" %>
+            <p><strong><%= current_user.nombre_completo %></strong></p>
+            <%= f.hidden_field :user_id, value: current_user.id %>
           </div>
 
           <div class="col-md-4">

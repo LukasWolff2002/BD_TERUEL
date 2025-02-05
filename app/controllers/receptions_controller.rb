@@ -36,6 +36,39 @@ class ReceptionsController < ApplicationController
     end
   end
 
+  # Acción para el informe con filtros
+  def informe
+    @receptions = Reception.all
+
+    # Filtrar por rango de fechas
+    if params[:fecha_inicio].present? && params[:fecha_fin].present?
+      @receptions = @receptions.where(fecha: params[:fecha_inicio]..params[:fecha_fin])
+    elsif params[:fecha_inicio].present?
+      @receptions = @receptions.where("fecha >= ?", params[:fecha_inicio])
+    elsif params[:fecha_fin].present?
+      @receptions = @receptions.where("fecha <= ?", params[:fecha_fin])
+    end
+
+    # Filtrar por sector (usando JOIN con la tabla sectors)
+    if params[:sector].present?
+      @receptions = @receptions.joins(:sector).where("sectors.nombre ILIKE ?", "%#{params[:sector]}%")
+    end
+
+    # Filtrar por nombre (búsqueda parcial sobre el campo 'nombre' de Reception)
+    if params[:nombre].present?
+      @receptions = @receptions.where("nombre ILIKE ?", "%#{params[:nombre]}%")
+    end
+
+    @receptions = @receptions.order(fecha: :desc)
+
+    respond_to do |format|
+      format.html
+      format.xlsx do
+        response.headers["Content-Disposition"] = "attachment; filename=recepciones_#{Time.now.strftime('%Y%m%d%H%M%S')}.xlsx"
+      end
+    end
+  end
+
   private
 
   def reception_params

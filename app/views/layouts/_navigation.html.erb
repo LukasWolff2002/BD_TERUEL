@@ -71,6 +71,20 @@
               </li>
             </ul>
           </li>
+  
+          <!-- Informes -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-archive"></i> Informes
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <%= link_to informe_receptions_path, class: "dropdown-item" do %>
+                  <i class="bi bi-card-list"></i> Recepciones
+                <% end %>
+              </li>
+            </ul>
+          </li>
         </ul>
   
         <!-- Menú derecho: Usuario y Cerrar Sesión -->

@@ -98,9 +98,11 @@
           <%= f.number_field :kilos_cajas, step: '0.01', class: "form-control" %>
         </div>
 
+        <!-- Evaluador: se asigna current_user y se muestra su nombre -->
         <div class="mb-3">
           <%= f.label :user_id, "Evaluador", class: "form-label" %>
-          <%= f.collection_select :user_id, User.all, :id, :nombre_completo, {}, class: "form-select" %>
+          <p><strong><%= current_user.nombre_completo %></strong></p>
+          <%= f.hidden_field :user_id, value: current_user.id %>
         </div>
 
         <div class="mb-3">
@@ -122,7 +124,6 @@
 <script>
   window.varietiesBySector = <%= raw @varieties_by_sector.to_json %>;
 </script>
-
 
 <script>
 // Función que se ejecuta al cambiar el sector
@@ -196,5 +197,4 @@ document.addEventListener("turbo:load", function () {
   document.getElementById("sector-select").addEventListener("change", onSectorChange);
   document.getElementById("variety-select").addEventListener("change", onVarietyChange);
 });
-
 </script>

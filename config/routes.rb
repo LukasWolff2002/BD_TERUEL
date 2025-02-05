@@ -15,7 +15,11 @@ Rails.application.routes.draw do
 
   resources :users
   resources :images
-  resources :receptions
+  resources :receptions do
+    collection do
+      get 'informe'
+    end
+  end
   resources :inventories
   resources :inventorie_histories
   resources :sectors do

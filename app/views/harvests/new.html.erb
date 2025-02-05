@@ -23,100 +23,81 @@
         <% end %>
 
         <div class="row g-3">
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                <%= f.label :fecha, "Fecha", class: "form-label" %>
-                <%= f.date_field :fecha, class: "form-control", readonly: true %>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                <%= f.label :hora, "Hora", class: "form-label" %>
-                <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
-                </div>
-            </div>
-
-          <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :sector, "Sector", class: "form-label" %>
-              <%= f.text_field :sector, class: "form-control", required: true %>
-            </div>
+          <!-- Sección: Datos Generales -->
+          <div class="col-12">
+            <h5 class="mb-3">Datos Generales</h5>
+          </div>
+          <div class="col-md-4">
+            <%= f.label :fecha, "Fecha", class: "form-label" %>
+            <%= f.date_field :fecha, class: "form-control", readonly: true %>
+          </div>
+          <div class="col-md-4">
+            <%= f.label :hora, "Hora", class: "form-label" %>
+            <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
+          </div>
+          <div class="col-md-4">
+            <%= f.label :evaluador, "Encargado de Cosecha", class: "form-label" %>
+            <p><strong><%= current_user.nombre_completo %></strong></p>
+            <%= f.hidden_field :user_id, value: current_user.id %>
           </div>
 
+          <!-- Sección: Ubicación y Variedad -->
+          <div class="col-12">
+            <h5 class="mb-3">Ubicación y Variedad</h5>
+          </div>
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :variedad, "Variedad", class: "form-label" %>
-              <%= f.text_field :variedad, class: "form-control", required: true %>
-            </div>
+            <%= f.label :sector_id, "Sector", class: "form-label" %>
+            <%= f.collection_select :sector_id, Sector.all, :id, :nombre, { prompt: "Seleccione un sector" }, { class: "form-select", id: "sector-select" } %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :variety_id, "Variedad", class: "form-label" %>
+            <%= f.collection_select :variety_id, [], :id, :nombre, { prompt: "Primero seleccione un sector" }, { class: "form-select", id: "variety-select", required: true, disabled: true } %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :color, "Color", class: "form-label" %>
+            <%= f.text_field :color, class: "form-control", readonly: true, id: "color-field" %>
           </div>
 
+          <!-- Sección: Datos del Volante -->
+          <div class="col-12">
+            <h5 class="mb-3">Datos del Volante</h5>
+          </div>
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :volante_rut, "RUT Volante", class: "form-label" %>
-              <%= f.text_field :volante_rut, class: "form-control", required: true %>
-            </div>
+            <%= f.label :volante_rut, "RUT Volante", class: "form-label" %>
+            <%= f.text_field :volante_rut, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :volante_nombre, "Nombre Volante", class: "form-label" %>
+            <%= f.text_field :volante_nombre, class: "form-control", required: true %>
           </div>
 
-          <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :volante_nombre, "Nombre Volante", class: "form-label" %>
-              <%= f.text_field :volante_nombre, class: "form-control", required: true %>
-            </div>
+          <!-- Sección: Datos de Cosecha -->
+          <div class="col-12">
+            <h5 class="mb-3">Datos de Cosecha</h5>
           </div>
-
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :encargado_cosecha, "Encargado de Cosecha", class: "form-label" %>
-              <%= f.text_field :encargado_cosecha, class: "form-control", required: true %>
-            </div>
+            <%= f.label :cosechero_rut, "RUT Cosechero", class: "form-label" %>
+            <%= f.text_field :cosechero_rut, class: "form-control", required: true %>
           </div>
-
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :cosechero_rut, "RUT Cosechero", class: "form-label" %>
-              <%= f.text_field :cosechero_rut, class: "form-control", required: true %>
-            </div>
+            <%= f.label :cosechero_nombre, "Nombre Cosechero", class: "form-label" %>
+            <%= f.text_field :cosechero_nombre, class: "form-control", required: true %>
           </div>
-
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :cosechero_nombre, "Nombre Cosechero", class: "form-label" %>
-              <%= f.text_field :cosechero_nombre, class: "form-control", required: true %>
-            </div>
+            <%= f.label :cajas, "Cajas", class: "form-label" %>
+            <%= f.number_field :cajas, class: "form-control", required: true, min: 1 %>
           </div>
-
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :cajas, "Cajas", class: "form-label" %>
-              <%= f.number_field :cajas, class: "form-control", required: true, min: 1 %>
-            </div>
+            <%= f.label :kilos_por_caja, "Kilos por Caja", class: "form-label" %>
+            <%= f.number_field :kilos_por_caja, class: "form-control", required: true, step: "0.01", min: 0 %>
           </div>
-
           <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :kilos_por_caja, "Kilos por Caja", class: "form-label" %>
-              <%= f.number_field :kilos_por_caja, class: "form-control", required: true, 
-                  step: "0.01", min: 0 %>
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :calidad, "Calidad", class: "form-label" %>
-              <%= f.text_field :calidad, class: "form-control", required: true %>
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="form-group mb-3">
-              <%= f.label :evaluador, "Evaluador", class: "form-label" %>
-              <%= f.text_field :evaluador, class: "form-control", required: true %>
-            </div>
+            <%= f.label :calidad, "Calidad", class: "form-label" %>
+            <%= f.text_field :calidad, class: "form-control", required: true %>
           </div>
         </div>
 
-        <div class="form-group mt-4">
+        <div class="mt-4">
           <%= f.submit "Guardar Registro", class: "btn btn-primary" %>
           <%= link_to "Cancelar", harvests_path, class: "btn btn-secondary" %>
         </div>
@@ -124,3 +105,95 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Precargamos la variable con las variedades agrupadas por sector
+  window.varietiesBySector = <%= raw @varieties_by_sector.to_json %>;
+
+  // Función que se ejecuta al cambiar el sector
+  function onSectorChange() {
+    const sectorId = this.value;
+    console.log("Sector seleccionado:", sectorId);
+
+    if (!sectorId) {
+      clearVarieties();
+      return;
+    }
+
+    // Obtener las variedades de la variable global
+    const varieties = window.varietiesBySector[sectorId] || [];
+    console.log("Variedades disponibles:", varieties);
+
+    updateVarieties(varieties);
+  }
+
+  // Función que se ejecuta al cambiar la variedad
+  function onVarietyChange() {
+    const varietyId = this.value;
+    console.log("Variedad seleccionada:", varietyId);
+    const colorField = document.getElementById("color-field");
+
+    if (!varietyId) {
+      colorField.value = "";
+      return;
+    }
+
+    // Buscar el color de la variedad seleccionada en la variable global
+    const sectorId = document.getElementById("sector-select").value;
+    const variety = (window.varietiesBySector[sectorId] || []).find(v => v.id == varietyId);
+    
+    colorField.value = variety ? variety.color : "";
+  }
+
+  // Actualiza el select de variedades
+  function updateVarieties(varieties) {
+    const varietySelect = document.getElementById("variety-select");
+    varietySelect.innerHTML = '<option value="">Seleccione una variedad</option>';
+
+    varieties.forEach(function(variety) {
+      const option = document.createElement("option");
+      option.value = variety.id;
+      option.textContent = variety.nombre;
+      varietySelect.appendChild(option);
+    });
+
+    // Si hay variedades disponibles, habilitamos el select
+    varietySelect.disabled = varieties.length === 0;
+  }
+
+  // Limpia el select de variedades
+  function clearVarieties() {
+    const varietySelect = document.getElementById("variety-select");
+    const colorField = document.getElementById("color-field");
+
+    varietySelect.innerHTML = '<option value="">Primero seleccione un sector</option>';
+    varietySelect.disabled = true;
+    colorField.value = "";
+  }
+
+  // Inicialización
+  document.addEventListener("DOMContentLoaded", function () {
+    const sectorSelect = document.getElementById("sector-select");
+    const varietySelect = document.getElementById("variety-select");
+
+    if(sectorSelect) {
+      sectorSelect.addEventListener("change", onSectorChange);
+    }
+    if(varietySelect) {
+      varietySelect.addEventListener("change", onVarietyChange);
+    }
+  });
+
+  // Para Turbo en Rails 7
+  document.addEventListener("turbo:load", function () {
+    const sectorSelect = document.getElementById("sector-select");
+    const varietySelect = document.getElementById("variety-select");
+
+    if(sectorSelect) {
+      sectorSelect.addEventListener("change", onSectorChange);
+    }
+    if(varietySelect) {
+      varietySelect.addEventListener("change", onVarietyChange);
+    }
+  });
+</script>

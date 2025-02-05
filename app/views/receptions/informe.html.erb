@@ -1,0 +1,77 @@
+<h1>Informe de Recepciones</h1>
+
+<%= form_with url: informe_receptions_path, method: :get, local: true do |f| %>
+  <div class="row mb-3">
+    <!-- Filtros por rango de fechas -->
+    <div class="col-md-4">
+      <%= f.label :fecha_inicio, "Fecha de Inicio" %>
+      <%= f.date_field :fecha_inicio, value: params[:fecha_inicio], class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :fecha_fin, "Fecha de Fin" %>
+      <%= f.date_field :fecha_fin, value: params[:fecha_fin], class: "form-control" %>
+    </div>
+    <!-- Filtro por sector (Dropdown) -->
+    <div class="col-md-4">
+      <%= f.label :sector, "Sector" %>
+      <%= f.select :sector, 
+            options_from_collection_for_select(Sector.all, :nombre, :nombre, params[:sector]), 
+            { include_blank: 'Todos' }, 
+            class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <!-- Filtro por nombre -->
+    <div class="col-md-6">
+      <%= f.label :nombre, "Nombre" %>
+      <%= f.text_field :nombre, value: params[:nombre], class: "form-control", placeholder: "Ingrese el nombre" %>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12 text-end">
+      <%= f.submit "Filtrar", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<% if @receptions.any? %>
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Sector</th>
+        <th>Variedad</th>
+        <th>Calidad</th>
+        <th>Cajas</th>
+        <th>Kilos Totales</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @receptions.each do |reception| %>
+        <tr>
+          <td><%= reception.fecha.strftime("%d/%m/%Y") if reception.fecha %></td>
+          <td><%= reception.sector.nombre if reception.sector.present? %></td>
+          <td><%= reception.variety.nombre if reception.variety.present? %></td>
+          <td><%= reception.calidad %></td>
+          <td><%= reception.cajas %></td>
+          <td><%= reception.kilos_totales %></td>
+          <td>
+            <%= link_to "Ver Detalle", reception_path(reception), class: "btn btn-sm btn-info" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="alert alert-warning">
+    No hay recepciones que cumplan con los filtros seleccionados.
+  </div>
+<% end %>
+
+<!-- Botón para exportar a Excel -->
+<div class="mt-3">
+  <%= link_to "Exportar a Excel", informe_receptions_path(request.query_parameters.merge(format: :xlsx)), class: "btn btn-success" %>
+</div>
