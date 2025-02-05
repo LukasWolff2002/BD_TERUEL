@@ -142,7 +142,6 @@ function initVarieties() {
   varietySelect.addEventListener("change", onVarietyChange, { once: true });
 }
 
-// Función que se ejecuta al cambiar el sector
 function onSectorChange() {
   const sectorId = this.value;
   console.log("Sector seleccionado:", sectorId);
@@ -154,6 +153,7 @@ function onSectorChange() {
 
   fetch(`${window.location.origin}/sectors/${sectorId}/varieties`)
     .then(response => {
+      console.log("Respuesta recibida:", response);
       if (!response.ok) {
         return response.text().then(text => {
           throw new Error("Respuesta del servidor no OK: " + text);
@@ -163,8 +163,8 @@ function onSectorChange() {
     })
     .then(data => {
       console.log("Variedades recibidas (crudo):", data);
-
-      // Si data es un string en vez de un array, convertirlo manualmente
+      
+      // Verificar si la respuesta es un string en lugar de un array
       if (typeof data === "string") {
         try {
           data = JSON.parse(data);
@@ -175,6 +175,7 @@ function onSectorChange() {
       }
 
       if (!Array.isArray(data)) {
+        console.error("Error: la respuesta del servidor no es un array", data);
         throw new Error("El servidor no devolvió un array de variedades.");
       }
 
@@ -185,6 +186,7 @@ function onSectorChange() {
       clearVarieties();
     });
 }
+
 
 // Función que se ejecuta al cambiar la variedad
 function onVarietyChange() {
