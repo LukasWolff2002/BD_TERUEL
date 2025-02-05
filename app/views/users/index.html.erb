@@ -15,7 +15,6 @@
             <th>Apellido</th>
             <th>RUT</th>
             <th>Cargo</th>
-            <th>Recepciones</th>
           </tr>
         </thead>
         <tbody>
@@ -25,17 +24,10 @@
               <td><%= user.apellido %></td>
               <td><%= user.rut %></td>
               <td>
-                <span class="badge bg-secondary">
+                <span class="badge <%= cargo_badge_class(user.cargo) %>">
                   <%= user.cargo %>
                 </span>
               </td>
-              <td>
-                <%= link_to receptions_path(evaluador_id: user.id), class: "text-decoration-none" do %>
-                  <span class="badge bg-info">
-                    <%= user.receptions.count %> recepciones
-                  </span>
-                <% end %>
-              </td>    
             </tr>
           <% end %>
         </tbody>

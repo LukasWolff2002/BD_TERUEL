@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
     def index
-      @users = User.all.order(:apellido)
+      @users = User.order(:cargo)
     end
 
     def new
