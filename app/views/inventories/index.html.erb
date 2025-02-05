@@ -1,0 +1,26 @@
+<h1>Listado de Inventarios</h1>
+
+<div class="d-flex justify-content-end mb-3">
+  <%= link_to 'Nuevo Item', new_inventory_path, class: "btn btn-primary" %>
+</div>
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Cantidad</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    <% @inventories.each do |inventorie| %>
+      <tr>
+        <td><%= inventorie.nombre %></td>
+        <td><%= inventorie.descripcion %></td>
+        <td><%= inventorie.cantidad %></td>
+        
+      </tr>
+    <% end %>
+  </tbody>
+</table>

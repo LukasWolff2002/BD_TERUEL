@@ -1,4 +1,6 @@
 class Harvest < ApplicationRecord
+  belongs_to :user
+  
   # Validaciones
   validates :fecha, presence: true
   validates :hora, presence: true
@@ -12,7 +14,7 @@ class Harvest < ApplicationRecord
   validates :cajas, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :kilos_por_caja, presence: true, numericality: { greater_than: 0 }
   validates :calidad, presence: true
-  validates :evaluador, presence: true
+  
   
   # Validación de formato RUT chileno (XX.XXX.XXX-X)
   validates :cargo_rut, :cosechero_rut, format: { 

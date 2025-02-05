@@ -38,7 +38,7 @@ class HarvestsController < ApplicationController
       :encargado_cosecha,
       :cosechero_rut, :cosechero_nombre,
       :cajas, :kilos_por_caja, :calidad,
-      :evaluador
+      :user_id
     )
   end
 end 

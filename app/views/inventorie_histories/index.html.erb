@@ -1,0 +1,30 @@
+<h1>Historial de Inventario</h1>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Artículo</th>
+      <th>Cantidad Modificada</th>
+      <th>Descripción</th>
+      <th>Usuario</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @inventorie_histories.each do |history| %>
+      <tr>
+        <td><%= history.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+        <td><%= history.inventorie.nombre %></td>
+        <td>
+          <% if history.cantidad_cambiada > 0 %>
+            <span class="text-success">+<%= history.cantidad_cambiada %></span>
+          <% else %>
+            <span class="text-danger"><%= history.cantidad_cambiada %></span>
+          <% end %>
+        </td>
+        <td><%= history.descripcion %></td>
+        <td><%= history.user.nombre %> <%= history.user.apellido %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

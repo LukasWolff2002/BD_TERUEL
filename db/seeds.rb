@@ -126,6 +126,25 @@ sectors.each do |sector|
   end
 end
 
+Inventorie.create!([
+    {
+      nombre: "Producto A",
+      descripcion: "Inventario base para Producto A",
+      cantidad: 100
+    },
+    {
+      nombre: "Producto B",
+      descripcion: "Inventario base para Producto B",
+      cantidad: 50
+    },
+    {
+      nombre: "Producto C",
+      descripcion: "Inventario base para Producto C",
+      cantidad: 25
+    }
+  ])
+  puts "Inventarios iniciales cargados exitosamente."
+
 puts "Seeds creados exitosamente!"
 puts "Se crearon:"
 puts "- #{User.count} usuarios"

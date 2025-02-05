@@ -49,7 +49,7 @@ class IrrigationsController < ApplicationController
 
   def irrigation_params
     params.require(:irrigation).permit(
-      :encargado_de_riego_id, :sector, :nro_pulsos, :tiempo_pulso,
+      :user_id, :sector, :nro_pulsos, :tiempo_pulso,
       :riego_entrada_mm, :riego_entrada_ph, :riego_entrada_ce, 
       :riego_entrada_nitratos, :riego_entrada_potasio,
       :drenaje_riego_mm, :drenaje_riego_ph, :drenaje_riego_ce,

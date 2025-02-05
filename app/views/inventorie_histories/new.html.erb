@@ -1,0 +1,30 @@
+<h1>Modificar Inventario</h1>
+
+<%= form_with model: @inventorie_history, local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :inventorie_id, "Artículo" %>
+    <%= f.collection_select :inventorie_id, Inventorie.all, :id, :nombre, { prompt: "Seleccione un artículo" }, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :cantidad_cambiada, "Cantidad a modificar" %>
+    <%= f.number_field :cantidad_cambiada, step: 1, class: "form-control" %>
+    <div class="form-text">Valores positivos para agregar, negativos para retirar.</div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :user_id, "Usuario" %>
+    <%= f.collection_select :user_id, User.all, :id, :nombre, { prompt: "Seleccione un usuario" }, class: "form-control" %>
+    <%# O, si usas current_user, puedes asignarlo automáticamente: %>
+    <%#= f.hidden_field :user_id, value: current_user.id %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :descripcion, "Motivo/Descripción" %>
+    <%= f.text_field :descripcion, class: "form-control" %>
+  </div>
+
+  <div>
+    <%= f.submit "Aplicar modificación", class: "btn btn-primary" %>
+  </div>
+<% end %> 

@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   resources :users
   resources :images
   resources :receptions
+  resources :inventories
+  resources :inventorie_histories
   resources :sectors do
     get 'varieties', on: :member
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_03_180257) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -56,12 +56,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_03_180257) do
     t.decimal "kilos_por_caja", precision: 5, scale: 2
     t.string "calidad"
     t.decimal "kilos_tomates", precision: 8, scale: 2
-    t.string "evaluador"
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cosechero_rut"], name: "index_harvests_on_cosechero_rut"
     t.index ["fecha"], name: "index_harvests_on_fecha"
     t.index ["sector"], name: "index_harvests_on_sector"
+    t.index ["user_id"], name: "index_harvests_on_user_id"
     t.index ["volante_rut"], name: "index_harvests_on_volante_rut"
   end
 
@@ -72,10 +73,29 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_03_180257) do
     t.index ["reception_id"], name: "index_images_on_reception_id"
   end
 
+  create_table "inventorie_histories", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "inventorie_id", null: false
+    t.integer "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
+    t.string "descripcion", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inventorie_id"], name: "index_inventorie_histories_on_inventorie_id"
+    t.index ["user_id"], name: "index_inventorie_histories_on_user_id"
+  end
+
+  create_table "inventories", force: :cascade do |t|
+    t.string "nombre", null: false
+    t.text "descripcion"
+    t.integer "cantidad", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "irrigations", force: :cascade do |t|
     t.date "fecha"
     t.time "hora"
-    t.bigint "encargado_de_riego_id"
+    t.bigint "user_id", null: false
     t.bigint "sector_id"
     t.integer "nro_pulsos"
     t.decimal "tiempo_pulso", precision: 5, scale: 2
@@ -101,8 +121,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_03_180257) do
     t.integer "muestras"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["encargado_de_riego_id"], name: "index_irrigations_on_encargado_de_riego_id"
     t.index ["sector_id"], name: "index_irrigations_on_sector_id"
+    t.index ["user_id"], name: "index_irrigations_on_user_id"
   end
 
   create_table "receptions", force: :cascade do |t|
@@ -168,9 +188,12 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_03_180257) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "harvests", "users"
   add_foreign_key "images", "receptions"
+  add_foreign_key "inventorie_histories", "inventories", column: "inventorie_id"
+  add_foreign_key "inventorie_histories", "users"
   add_foreign_key "irrigations", "sectors"
-  add_foreign_key "irrigations", "users", column: "encargado_de_riego_id"
+  add_foreign_key "irrigations", "users"
   add_foreign_key "receptions", "sectors"
   add_foreign_key "receptions", "users"
   add_foreign_key "receptions", "varieties"

@@ -1,8 +1,9 @@
 class User < ApplicationRecord
     has_many :images, dependent: :destroy
     has_many :receptions, dependent: :destroy  # Como evaluador
-    has_many :irrigations, foreign_key: 'encargado_de_riego_id'
-    
+    has_many :irrigations, dependent: :destroy  # Como evaluador
+    has_many :harvests, dependent: :destroy  # Como evaluador
+    has_many :inventorie_historys, dependent: :destroy
     validates :rut, presence: true, uniqueness: true
     validates :nombre, presence: true
     validates :apellido, presence: true

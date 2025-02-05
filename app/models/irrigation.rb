@@ -1,6 +1,6 @@
 class Irrigation < ApplicationRecord
   belongs_to :sector
-  belongs_to :encargado_de_riego, class_name: 'User'
+  belongs_to :user
 
   validates :fecha, presence: true
   validates :hora, presence: true

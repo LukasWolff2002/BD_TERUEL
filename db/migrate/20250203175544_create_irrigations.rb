@@ -3,7 +3,7 @@ class CreateIrrigations < ActiveRecord::Migration[7.1]
     create_table :irrigations do |t|
       t.date :fecha #Al momento de creacion de recepcion
       t.time :hora #Al momento de creacion de recepcion
-      t.references :encargado_de_riego, foreign_key: { to_table: :users }
+      t.references :user, null: false, foreign_key: true
       t.references :sector, foreign_key: true  # Forma correcta de crear la referenci
       t.integer :nro_pulsos
       t.decimal :tiempo_pulso, precision: 5, scale: 2  # minutos con decimales

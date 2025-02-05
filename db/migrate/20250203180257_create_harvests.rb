@@ -20,7 +20,7 @@ class CreateHarvests < ActiveRecord::Migration[7.1]
       t.decimal :kilos_por_caja, precision: 5, scale: 2
       t.string :calidad
       t.decimal :kilos_tomates, precision: 8, scale: 2  # Campo calculado
-      t.string :evaluador #Es quien hace la fiha
+      t.references :user, null: false, foreign_key: true
 
       t.timestamps
     end

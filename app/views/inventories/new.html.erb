@@ -1,0 +1,22 @@
+<h1>Nuevo Item de Inventario</h1>
+
+<%= form_with model: @inventorie, local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :nombre, "Nombre del Item" %>
+    <%= f.text_field :nombre, class: "form-control", placeholder: "Ingrese el nombre" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :descripcion, "Descripción" %>
+    <%= f.text_area :descripcion, class: "form-control", placeholder: "Ingrese una descripción" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :cantidad, "Cantidad Inicial" %>
+    <%= f.number_field :cantidad, class: "form-control", value: 0 %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.submit "Crear Item", class: "btn btn-primary" %>
+  </div>
+<% end %> 
