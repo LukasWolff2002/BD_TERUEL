@@ -1,0 +1,126 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1>Nuevo Registro de Cosecha</h1>
+        <%= link_to harvests_path, class: 'btn btn-secondary' do %>
+          <i class="bi bi-arrow-left"></i> Volver
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <%= form_with(model: @harvest, local: true) do |f| %>
+        <% if @harvest.errors.any? %>
+          <div class="alert alert-danger">
+            <h4><%= pluralize(@harvest.errors.count, "error") %> impidieron guardar este registro:</h4>
+            <ul>
+              <% @harvest.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                <%= f.label :fecha, "Fecha", class: "form-label" %>
+                <%= f.date_field :fecha, class: "form-control", readonly: true %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                <%= f.label :hora, "Hora", class: "form-label" %>
+                <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
+                </div>
+            </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :sector, "Sector", class: "form-label" %>
+              <%= f.text_field :sector, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :variedad, "Variedad", class: "form-label" %>
+              <%= f.text_field :variedad, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :volante_rut, "RUT Volante", class: "form-label" %>
+              <%= f.text_field :volante_rut, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :volante_nombre, "Nombre Volante", class: "form-label" %>
+              <%= f.text_field :volante_nombre, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :encargado_cosecha, "Encargado de Cosecha", class: "form-label" %>
+              <%= f.text_field :encargado_cosecha, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :cosechero_rut, "RUT Cosechero", class: "form-label" %>
+              <%= f.text_field :cosechero_rut, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :cosechero_nombre, "Nombre Cosechero", class: "form-label" %>
+              <%= f.text_field :cosechero_nombre, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :cajas, "Cajas", class: "form-label" %>
+              <%= f.number_field :cajas, class: "form-control", required: true, min: 1 %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :kilos_por_caja, "Kilos por Caja", class: "form-label" %>
+              <%= f.number_field :kilos_por_caja, class: "form-control", required: true, 
+                  step: "0.01", min: 0 %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :calidad, "Calidad", class: "form-label" %>
+              <%= f.text_field :calidad, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :evaluador, "Evaluador", class: "form-label" %>
+              <%= f.text_field :evaluador, class: "form-control", required: true %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mt-4">
+          <%= f.submit "Guardar Registro", class: "btn btn-primary" %>
+          <%= link_to "Cancelar", harvests_path, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

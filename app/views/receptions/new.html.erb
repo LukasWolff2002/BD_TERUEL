@@ -1,0 +1,241 @@
+<div class="container mt-4">
+  <h1>Nueva Recepción</h1>
+
+  <%= form_with(model: @reception, local: true) do |f| %>
+    <% if @reception.errors.any? %>
+      <div class="alert alert-danger">
+        <h2><%= pluralize(@reception.errors.count, "error") %> impidieron guardar esta recepción:</h2>
+        <ul>
+          <% @reception.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="row">
+      <!-- Columna Izquierda -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <%= f.label :fecha, class: "form-label" %>
+          <%= f.date_field :fecha, class: "form-control", readonly: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :hora, class: "form-label" %>
+          <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :sector_id, "Sector", class: "form-label" %>
+          <%= f.collection_select :sector_id, 
+              Sector.all, 
+              :id, 
+              :nombre, 
+              { prompt: "Seleccione un sector" }, 
+              { 
+                class: "form-select",
+                id: "sector-select"
+              } 
+          %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :variety_id, "Variedad", class: "form-label" %>
+          <%= f.collection_select :variety_id, 
+              [], 
+              :id, 
+              :nombre, 
+              { prompt: "Primero seleccione un sector" }, 
+              { 
+                class: "form-select",
+                id: "variety-select",
+                required: true,
+                disabled: true
+              } 
+          %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :color, "Color", class: "form-label" %>
+          <%= f.text_field :color, 
+              class: "form-control",
+              readonly: true,
+              id: "color-field"
+          %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :nro_guia_despacho, "Número de Guía de Despacho", class: "form-label" %>
+          <%= f.text_field :nro_guia_despacho, class: "form-control" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :firmeza, class: "form-label" %>
+          <%= f.select :firmeza, Reception::FIRMEZA_OPCIONES, {}, class: "form-select" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :calidad, class: "form-label" %>
+          <%= f.select :calidad, Reception::CALIDAD_OPCIONES, {}, class: "form-select" %>
+        </div>
+      </div>
+
+      <!-- Columna Derecha -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <%= f.label :pallets, class: "form-label" %>
+          <%= f.number_field :pallets, class: "form-control" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :cajas, class: "form-label" %>
+          <%= f.number_field :cajas, class: "form-control" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :kilos_cajas, "Kilos por Caja", class: "form-label" %>
+          <%= f.number_field :kilos_cajas, step: '0.01', class: "form-control" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :user_id, "Evaluador", class: "form-label" %>
+          <%= f.collection_select :user_id, User.all, :id, :nombre_completo, {}, class: "form-select" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :guia_despacho, "Imagen de Guía de Despacho", class: "form-label" %>
+          <%= f.file_field :guia_despacho, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <%= f.submit "Crear Recepción", class: "btn btn-primary" %>
+        <%= link_to 'Volver', receptions_path, class: 'btn btn-secondary ms-2' %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  // Función de inicialización
+  function initVarieties() {
+    console.log("initVarieties llamada");
+    
+    const sectorSelect = document.getElementById('sector-select');
+    const varietySelect = document.getElementById('variety-select');
+    const colorField = document.getElementById('color-field');
+
+    if (!sectorSelect || !varietySelect || !colorField) {
+      console.log("No se han encontrado uno o más elementos requeridos");
+      return;
+    }
+    
+    // Evita agregar listeners repetidos
+    sectorSelect.removeEventListener('change', onSectorChange);
+    varietySelect.removeEventListener('change', onVarietyChange);
+
+    // Listener para cambio de sector
+    sectorSelect.addEventListener('change', onSectorChange);
+
+    // Listener para cambio de variedad
+    varietySelect.addEventListener('change', onVarietyChange);
+  }
+
+  // Función que se ejecuta al cambiar el sector
+  function onSectorChange() {
+    const sectorId = this.value;
+    console.log('Sector seleccionado:', sectorId);
+    
+    if (!sectorId) {
+      clearVarieties();
+      return;
+    }
+    
+    fetch(`${window.location.origin}/sectors/${sectorId}/varieties`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Respuesta del servidor no OK");
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Variedades recibidas:", data);
+        updateVarieties(data);
+      })
+      .catch(error => {
+        console.error("Error al hacer fetch de variedades:", error);
+        clearVarieties();
+      });
+  }
+
+  // Función que se ejecuta al cambiar la variedad
+  function onVarietyChange() {
+    const varietyId = this.value;
+    console.log("Variedad seleccionada:", varietyId);
+    const colorField = document.getElementById('color-field');
+    
+    if (!varietyId) {
+      colorField.value = "";
+      return;
+    }
+    
+    fetch(`${window.location.origin}/varieties/${varietyId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Respuesta del servidor no OK");
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Detalle de la variedad:", data);
+        colorField.value = data.color || "";
+      })
+      .catch(error => {
+        console.error("Error al hacer fetch de la variedad:", error);
+        colorField.value = "";
+      });
+  }
+
+  // Actualiza el select de variedades
+  function updateVarieties(varieties) {
+    const varietySelect = document.getElementById('variety-select');
+    let options = '<option value="">Seleccione una variedad</option>';
+    varieties.forEach(function(variety) {
+      options += `<option value="${variety.id}">${variety.nombre}</option>`;
+    });
+    varietySelect.innerHTML = options;
+    varietySelect.disabled = false;
+  }
+
+  // Limpia el select de variedades
+  function clearVarieties() {
+    const varietySelect = document.getElementById('variety-select');
+    const colorField = document.getElementById('color-field');
+    
+    varietySelect.innerHTML = '<option value="">Primero seleccione un sector</option>';
+    varietySelect.disabled = true;
+    colorField.value = "";
+  }
+
+  // Agrega listeners según el estado de carga de la página
+  function attachListeners() {
+    console.log("attachListeners ejecutado");
+    initVarieties();
+  }
+
+  // Si la página aún está cargando
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", attachListeners);
+  } else {
+    attachListeners();
+  }
+
+  // Para navegaciones con Turbo (Rails 7)
+  document.addEventListener("turbo:load", function() {
+    console.log("turbo:load activado");
+    attachListeners();
+  });
+</script> 

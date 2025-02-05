@@ -1,0 +1,231 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1>Nueva Irrigación</h1>
+        <%= link_to irrigations_path, class: 'btn btn-secondary' do %>
+          <i class="bi bi-arrow-left"></i> Volver
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <%= form_with(model: @irrigation, local: true) do |f| %>
+        <% if @irrigation.errors.any? %>
+          <div class="alert alert-danger">
+            <h4><%= pluralize(@irrigation.errors.count, "error") %> impidieron guardar este registro:</h4>
+            <ul>
+              <% @irrigation.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="row g-3">
+          <!-- Información básica -->
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :fecha, "Fecha", class: "form-label" %>
+              <%= f.date_field :fecha, class: "form-control", readonly: true %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :hora, "Hora", class: "form-label" %>
+              <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :encargado_de_riego_id, "Encargado de Riego", class: "form-label" %>
+              <%= f.collection_select :encargado_de_riego_id, User.all, :id, :nombre_completo, 
+                  { prompt: "Seleccionar encargado" }, { class: "form-select", required: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :sector_id, "Sector", class: "form-label" %>
+              <%= f.collection_select :sector_id, Sector.all, :id, :nombre, 
+                  { prompt: "Seleccionar sector" }, { class: "form-select", required: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :nro_pulsos, "Número de Pulsos", class: "form-label" %>
+              <%= f.number_field :nro_pulsos, class: "form-control", required: true, min: 1 %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :tiempo_pulso, "Tiempo por Pulso (min)", class: "form-label" %>
+              <%= f.number_field :tiempo_pulso, class: "form-control", required: true, step: "0.01", min: 0 %>
+            </div>
+          </div>
+
+          <!-- Riego de entrada -->
+          <h4 class="mt-4">Riego de Entrada</h4>
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :riego_entrada_mm, "MM", class: "form-label" %>
+              <%= f.number_field :riego_entrada_mm, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :riego_entrada_ph, "PH", class: "form-label" %>
+              <%= f.number_field :riego_entrada_ph, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :riego_entrada_ce, "CE", class: "form-label" %>
+              <%= f.number_field :riego_entrada_ce, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :riego_entrada_nitratos, "Nitratos", class: "form-label" %>
+              <%= f.number_field :riego_entrada_nitratos, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :riego_entrada_potasio, "Potasio", class: "form-label" %>
+              <%= f.number_field :riego_entrada_potasio, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <!-- Drenaje de riego -->
+          <h4 class="mt-4">Drenaje de Riego</h4>
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :drenaje_riego_mm, "MM", class: "form-label" %>
+              <%= f.number_field :drenaje_riego_mm, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :drenaje_riego_ph, "PH", class: "form-label" %>
+              <%= f.number_field :drenaje_riego_ph, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :drenaje_riego_ce, "CE", class: "form-label" %>
+              <%= f.number_field :drenaje_riego_ce, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :drenaje_riego_nitratos, "Nitratos", class: "form-label" %>
+              <%= f.number_field :drenaje_riego_nitratos, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group mb-3">
+              <%= f.label :drenaje_riego_potasio, "Potasio", class: "form-label" %>
+              <%= f.number_field :drenaje_riego_potasio, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <!-- Mediciones -->
+          <h4 class="mt-4">Mediciones</h4>
+          <div class="col-md-3">
+            <div class="form-group mb-3">
+              <%= f.label :humedad_inicial, "Humedad Inicial (%)", class: "form-label" %>
+              <%= f.number_field :humedad_inicial, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="form-group mb-3">
+              <%= f.label :ce_inicial, "CE Inicial", class: "form-label" %>
+              <%= f.number_field :ce_inicial, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="form-group mb-3">
+              <%= f.label :humedad_final, "Humedad Final (%)", class: "form-label" %>
+              <%= f.number_field :humedad_final, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="form-group mb-3">
+              <%= f.label :ce_final, "CE Final", class: "form-label" %>
+              <%= f.number_field :ce_final, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <!-- Pulsos con agua -->
+          <h4 class="mt-4">Pulsos con Agua</h4>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :pulsos_agua, "Número de Pulsos", class: "form-label" %>
+              <%= f.number_field :pulsos_agua, class: "form-control", min: 0 %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :tiempo_pulsos_agua, "Tiempo (min)", class: "form-label" %>
+              <%= f.number_field :tiempo_pulsos_agua, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <!-- Mediciones hoja -->
+          <h4 class="mt-4">Mediciones Hoja</h4>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :potasio_hoja, "Potasio", class: "form-label" %>
+              <%= f.number_field :potasio_hoja, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :nitratos_hoja, "Nitratos", class: "form-label" %>
+              <%= f.number_field :nitratos_hoja, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <!-- Otros -->
+          <h4 class="mt-4">Otros Datos</h4>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :porcentaje_drenaje, "Porcentaje Drenaje (%)", class: "form-label" %>
+              <%= f.number_field :porcentaje_drenaje, class: "form-control", step: "0.01" %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <%= f.label :muestras, "Número de Muestras", class: "form-label" %>
+              <%= f.number_field :muestras, class: "form-control", min: 0 %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mt-4">
+          <%= f.submit "Guardar Registro", class: "btn btn-primary" %>
+          <%= link_to "Cancelar", irrigations_path, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div> 

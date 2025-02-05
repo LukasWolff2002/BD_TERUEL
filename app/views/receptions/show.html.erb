@@ -1,0 +1,90 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h2>Recepción #<%= @reception.id %></h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h4>Información General</h4>
+          <table class="table">
+            <tr>
+              <th>Fecha:</th>
+              <td><%= @reception.fecha.strftime("%d/%m/%Y") %></td>
+            </tr>
+            <tr>
+              <th>Hora:</th>
+              <td><%= @reception.hora.strftime("%H:%M") %></td>
+            </tr>
+            <tr>
+              <th>Sector:</th>
+              <td><%= @reception.sector.nombre %></td>
+            </tr>
+            <tr>
+              <th>N° Guía Despacho:</th>
+              <td><%= @reception.nro_guia_despacho %></td>
+            </tr>
+            <tr>
+              <th>Evaluador:</th>
+              <td><%= "#{@reception.user.nombre} #{@reception.user.apellido}" %></td>
+            </tr>
+          </table>
+
+          <h4 class="mt-4">Detalles del Producto</h4>
+          <table class="table">
+            <tr>
+              <th>Firmeza:</th>
+              <td><%= @reception.firmeza %></td>
+            </tr>
+            <tr>
+              <th>Calidad:</th>
+              <td><%= @reception.calidad %></td>
+            </tr>
+            <tr>
+              <th>Color:</th>
+              <td><%= @reception.color %></td>
+            </tr>
+            <tr>
+              <th>Variedad:</th>
+              <td><%= @reception.variety.nombre %></td>
+            </tr>
+          </table>
+
+          <h4 class="mt-4">Cantidades</h4>
+          <table class="table">
+            <tr>
+              <th>Pallets:</th>
+              <td><%= @reception.pallets %></td>
+            </tr>
+            <tr>
+              <th>Cajas:</th>
+              <td><%= @reception.cajas %></td>
+            </tr>
+            <tr>
+              <th>Kilos por Caja:</th>
+              <td><%= number_with_precision(@reception.kilos_cajas, precision: 2) %> kg</td>
+            </tr>
+            <tr>
+              <th>Kilos Totales:</th>
+              <td><%= number_with_precision(@reception.kilos_totales, precision: 2) %> kg</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="col-md-6">
+          <h4>Guía de Despacho</h4>
+          <% if @reception.guia_despacho.attached? %>
+            <div class="text-center">
+              <%= image_tag @reception.guia_despacho, class: "img-fluid border rounded" %>
+            </div>
+          <% else %>
+            <p class="text-muted">No hay imagen de guía de despacho adjunta.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer"> 
+      <%= link_to 'Volver', receptions_path, class: 'btn btn-secondary ms-2' %>
+    </div>
+  </div>
+</div> 

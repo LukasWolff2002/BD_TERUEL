@@ -1,0 +1,26 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="text-center">Iniciar Sesión</h2>
+        </div>
+        <div class="card-body">
+          <%= form_with(scope: :session, 
+                        url: login_path, 
+                        method: :post, 
+                        data: { turbo: false }, 
+                        local: true) do |f| %>
+            <div class="mb-3">
+              <%= f.label :rut, "RUT", class: "form-label" %>
+              <%= f.text_field :rut, class: "form-control", placeholder: "Ej: 12.345.678-9" %>
+            </div>
+            <div class="d-grid gap-2">
+              <%= f.submit "Ingresar", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

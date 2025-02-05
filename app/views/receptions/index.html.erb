@@ -1,0 +1,53 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Recepciones</h1>
+    <%= link_to 'Nueva Recepción', new_reception_path, class: 'btn btn-primary' %>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Sector</th>
+          <th>N° Guía</th>
+          <th>Firmeza</th>
+          <th>Calidad</th>
+          <th>Pallets</th>
+          <th>Cajas</th>
+          <th>Kilos/Caja</th>
+          <th>Kilos Totales</th>
+          <th>Color</th>
+          <th>Variedad</th>
+          <th>Evaluador</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @receptions.each do |reception| %>
+          <tr>
+            <td><%= reception.fecha.strftime("%d/%m/%Y") %></td>
+            <td><%= reception.hora.strftime("%H:%M") %></td>
+            <td><%= reception.sector.nombre %></td>
+            <td><%= reception.nro_guia_despacho %></td>
+            <td><%= reception.firmeza %></td>
+            <td><%= reception.calidad %></td>
+            <td><%= reception.pallets %></td>
+            <td><%= reception.cajas %></td>
+            <td><%= number_with_precision(reception.kilos_cajas, precision: 2) %></td>
+            <td><%= number_with_precision(reception.kilos_totales, precision: 2) %></td>
+            <td><%= reception.color %></td>
+            <td><%= reception.variety.nombre %></td>
+            <td><%= "#{reception.user.nombre} #{reception.user.apellido}" %></td>
+            <td>
+              <%= link_to reception_path(reception), class: "btn btn-sm btn-info me-1" do %>
+                <i class="bi bi-eye"></i> Ver
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

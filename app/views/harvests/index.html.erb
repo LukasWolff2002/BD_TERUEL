@@ -1,0 +1,70 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Registros de Cosecha</h1>
+    <%= link_to new_harvest_path, class: 'btn btn-primary' do %>
+      <i class="bi bi-plus-circle"></i> Nuevo Registro
+    <% end %>
+  </div>
+
+  <% if @harvests.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Sector</th>
+            <th>Variedad</th>
+            <th>Encargado</th>
+            <th>Cosechero</th>
+            <th>Cajas</th>
+            <th>Kilos/Caja</th>
+            <th>Kilos Total</th>
+            <th>Calidad</th>
+            <th>Evaluador</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @harvests.each do |harvest| %>
+            <tr>
+              <td><%= harvest.fecha.strftime("%d/%m/%Y") %></td>
+              <td><%= harvest.hora.strftime("%H:%M") %></td>
+              <td><%= harvest.sector %></td>
+              <td><%= harvest.variedad %></td>
+              <td><%= harvest.encargado_cosecha %></td>
+              <td><%= "#{harvest.cosechero_nombre} (#{harvest.cosechero_rut})" %></td>
+              <td><%= harvest.cajas %></td>
+              <td><%= number_with_precision(harvest.kilos_por_caja, precision: 2) %></td>
+              <td><%= number_with_precision(harvest.kilos_tomates, precision: 2) %></td>
+              <td><%= harvest.calidad %></td>
+              <td><%= harvest.evaluador %></td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <%= link_to harvest_path(harvest), class: "btn btn-info" do %>
+                    <i class="bi bi-eye"></i>
+                  <% end %>
+                  
+                  <%= link_to edit_harvest_path(harvest), class: "btn btn-warning" do %>
+                    <i class="bi bi-pencil"></i>
+                  <% end %>
+                  
+                  <%= button_to harvest_path(harvest), 
+                      method: :delete, 
+                      class: "btn btn-danger",
+                      form: { data: { turbo_confirm: "¿Estás seguro?" } } do %>
+                    <i class="bi bi-trash"></i>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle"></i> No hay registros de cosecha.
+    </div>
+  <% end %>
+</div> 

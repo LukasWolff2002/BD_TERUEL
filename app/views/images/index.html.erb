@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h1>Galería de Imágenes</h1>
+
+  <div class="row">
+    <% @images.each do |image| %>
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <% if image.image.attached? %>
+            <%= image_tag image.image, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
+          <% end %>
+          <div class="card-body">
+            <p class="card-text">
+              <small class="text-muted">
+                Recepción #<%= image.reception.id %><br>
+                Guía: <%= image.reception.nro_guia_despacho %><br>
+                Fecha: <%= image.reception.fecha.strftime('%d/%m/%Y') %>
+              </small>
+            </p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>

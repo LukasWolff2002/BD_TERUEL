@@ -1,0 +1,49 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Registros de Riego</h1>
+    <%= link_to new_irrigation_path, class: 'btn btn-primary' do %>
+      <i class="bi bi-plus-circle"></i> Nuevo Registro
+    <% end %>
+  </div>
+
+  <% if @irrigations.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Fecha</th>
+            <th>Encargado</th>
+            <th>Sector</th>
+            <th>Pulsos</th>
+            <th>Tiempo/Pulso</th>
+            <th>% Drenaje</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @irrigations.each do |irrigation| %>
+            <tr>
+              <td><%= irrigation.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+              <td><%= irrigation.encargado_de_riego.nombre_completo %></td>
+              <td><%= irrigation.sector %></td>
+              <td><%= irrigation.nro_pulsos %></td>
+              <td><%= number_with_precision(irrigation.tiempo_pulso, precision: 2) %> min</td>
+              <td><%= number_with_precision(irrigation.porcentaje_drenaje, precision: 2) %>%</td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <%= link_to irrigation_path(irrigation), class: "btn btn-info" do %>
+                    <i class="bi bi-eye"></i>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle"></i> No hay registros de riego.
+    </div>
+  <% end %>
+</div> 
