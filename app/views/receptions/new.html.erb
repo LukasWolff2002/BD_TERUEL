@@ -146,30 +146,36 @@
 
   // Función que se ejecuta al cambiar el sector
   function onSectorChange() {
-    const sectorId = this.value;
-    console.log('Sector seleccionado:', sectorId);
-    
-    if (!sectorId) {
-      clearVarieties();
-      return;
-    }
-    
-    fetch(`${window.location.origin}/sectors/${sectorId}/varieties`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Respuesta del servidor no OK");
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Variedades recibidas:", data);
-        updateVarieties(data);
-      })
-      .catch(error => {
-        console.error("Error al hacer fetch de variedades:", error);
-        clearVarieties();
-      });
+  const sectorId = this.value;
+  console.log('Sector seleccionado:', sectorId);
+  
+  if (!sectorId) {
+    clearVarieties();
+    return;
   }
+
+  fetch(`${window.location.origin}/sectors/${sectorId}/varieties`)
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error("Respuesta del servidor no OK: " + text);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Variedades recibidas:", data);
+      if (!Array.isArray(data)) {
+        throw new Error("El servidor no devolvió un array de variedades");
+      }
+      updateVarieties(data);
+    })
+    .catch(error => {
+      console.error("Error al hacer fetch de variedades:", error);
+      clearVarieties();
+    });
+}
+
 
   // Función que se ejecuta al cambiar la variedad
   function onVarietyChange() {
