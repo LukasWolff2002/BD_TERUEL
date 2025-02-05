@@ -120,35 +120,33 @@
 </div>
 
 <script>
-  // Función de inicialización
-  function initVarieties() {
-    console.log("initVarieties llamada");
-    
-    const sectorSelect = document.getElementById('sector-select');
-    const varietySelect = document.getElementById('variety-select');
-    const colorField = document.getElementById('color-field');
+ // Función de inicialización
+function initVarieties() {
+  console.log("initVarieties llamada");
 
-    if (!sectorSelect || !varietySelect || !colorField) {
-      console.log("No se han encontrado uno o más elementos requeridos");
-      return;
-    }
-    
-    // Evita agregar listeners repetidos
-    sectorSelect.removeEventListener('change', onSectorChange);
-    varietySelect.removeEventListener('change', onVarietyChange);
+  const sectorSelect = document.getElementById("sector-select");
+  const varietySelect = document.getElementById("variety-select");
+  const colorField = document.getElementById("color-field");
 
-    // Listener para cambio de sector
-    sectorSelect.addEventListener('change', onSectorChange);
-
-    // Listener para cambio de variedad
-    varietySelect.addEventListener('change', onVarietyChange);
+  if (!sectorSelect || !varietySelect || !colorField) {
+    console.log("No se han encontrado uno o más elementos requeridos");
+    return;
   }
 
-  // Función que se ejecuta al cambiar el sector
-  function onSectorChange() {
+  // Evita duplicados en los listeners
+  sectorSelect.removeEventListener("change", onSectorChange);
+  varietySelect.removeEventListener("change", onVarietyChange);
+
+  // Asigna eventos
+  sectorSelect.addEventListener("change", onSectorChange, { once: true });
+  varietySelect.addEventListener("change", onVarietyChange, { once: true });
+}
+
+// Función que se ejecuta al cambiar el sector
+function onSectorChange() {
   const sectorId = this.value;
-  console.log('Sector seleccionado:', sectorId);
-  
+  console.log("Sector seleccionado:", sectorId);
+
   if (!sectorId) {
     clearVarieties();
     return;
@@ -164,10 +162,22 @@
       return response.json();
     })
     .then(data => {
-      console.log("Variedades recibidas:", data);
-      if (!Array.isArray(data)) {
-        throw new Error("El servidor no devolvió un array de variedades");
+      console.log("Variedades recibidas (crudo):", data);
+
+      // Si data es un string en vez de un array, convertirlo manualmente
+      if (typeof data === "string") {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          console.error("Error al parsear JSON:", e);
+          throw new Error("El servidor devolvió un string en lugar de un array.");
+        }
       }
+
+      if (!Array.isArray(data)) {
+        throw new Error("El servidor no devolvió un array de variedades.");
+      }
+
       updateVarieties(data);
     })
     .catch(error => {
@@ -176,72 +186,76 @@
     });
 }
 
+// Función que se ejecuta al cambiar la variedad
+function onVarietyChange() {
+  const varietyId = this.value;
+  console.log("Variedad seleccionada:", varietyId);
+  const colorField = document.getElementById("color-field");
 
-  // Función que se ejecuta al cambiar la variedad
-  function onVarietyChange() {
-    const varietyId = this.value;
-    console.log("Variedad seleccionada:", varietyId);
-    const colorField = document.getElementById('color-field');
-    
-    if (!varietyId) {
-      colorField.value = "";
-      return;
-    }
-    
-    fetch(`${window.location.origin}/varieties/${varietyId}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Respuesta del servidor no OK");
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Detalle de la variedad:", data);
-        colorField.value = data.color || "";
-      })
-      .catch(error => {
-        console.error("Error al hacer fetch de la variedad:", error);
-        colorField.value = "";
-      });
-  }
-
-  // Actualiza el select de variedades
-  function updateVarieties(varieties) {
-    const varietySelect = document.getElementById('variety-select');
-    let options = '<option value="">Seleccione una variedad</option>';
-    varieties.forEach(function(variety) {
-      options += `<option value="${variety.id}">${variety.nombre}</option>`;
-    });
-    varietySelect.innerHTML = options;
-    varietySelect.disabled = false;
-  }
-
-  // Limpia el select de variedades
-  function clearVarieties() {
-    const varietySelect = document.getElementById('variety-select');
-    const colorField = document.getElementById('color-field');
-    
-    varietySelect.innerHTML = '<option value="">Primero seleccione un sector</option>';
-    varietySelect.disabled = true;
+  if (!varietyId) {
     colorField.value = "";
+    return;
   }
 
-  // Agrega listeners según el estado de carga de la página
-  function attachListeners() {
-    console.log("attachListeners ejecutado");
-    initVarieties();
-  }
+  fetch(`${window.location.origin}/varieties/${varietyId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Respuesta del servidor no OK");
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Detalle de la variedad:", data);
+      colorField.value = data.color || "";
+    })
+    .catch(error => {
+      console.error("Error al hacer fetch de la variedad:", error);
+      colorField.value = "";
+    });
+}
 
-  // Si la página aún está cargando
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", attachListeners);
-  } else {
-    attachListeners();
-  }
+// Actualiza el select de variedades
+function updateVarieties(varieties) {
+  const varietySelect = document.getElementById("variety-select");
+  varietySelect.innerHTML = '<option value="">Seleccione una variedad</option>';
 
-  // Para navegaciones con Turbo (Rails 7)
-  document.addEventListener("turbo:load", function() {
-    console.log("turbo:load activado");
-    attachListeners();
+  varieties.forEach(variety => {
+    const option = document.createElement("option");
+    option.value = variety.id;
+    option.textContent = variety.nombre;
+    varietySelect.appendChild(option);
   });
+
+  varietySelect.disabled = false;
+}
+
+// Limpia el select de variedades
+function clearVarieties() {
+  const varietySelect = document.getElementById("variety-select");
+  const colorField = document.getElementById("color-field");
+
+  varietySelect.innerHTML = '<option value="">Primero seleccione un sector</option>';
+  varietySelect.disabled = true;
+  colorField.value = "";
+}
+
+// Agrega listeners según el estado de carga de la página
+function attachListeners() {
+  console.log("attachListeners ejecutado");
+  initVarieties();
+}
+
+// Si la página aún está cargando
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", attachListeners);
+} else {
+  attachListeners();
+}
+
+// Para navegaciones con Turbo (Rails 7)
+document.addEventListener("turbo:load", function () {
+  console.log("turbo:load activado");
+  attachListeners();
+});
+
 </script> 
