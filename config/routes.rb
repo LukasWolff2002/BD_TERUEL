@@ -24,8 +24,12 @@ Rails.application.routes.draw do
   resources :inventorie_histories
   resources :sectors do
     get 'varieties', on: :member
+    member do
+      get :edit_varieties
+      patch :update_varieties
+    end
   end
-  resources :varieties, only: [:show]
+  resources :varieties, only: [:index, :new, :create, :edit, :update, :destroy]
   resources :irrigations
   resources :harvests
 end

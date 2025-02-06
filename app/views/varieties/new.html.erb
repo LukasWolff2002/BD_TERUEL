@@ -1,0 +1,24 @@
+<div class="container mt-4">
+  <h1>Nueva Variedad</h1>
+  
+  <%= form_with(model: @variety, local: true) do |f| %>
+    <div class="mb-3">
+      <%= f.label :nombre, "Nombre", class: "form-label" %>
+      <%= f.text_field :nombre, class: "form-control", placeholder: "Nombre de la variedad" %>
+    </div>
+    
+    <div class="mb-3">
+      <%= f.label :color, "Color", class: "form-label" %>
+      <%= f.text_field :color, class: "form-control", placeholder: "Ej: Rojo, Verde, Azul..." %>
+    </div>
+    
+    <div class="mb-3">
+      <%= f.label :descripcion, "Descripción", class: "form-label" %>
+      <%= f.text_area :descripcion, class: "form-control", rows: 3, placeholder: "Descripción de la variedad" %>
+    </div>
+    
+    <%= f.submit "Crear Variedad", class: "btn btn-primary" %>
+  <% end %>
+  
+  <%= link_to "Volver a Variedades", varieties_path, class: "btn btn-secondary mt-2" %>
+</div> 

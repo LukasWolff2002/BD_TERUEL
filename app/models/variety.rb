@@ -1,6 +1,5 @@
 class Variety < ApplicationRecord
-  has_many :sector_varieties
-  has_many :sectors, through: :sector_varieties
+  has_and_belongs_to_many :sectors, join_table: 'SectorsVarieties'
   has_many :receptions
 
   validates :nombre, presence: true

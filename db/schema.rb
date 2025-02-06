@@ -14,6 +14,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "SectorsVarieties", id: false, force: :cascade do |t|
+    t.bigint "sector_id", null: false
+    t.bigint "variety_id", null: false
+    t.index ["sector_id", "variety_id"], name: "index_SectorsVarieties_on_sector_id_and_variety_id", unique: true
+    t.index ["sector_id"], name: "index_SectorsVarieties_on_sector_id"
+    t.index ["variety_id"], name: "index_SectorsVarieties_on_variety_id"
+  end
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -187,6 +195,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.index ["nombre"], name: "index_varieties_on_nombre", unique: true
   end
 
+  add_foreign_key "SectorsVarieties", "sectors"
+  add_foreign_key "SectorsVarieties", "varieties"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "harvests", "sectors"

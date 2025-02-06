@@ -119,35 +119,40 @@ varieties = Variety.create!([
 ])
 
 # Crear relaciones entre sectores y variedades
+# Usamos la asociación HABTM definida en Sector (y automáticamente se insertará en la tabla SectorsVarieties)
 sectors.each do |sector|
   # Asignar 2-3 variedades aleatorias a cada sector
   varieties.sample(rand(2..3)).each do |variety|
-    SectorVariety.create!(sector: sector, variety: variety)
+    sector.varieties << variety unless sector.varieties.include?(variety)
   end
 end
 
+# Crear inventarios
 Inventorie.create!([
-    {
-      nombre: "Producto A",
-      descripcion: "Inventario base para Producto A",
-      cantidad: 100
-    },
-    {
-      nombre: "Producto B",
-      descripcion: "Inventario base para Producto B",
-      cantidad: 50
-    },
-    {
-      nombre: "Producto C",
-      descripcion: "Inventario base para Producto C",
-      cantidad: 25
-    }
-  ])
-  puts "Inventarios iniciales cargados exitosamente."
+  {
+    nombre: "Producto A",
+    descripcion: "Inventario base para Producto A",
+    cantidad: 100
+  },
+  {
+    nombre: "Producto B",
+    descripcion: "Inventario base para Producto B",
+    cantidad: 50
+  },
+  {
+    nombre: "Producto C",
+    descripcion: "Inventario base para Producto C",
+    cantidad: 25
+  }
+])
+puts "Inventarios iniciales cargados exitosamente."
 
 puts "Seeds creados exitosamente!"
 puts "Se crearon:"
 puts "- #{User.count} usuarios"
 puts "- #{Sector.count} sectores"
 puts "- #{Variety.count} variedades"
-puts "- #{SectorVariety.count} relaciones sector-variedad"
+
+# Para mostrar la cantidad de relaciones añadidas, sumamos las asociaciones de cada sector
+total_relations = sectors.map { |sector| sector.varieties.count }.sum
+puts "- #{total_relations} relaciones sector-variedad"

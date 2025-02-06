@@ -1,0 +1,76 @@
+<div class="container mt-4">
+  <h1>Administrar Variedades de: <%= @sector.nombre %></h1>
+  <p class="text-muted">Solo puedes agregar nuevas variedades o eliminar las existentes; no se permite modificarlas.</p>
+  
+  <%= form_with(model: @sector, url: update_varieties_sector_path(@sector), method: :patch, local: true) do |f| %>
+    <div id="varieties-container">
+      <!-- Listado de variedades ya asociadas (solo lectura con opción a eliminar) -->
+      <% if @sector.varieties.any? %>
+        <%= f.fields_for :varieties do |vf| %>
+          <% if vf.object.present? && vf.object.persisted? %>
+            <div class="card mb-3 variety-field">
+              <div class="card-body">
+                <div class="mb-3">
+                  <label>Nombre de la Variedad:</label>
+                  <span><%= vf.object.nombre %></span>
+                  <%= vf.hidden_field :id %>
+                </div>
+                <div class="mb-3">
+                  <label>Color:</label>
+                  <span><%= vf.object.color %></span>
+                  <%= vf.hidden_field :color %>
+                </div>
+                <div class="mb-3">
+                  <label>Descripción:</label>
+                  <span><%= vf.object.descripcion %></span>
+                  <%= vf.hidden_field :descripcion %>
+                </div>
+                <div class="form-check">
+                  <%= vf.check_box :_destroy, class: "form-check-input" %>
+                  <%= vf.label :_destroy, "Eliminar", class: "form-check-label" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Botón para agregar nuevas variedades -->
+    <%= link_to "Agregar Variedad", "#", id: "add_variety", class: "btn btn-secondary mt-2" %>
+    <%= f.submit "Actualizar Variedades", class: "btn btn-primary mt-2" %>
+  <% end %>
+</div>
+
+<!-- Template oculto para agregar nuevas variedades mediante selección -->
+<div id="variety_template" style="display: none;">
+  <div class="card mb-3 variety-field">
+    <div class="card-body">
+      <div class="mb-3">
+        <label>Selecciona Variedad</label>
+        <select name="sector[varieties_attributes][new_varieties][id]" class="form-control">
+          <option value="">Selecciona una variedad</option>
+          <%# Se listan solo las variedades que NO están asociadas al sector actualmente %>
+          <% available_varieties = Variety.where.not(id: @sector.varieties.pluck(:id)).order(:nombre) %>
+          <% available_varieties.each do |variety| %>
+            <option value="<%= variety.id %>"><%= variety.nombre %></option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const addButton = document.getElementById("add_variety");
+    addButton.addEventListener("click", function(e) {
+      e.preventDefault();
+      const container = document.getElementById("varieties-container");
+      const time = new Date().getTime(); // Genera un identificador único
+      let template = document.getElementById("variety_template").innerHTML;
+      template = template.replace(/new_varieties/g, time);
+      container.insertAdjacentHTML('beforeend', template);
+    });
+  });
+</script> 

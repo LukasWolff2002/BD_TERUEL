@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <h1>Variedades de Tomates</h1>
+  
+  <% if @varieties.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th>
+            <th>Color</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @varieties.each do |variety| %>
+            <tr>
+              <td><%= variety.nombre %></td>
+              <td>
+                <span class="badge text-black" style="background-color: <%= variety.color %>;">
+                  <%= variety.color %>
+                </span>
+              </td>
+              <td><%= variety.descripcion %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      No hay variedades registradas.
+    </div>
+  <% end %>
+  
+  <%= link_to "Nueva Variedad", new_variety_path, class: "btn btn-primary mt-2" %>
+</div> 

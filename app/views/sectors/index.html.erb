@@ -1,0 +1,49 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Sectores</h1>
+    <%= link_to "Nuevo Sector", new_sector_path, class: "btn btn-primary" %>
+  </div>
+
+  <% if @sectors.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th>
+            <th>Variedades de Tomate</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @sectors.each do |sector| %>
+            <tr>
+              <td><%= sector.nombre %></td>
+              <td>
+                <% if sector.varieties.any? %>
+                  <ul class="list-unstyled mb-0">
+                    <% sector.varieties.each do |variety| %>
+                      <li>
+                        <span class="badge text-black" style="background-color: <%= variety.color %>;">
+                          <%= variety.nombre %>
+                        </span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <em>Sin variedades</em>
+                <% end %>
+              </td>
+              <td>
+                <%= link_to "Editar variedades", edit_varieties_sector_path(sector), class: "btn btn-sm btn-info" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle"></i> No hay sectores registrados.
+    </div>
+  <% end %>
+</div> 
