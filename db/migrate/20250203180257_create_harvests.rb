@@ -3,15 +3,15 @@ class CreateHarvests < ActiveRecord::Migration[7.1]
     create_table :harvests do |t|
       t.date :fecha
       t.time :hora
-      t.references :user, null: false, foreign_key: true
+      t.references :user, null: false, foreign_key: true #El usuario es el volante, que es el que registra la cosecha, o tambien jefe de volante
       t.references :sector, null: false, foreign_key: true
       t.references :variety, null: false, foreign_key: true
       
       # Información del cargo
-      t.string :volante_rut
+      t.string :volante_rut #Eliminar esto
       t.string :volante_nombre
       
-      t.string :encargado_cosecha
+      t.string :encargado_cosecha #Eliminar ya que es el usuario
       
       # Información del cosechero
       t.string :cosechero_rut
@@ -19,7 +19,7 @@ class CreateHarvests < ActiveRecord::Migration[7.1]
       
       t.integer :cajas
       t.decimal :kilos_por_caja, precision: 5, scale: 2
-      t.string :calidad
+      t.string :calidad #Usar la misma calidad que en recepciones
       t.decimal :kilos_tomates, precision: 8, scale: 2  # Campo calculado
 
       t.timestamps

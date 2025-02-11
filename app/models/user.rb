@@ -10,7 +10,7 @@ class User < ApplicationRecord
 
     # Validación de cargo como string
     validates :cargo, inclusion: { 
-        in: ['Administrativo', 'Jefe de Campo', 'Jefe Tecnico', 'Jefe Packing', 'Riego', 'Cosechador', 'Volante'],
+        in: ['Administrativo', 'Jefe de Campo', 'Jefe Tecnico', 'Jefe Packing', 'Jefe Volante', 'Riego', 'Cosechador', 'Volante'],
         message: "debe ser uno de: Administrativo, Jefe de Campo, Jefe Tecnico, Jefe Packing, Riego, Cosechador o Volante" 
     }
 
