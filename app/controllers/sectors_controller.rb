@@ -12,8 +12,37 @@ class SectorsController < ApplicationController
   def create
     @sector = Sector.new(sector_params)
     if @sector.save
+      Rails.logger.info "Sector creado: #{@sector.inspect}"
+      # Procesamos las asociaciones de variedades y colores
+      if params[:sector][:sector_variety_color_assignments].present?
+        params[:sector][:sector_variety_color_assignments].each do |variety_id, color_ids|
+          # Convertimos los IDs a enteros y eliminamos valores en blanco
+          color_ids = color_ids.reject(&:blank?).map(&:to_i)
+          Rails.logger.info "Variety ID #{variety_id}: Color IDs recibidos: #{color_ids.inspect}"
+          next if color_ids.empty?
+
+          variety = Variety.find_by(id: variety_id.to_i)
+          unless variety
+            Rails.logger.warn "Variety id #{variety_id} no encontrada"
+            next
+          end
+
+          color_ids.each do |color_id|
+            color = Color.find_by(id: color_id)
+            if color && variety.colors.exists?(id: color.id)
+              SectorVarietyColor.create!(sector: @sector, variety: variety, color: color)
+              Rails.logger.info "Creada asociación: Sector #{@sector.id} - Variedad #{variety.id} - Color #{color.id}"
+            else
+              Rails.logger.warn "El color #{color_id} no pertenece a la variedad #{variety.nombre}"
+            end
+          end
+        end
+      else
+        Rails.logger.info "No se enviaron asociaciones de variedades y colores."
+      end
       redirect_to sectors_path, notice: "Sector creado exitosamente."
     else
+      Rails.logger.error "Error al crear sector: #{@sector.errors.full_messages.join(', ')}"
       render :new, status: :unprocessable_entity
     end
   end
