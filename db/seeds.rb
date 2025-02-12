@@ -54,29 +54,6 @@ User.create!([
   }
 ])
 
-# Crear sectores
-sectors = Sector.create!([
-  {
-    nombre: "Invernadero 1",
-    hectareas: 15
-  },
-  {
-    nombre: "Invernadero 2",
-    hectareas: 25
-  },
-  {
-    nombre: "Invernadero 3",
-    hectareas: 10
-  },
-  {
-    nombre: "Invernadero 4",
-    hectareas: 12
-  },
-  {
-    nombre: "Invernadero 5",
-    hectareas: 10
-  }
-])
 
 # Crear colores disponibles
 colors = Color.create!([
@@ -123,27 +100,6 @@ varieties.each do |variety|
   variety.colors = assigned_colors
 end
 
-# Crear relaciones entre sectores y variedades (relación sector_varieties)
-sectors.each do |sector|
-  # Asignar 2 a 3 variedades aleatorias a cada sector
-  selected_varieties = varieties.sample(rand(2..3))
-  selected_varieties.each do |variety|
-    unless sector.varieties.include?(variety)
-      sector.varieties << variety
-    end
-
-    # Para cada combinación sector-variedad, seleccionar aleatoriamente algunos de los colores de la variedad
-    available_colors = variety.colors
-    selected_colors = available_colors.sample(rand(1..available_colors.size))
-    selected_colors.each do |color|
-      SectorVarietyColor.find_or_create_by!(
-        sector: sector,
-        variety: variety,
-        color: color
-      )
-    end
-  end
-end
 
 # Crear inventarios
 Inventorie.create!([
