@@ -4,7 +4,7 @@ class CreateUsers < ActiveRecord::Migration[7.1]
       t.string :nombre
       t.string :apellido
       t.string :rut
-      t.string :email #Agregar mail
+      t.string :email
       t.string :cargo
       t.string :contrato #interno o externo
       t.timestamps

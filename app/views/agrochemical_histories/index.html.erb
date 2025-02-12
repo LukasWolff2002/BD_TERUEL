@@ -1,0 +1,32 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Historial de Modificaciones de Agroquímicos</h1>
+
+  <% if @agrochemical_histories.any? %>
+    <table class="table table-bordered table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>Agroquímico</th>
+          <th>Usuario</th>
+          <th>Cantidad Cambiada</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @agrochemical_histories.each do |history| %>
+          <tr>
+            <td><%= history.agrochemical.nombre %></td>
+            <td><%= history.usuario %></td>
+            <td><%= history.cantidad_cambiada %></td>
+            <td><%= l(history.created_at, format: :short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>No se han registrado modificaciones en el inventario de agroquímicos.</p>
+  <% end %>
+
+  <div class="mt-3">
+    <%= link_to 'Volver a Agroquímicos', agrochemicals_path, class: "btn btn-secondary ml-2" %>
+  </div>
+</div> 

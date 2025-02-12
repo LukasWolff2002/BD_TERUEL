@@ -5,11 +5,15 @@ puts "Reiniciando la base de datos..."
 
 # Eliminamos registros sin disparar callbacks para evitar problemas con asociaciones incorrectas.
 SectorVarietyColor.delete_all
+VarietyColor.delete_all
 Sector.delete_all
-Variety.delete_all
+
 Color.delete_all
+Variety.delete_all
 User.delete_all
 Supplier.delete_all
+Agrochemical.delete_all
+AgrochemicalDivision.delete_all
 
 puts "Creando usuarios..."
 User.create!([
@@ -17,6 +21,7 @@ User.create!([
     nombre: "Juan",
     apellido: "Pérez",
     rut: "12.345.678-9",
+    email: "juan.perez@example.com",
     cargo: "Administrativo",
     contrato: "interno"
   },
@@ -24,14 +29,163 @@ User.create!([
     nombre: "María",
     apellido: "González",
     rut: "87.654.321-0",
-    cargo: "Administrativo",
+    email: "maria.gonzalez@example.com",
+    cargo: "Jefe de Campo",
     contrato: "externo"
+  },
+  {
+    nombre: "Carlos",
+    apellido: "Sánchez",
+    rut: "11.111.111-1",
+    email: "carlos.sanchez@example.com",
+    cargo: "Jefe Tecnico",
+    contrato: "interno"
+  },
+  {
+    nombre: "Ana",
+    apellido: "Martinez",
+    rut: "22.222.222-2",
+    email: "ana.martinez@example.com",
+    cargo: "Jefe Packing",
+    contrato: "externo"
+  },
+  {
+    nombre: "Luis",
+    apellido: "Hernandez",
+    rut: "33.333.333-3",
+    email: "luis.hernandez@example.com",
+    cargo: "Jefe Volante",
+    contrato: "interno"
+  },
+  {
+    nombre: "Sofía",
+    apellido: "Ramirez",
+    rut: "44.444.444-4",
+    email: "sofia.ramirez@example.com",
+    cargo: "Riego",
+    contrato: "externo"
+  },
+  {
+    nombre: "Diego",
+    apellido: "Lopez",
+    rut: "55.555.555-5",
+    email: "diego.lopez@example.com",
+    cargo: "Cosechador",
+    contrato: "interno"
+  },
+  {
+    nombre: "Camila",
+    apellido: "Flores",
+    rut: "66.666.666-6",
+    email: "camila.flores@example.com",
+    cargo: "Volante",
+    contrato: "externo"
+  },
+  {
+    nombre: "Andrés",
+    apellido: "Gutierrez",
+    rut: "77.777.777-7",
+    email: "andres.gutierrez@example.com",
+    cargo: "Administrativo",
+    contrato: "interno"
+  },
+  {
+    nombre: "Valentina",
+    apellido: "Morales",
+    rut: "88.888.888-8",
+    email: "valentina.morales@example.com",
+    cargo: "Jefe de Campo",
+    contrato: "externo"
+  }
+])
+
+# Creamos las divisiones de agroquímicos
+divisions = AgrochemicalDivision.create!([
+  { division: "Fungicidas" },
+  { division: "Herbicidas" },
+  { division: "Insecticidas" },
+  { division: "Reguladores de Crecimiento" }
+])
+
+# Creamos los agroquímicos con todos los atributos requeridos
+Agrochemical.create!([
+  {
+    nombre: "Fungicida Alpha",
+    cantidad: 100,
+    ingrediente_activo: "Clorotalonil",
+    objetivo: "Control de hongos en frutas y vegetales",
+    agrochemical_division: divisions.find { |d| d.division == "Fungicidas" },
+    ph: 5,
+    incomatibilidad: "Incompatible con productos a base de cobre",
+    carencias: "Ninguna",
+    reingreso: 7,
+    daño_a_abejorros: "Bajo impacto"
+  },
+  {
+    nombre: "Herbicida Bravo",
+    cantidad: 200,
+    ingrediente_activo: "Glifosato",
+    objetivo: "Eliminación de malezas de hoja ancha",
+    agrochemical_division: divisions.find { |d| d.division == "Herbicidas" },
+    ph: 6,
+    incomatibilidad: "No mezclar con fertilizantes nitrogenados",
+    carencias: "Ninguna",
+    reingreso: 10,
+    daño_a_abejorros: "Alto impacto"
+  },
+  {
+    nombre: "Insecticida Charlie",
+    cantidad: 150,
+    ingrediente_activo: "Imidacloprid",
+    objetivo: "Control de insectos chupadores",
+    agrochemical_division: divisions.find { |d| d.division == "Insecticidas" },
+    ph: 7,
+    incomatibilidad: "Incompatible con aceites hortícolas",
+    carencias: "Ninguna",
+    reingreso: 5,
+    daño_a_abejorros: "Muy alto"
+  },
+  {
+    nombre: "Regulador Delta",
+    cantidad: 80,
+    ingrediente_activo: "Etephon",
+    objetivo: "Regulación del crecimiento y maduración",
+    agrochemical_division: divisions.find { |d| d.division == "Reguladores de Crecimiento" },
+    ph: 5,
+    incomatibilidad: "No combinar con algunos fungicidas",
+    carencias: "Suplementar calcio",
+    reingreso: 12,
+    daño_a_abejorros: "Medio"
+  },
+  {
+    nombre: "Fungicida Echo",
+    cantidad: 120,
+    ingrediente_activo: "Mancozeb",
+    objetivo: "Prevención de enfermedades fúngicas en granos",
+    agrochemical_division: divisions.find { |d| d.division == "Fungicidas" },
+    ph: 4,
+    incomatibilidad: "No combinar con insecticidas piretroides",
+    carencias: "Ninguna",
+    reingreso: 8,
+    daño_a_abejorros: "Bajo impacto"
+  },
+  {
+    nombre: "Herbicida Foxtrot",
+    cantidad: 250,
+    ingrediente_activo: "2,4-D",
+    objetivo: "Control rápido de malezas de crecimiento acelerado",
+    agrochemical_division: divisions.find { |d| d.division == "Herbicidas" },
+    ph: 6,
+    incomatibilidad: "Incompatible con reguladores de crecimiento",
+    carencias: "Ninguna",
+    reingreso: 9,
+    daño_a_abejorros: "Impacto medio"
   }
 ])
 
 Supplier.create!([
   {
-    nombre: "Supplier 1",
+    nombre: "Agricola Teruel",
     rut: "12.345.678-9"
   },
   {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -48,6 +48,63 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "agrochemical_divisions", force: :cascade do |t|
+    t.string "division", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "agrochemical_histories", force: :cascade do |t|
+    t.string "usuario", null: false, comment: "Nombre o identificador del usuario que realizó el cambio"
+    t.bigint "agrochemical_id", null: false
+    t.integer "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agrochemical_id"], name: "index_agrochemical_histories_on_agrochemical_id"
+  end
+
+  create_table "agrochemicals", force: :cascade do |t|
+    t.string "nombre", null: false
+    t.integer "cantidad", null: false
+    t.text "ingrediente_activo", null: false
+    t.text "objetivo", null: false
+    t.bigint "agrochemical_division_id", null: false
+    t.integer "ph", null: false
+    t.text "incomatibilidad", null: false
+    t.text "carencias", null: false
+    t.integer "reingreso", null: false
+    t.text "daño_a_abejorros", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agrochemical_division_id"], name: "index_agrochemicals_on_agrochemical_division_id"
+  end
+
+  create_table "applications", force: :cascade do |t|
+    t.integer "temperature"
+    t.integer "humidity"
+    t.integer "nubosidad", comment: "Nivel de nubosidad"
+    t.integer "viento"
+    t.time "hora_inicio"
+    t.time "hora_fin"
+    t.date "fecha_aplicacion"
+    t.string "operador_tractor", comment: "Nombre del operador de tractor (no FK)"
+    t.string "aplicadores", comment: "Lista de aplicadores (mínimo 4, separados por comas), sin FK"
+    t.string "sector"
+    t.string "motivo"
+    t.boolean "uso_de_proteccion"
+    t.string "observaciones", comment: "Lista de usuarios que realizaron observaciones, sin FK"
+    t.string "agroquimicos", comment: "Lista de agroquímicos usados, sin FK"
+    t.float "dosificacion"
+    t.string "maquinaria"
+    t.date "fecha_de_liberacion"
+    t.float "mojamiento_relativo"
+    t.float "mojamiento_real"
+    t.string "encargado_aplicacion", comment: "Encargado de la aplicación (no FK)"
+    t.boolean "lavado_de_equipo"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "colors", force: :cascade do |t|
@@ -222,6 +279,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   add_foreign_key "SectorsVarieties", "varieties"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "agrochemical_histories", "agrochemicals"
+  add_foreign_key "agrochemicals", "agrochemical_divisions"
   add_foreign_key "harvests", "sectors"
   add_foreign_key "harvests", "users"
   add_foreign_key "harvests", "varieties"

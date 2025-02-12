@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Listado de Agroquímicos</h1>
+  
+  <div class="mb-3">
+    <%= link_to "Nuevo Agroquímico", new_agrochemical_path, class: "btn btn-primary" %>
+    <%= link_to "Historial de Agroquímicos", agrochemical_histories_path, class: "btn btn-primary" %>
+  </div>
+  
+  <% if @agrochemicals.empty? %>
+    <p>No hay agroquímicos registrados.</p>
+  <% else %>
+    <table class="table table-bordered table-hover">
+      <thead class="thead-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Cantidad</th>
+          <th>División</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @agrochemicals.each do |agro| %>
+          <tr>
+            <td><%= agro.nombre %></td>
+            <td><%= agro.cantidad %></td>
+            <td><%= agro.agrochemical_division.division if agro.agrochemical_division %></td>
+            <td>
+              <%= link_to "Modificar Cantidad", new_agrochemical_history_path(agrochemical_id: agro.id), class: "btn btn-sm btn-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div> 

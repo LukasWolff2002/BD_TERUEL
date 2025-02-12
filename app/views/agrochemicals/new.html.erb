@@ -1,0 +1,70 @@
+<h1>Nuevo Agroquímico</h1>
+
+<%= form_with(model: @agrochemical, local: true) do |form| %>
+  <% if @agrochemical.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@agrochemical.errors.count, "error") %> impiden que se guarde el agroquímico:</h2>
+      <ul>
+        <% @agrochemical.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :nombre %>
+    <%= form.text_field :nombre %>
+  </div>
+
+  <div class="field">
+    <%= form.label :cantidad %>
+    <%= form.number_field :cantidad %>
+  </div>
+
+  <div class="field">
+    <%= form.label :ingrediente_activo %>
+    <%= form.text_area :ingrediente_activo %>
+  </div>
+
+  <div class="field">
+    <%= form.label :objetivo %>
+    <%= form.text_area :objetivo %>
+  </div>
+
+  <div class="field">
+    <%= form.label :agrochemical_division_id, "División" %>
+    <%= form.collection_select :agrochemical_division_id, AgrochemicalDivision.all, :id, :division, prompt: "Selecciona una división" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :ph %>
+    <%= form.number_field :ph %>
+  </div>
+
+  <div class="field">
+    <%= form.label :incomatibilidad %>
+    <%= form.text_area :incomatibilidad %>
+  </div>
+
+  <div class="field">
+    <%= form.label :carencias %>
+    <%= form.text_area :carencias %>
+  </div>
+
+  <div class="field">
+    <%= form.label :reingreso %>
+    <%= form.number_field :reingreso %>
+  </div>
+
+  <div class="field">
+    <%= form.label :daño_a_abejorros, "Daño a Abejorros" %>
+    <%= form.text_area :daño_a_abejorros %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Crear Agroquímico" %>
+  </div>
+<% end %>
+
+<%= link_to 'Volver', agrochemicals_path %> 

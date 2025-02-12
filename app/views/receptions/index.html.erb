@@ -12,9 +12,7 @@
           <th>Hora</th>
           <th>N° Guía</th>
           <th>Productos</th>
-          <th>Pallets</th>
-          <th>Cajas</th>
-          <th>Kilos Totales</th>
+          <th>Proveedor</th>
           <th>Evaluador</th>
           <th>Acciones</th>
         </tr>
@@ -41,9 +39,13 @@
                 <em>No hay productos</em>
               <% end %>
             </td>
-            <td><%= reception.pallets %></td>
-            <td><%= reception.cajas %></td>
-            <td><%= number_with_precision(reception.kilos_totales, precision: 2) %> kg</td>
+            <td>
+              <% if reception.supplier.present? %>
+                <%= reception.supplier.nombre %>
+              <% else %>
+                <em>Sin proveedor</em>
+              <% end %>
+            </td>
             <td>
               <% if reception.user.present? %>
                 <%= "#{reception.user.nombre} #{reception.user.apellido}" %>

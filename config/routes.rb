@@ -33,4 +33,13 @@ Rails.application.routes.draw do
   resources :irrigations
   resources :harvests
   resources :colors
+  resources :applications
+  resources :suppliers
+  resources :agrochemicals do
+    member do
+      get 'edit_quantity'
+      patch 'update_quantity'
+    end
+  end
+  resources :agrochemical_histories, only: [:index, :new, :create]
 end

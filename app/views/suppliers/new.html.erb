@@ -1,0 +1,32 @@
+<div class="container mt-4">
+  <h1>Nuevo Proveedor</h1>
+
+  <%= form_with(model: @supplier, local: true) do |form| %>
+    <% if @supplier.errors.any? %>
+      <div class="alert alert-danger">
+        <h4><%= pluralize(@supplier.errors.count, "error") %> impidieron guardar este proveedor:</h4>
+        <ul>
+          <% @supplier.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= form.label :nombre, "Nombre", class: "form-label" %>
+      <%= form.text_field :nombre, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :rut, "RUT", class: "form-label" %>
+      <%= form.text_field :rut, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.submit "Crear Proveedor", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+  <%= link_to "Volver", suppliers_path, class: "btn btn-secondary" %>
+</div> 

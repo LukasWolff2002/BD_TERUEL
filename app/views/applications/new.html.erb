@@ -1,0 +1,188 @@
+<div class="container mt-4">
+  <h1>Nueva Aplicación</h1>
+  
+  <%= form_with(model: @application, local: true) do |f| %>
+    <% if @application.errors.any? %>
+      <div class="alert alert-danger">
+        <h4>Se encontraron errores:</h4>
+        <ul>
+          <% @application.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Datos Generales -->
+    <div class="form-group">
+      <%= f.label :fecha_aplicacion, "Fecha de Aplicación" %>
+      <%= f.date_field :fecha_aplicacion, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :sector, "Sector" %>
+      <%= f.select :sector, options_for_select(Sector.pluck(:nombre)), { include_blank: 'Seleccione un sector' }, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :operador_tractor, "Operador de Tractor" %>
+      <%= f.select :operador_tractor, options_from_collection_for_select(User.all, "nombre", "nombre"), { include_blank: 'Seleccione un operador' }, class: "form-control" %>
+    </div>
+
+    <!-- Selección de Aplicadores usando Checkboxes -->
+    <div class="form-group">
+      <%= f.label :aplicadores, "Aplicadores" %>
+      <div class="border p-2">
+        <%= f.collection_check_boxes(:aplicadores, User.all, :nombre, :nombre) do |b| %>
+          <div class="form-check form-check-inline">
+            <%= b.check_box(class: "form-check-input") %>
+            <%= b.label(class: "form-check-label") %>
+          </div>
+        <% end %>
+      </div>
+      <small class="form-text text-muted">Seleccione al menos 4 aplicadores.</small>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :motivo, "Motivo" %>
+      <%= f.text_field :motivo, class: "form-control" %>
+    </div>
+
+    <!-- Datos de Seguridad y Observaciones -->
+    <div class="form-group">
+      <%= f.label :uso_de_proteccion, "Uso de Protección" %>
+      <%= f.check_box :uso_de_proteccion %>
+    </div>
+    <div class="form-group">
+      <%= f.label :observaciones, "Observaciones" %>
+      <%= f.text_area :observaciones, class: "form-control", placeholder: "Ingrese los nombres de los usuarios que realizaron observaciones, separados por comas" %>
+    </div>
+
+    <!-- Selección Dinámica de Agroquímicos y sus Dosis en 100 L -->
+    <div class="form-group">
+      <label>Agroquímicos Usados y sus Dosis en 100 L</label>
+      <div id="agrochemicals-container"></div>
+      <button type="button" id="add-agrochemical" class="btn btn-secondary mt-2">Agregar Agroquímico</button>
+      <small class="form-text text-muted">
+        Seleccione agroquímicos de la lista y asigne la dosis en 100 L correspondiente.
+      </small>
+      <!-- Campos ocultos para almacenar los datos combinados -->
+      <%= f.hidden_field :agroquimicos, id: "agroquimicos-field" %>
+      <%= f.hidden_field :dosis_en_100_l, id: "dosis-field" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :maquinaria, "Maquinaria" %>
+      <%= f.text_field :maquinaria, class: "form-control" %>
+    </div>
+
+    <!-- Datos para Cálculos -->
+    <div class="form-group">
+      <%= f.label :mojamiento_relativo, "Mojamiento Relativo" %>
+      <%= f.number_field :mojamiento_relativo, class: "form-control", step: :any %>
+    </div>
+    <div class="form-group">
+      <%= f.label :hectareas, "Hectáreas" %>
+      <%= f.number_field :hectareas, class: "form-control", step: :any %>
+    </div>
+
+    <!-- Datos Adicionales -->
+    <div class="form-group">
+      <%= f.label :encargado_aplicacion, "Encargado de Aplicación" %>
+      <%= f.text_field :encargado_aplicacion, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :lavado_de_equipo, "Lavado de Equipo" %>
+      <%= f.check_box :lavado_de_equipo %>
+    </div>
+
+    <!-- Datos Ambientales -->
+    <div class="form-group">
+      <%= f.label :temperature, "Temperatura" %>
+      <%= f.number_field :temperature, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :humidity, "Humedad" %>
+      <%= f.number_field :humidity, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :nubosidad, "Nubosidad" %>
+      <%= f.number_field :nubosidad, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :viento, "Viento" %>
+      <%= f.number_field :viento, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :hora_inicio, "Hora de Inicio" %>
+      <%= f.time_field :hora_inicio, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :hora_fin, "Hora de Fin" %>
+      <%= f.time_field :hora_fin, class: "form-control" %>
+    </div>
+
+    <div class="mt-3">
+      <%= f.submit "Crear Aplicación", class: "btn btn-primary" %>
+      <%= link_to 'Cancelar', applications_path, class: "btn btn-secondary ml-2" %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Plantilla para agregar un agroquímico (oculta) -->
+<div id="agrochemical-template" style="display: none;">
+  <div class="form-row align-items-end agrochemical-row mb-2">
+    <div class="col">
+      <label>Agroquímico</label>
+      <select class="form-control agrochemical-select">
+        <option value="">Seleccione</option>
+        <% Agrochemical.all.each do |agro| %>
+          <option value="<%= agro.nombre %>"><%= agro.nombre %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="col">
+      <label>Dosis en 100 L</label>
+      <input type="number" step="any" class="form-control agrochemical-dose" placeholder="Dosis">
+    </div>
+    <div class="col-auto">
+      <button type="button" class="btn btn-danger remove-agrochemical">Quitar</button>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript para agregar/quitar agroquímicos y compilar los datos -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const addButton = document.getElementById("add-agrochemical");
+    const container = document.getElementById("agrochemicals-container");
+    const template = document.getElementById("agrochemical-template").innerHTML;
+    
+    addButton.addEventListener("click", function() {
+      container.insertAdjacentHTML('beforeend', template);
+    });
+    
+    container.addEventListener("click", function(e) {
+      if (e.target && e.target.classList.contains("remove-agrochemical")) {
+        e.target.closest(".agrochemical-row").remove();
+      }
+    });
+    
+    // Al enviar el formulario, se compilan los valores de cada fila en los campos ocultos
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function() {
+      let agroValues = [];
+      let doseValues = [];
+      container.querySelectorAll(".agrochemical-row").forEach(function(row) {
+        const select = row.querySelector(".agrochemical-select");
+        const doseInput = row.querySelector(".agrochemical-dose");
+        if (select.value.trim() !== "") {
+          agroValues.push(select.value);
+          doseValues.push(doseInput.value);
+        }
+      });
+      document.getElementById("agroquimicos-field").value = agroValues.join(", ");
+      document.getElementById("dosis-field").value = doseValues.join(", ");
+    });
+  });
+</script> 
