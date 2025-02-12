@@ -6,7 +6,7 @@ class Reception < ApplicationRecord
   
     # Definimos las opciones válidas de firmeza y calidad
     FIRMEZA_OPCIONES = ['Blanda', 'Media', 'Firme'].freeze 
-    CALIDAD_OPCIONES = ['Bueno', 'Regular', 'Malo'].freeze #Bueno, regular,  malo
+    CALIDAD_OPCIONES = ['Primera', 'Segunda', 'Tercera'].freeze #Bueno, regular,  malo
   
     # Validaciones
     validates :fecha, presence: true

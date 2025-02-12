@@ -22,13 +22,22 @@ class ReceptionsController < ApplicationController
 
   def create
     @reception = Reception.new(reception_params)
-    
-    Rails.logger.debug "Parámetros recibidos: #{reception_params.inspect}"
-
+  
     if @reception.save
       redirect_to @reception, notice: 'Recepción creada exitosamente.'
     else
-      Rails.logger.debug "Errores: #{@reception.errors.full_messages}"
+      # Asigna nuevamente las variables que usa el formulario
+      @sectors = Sector.includes(varieties: :colors).all
+      @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
+        hash[sector.id] = sector.varieties.map do |variety|
+          {
+            id: variety.id,
+            nombre: variety.nombre,
+            colors: variety.colors.map(&:nombre)
+          }
+        end
+      end
+  
       render :new, status: :unprocessable_entity
     end
   end
