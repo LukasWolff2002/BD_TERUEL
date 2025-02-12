@@ -1,0 +1,24 @@
+<h1>Nuevo Color</h1>
+
+<%= form_with(model: @color, local: true) do |f| %>
+  <% if @color.errors.any? %>
+    <div class="alert alert-danger">
+      <h2><%= pluralize(@color.errors.count, "error") %> impidieron guardar el color:</h2>
+      <ul>
+        <% @color.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :nombre, "Nombre" %>
+    <%= f.text_field :nombre, class: 'form-control' %>
+  </div>
+
+  <div class="actions mt-3">
+    <%= f.submit "Crear Color", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", colors_path, class: "btn btn-secondary" %>
+  </div>
+<% end %> 

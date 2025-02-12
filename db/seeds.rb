@@ -1,12 +1,6 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# Este archivo se encarga de crear los registros necesarios para que la aplicación funcione en
+# cualquier entorno. Es idempotente en el sentido de que se pueden ejecutar varias veces para configurar la base.
+
 # Crear usuarios de ejemplo
 User.create!([
   {
@@ -64,66 +58,90 @@ User.create!([
 sectors = Sector.create!([
   {
     nombre: "Invernadero 1",
-    descripcion: "Invernadero principal con sistema de riego automatizado"
+    hectareas: 15
   },
   {
     nombre: "Invernadero 2",
-    descripcion: "Invernadero secundario con control de temperatura"
+    hectareas: 25
   },
   {
     nombre: "Invernadero 3",
-    descripcion: "Invernadero experimental para nuevas variedades"
+    hectareas: 10
   },
   {
     nombre: "Invernadero 4",
-    descripcion: "Invernadero de producción intensiva"
+    hectareas: 12
   },
   {
     nombre: "Invernadero 5",
-    descripcion: "Invernadero de propagación y semilleros"
+    hectareas: 10
   }
+])
+
+# Crear colores disponibles
+colors = Color.create!([
+  { nombre: "Rojo" },
+  { nombre: "Verde" },
+  { nombre: "Amarillo" },
+  { nombre: "Marrón" },
+  { nombre: "Rosa" },
+  { nombre: "Naranja" }
 ])
 
 # Crear variedades de tomates
 varieties = Variety.create!([
   {
     nombre: "RAF",
-    descripcion: "Tomate de sabor intenso y dulce, muy apreciado en alta cocina",
-    color: "Verde oscuro a marrón"
+    
   },
   {
     nombre: "Corazón de Buey",
-    descripcion: "Tomate grande y carnoso, ideal para ensaladas",
-    color: "Rojo intenso"
+   
   },
   {
     nombre: "Cherry",
-    descripcion: "Tomate pequeño y dulce, perfecto para snacks",
-    color: "Rojo brillante"
+   
   },
   {
     nombre: "Kumato",
-    descripcion: "Tomate de color oscuro y sabor dulce",
-    color: "Marrón oscuro"
+ 
   },
   {
     nombre: "Pera",
-    descripcion: "Tomate alargado ideal para salsas",
-    color: "Rojo"
+
   },
   {
     nombre: "Rosa",
-    descripcion: "Tomate de color rosado y sabor suave",
-    color: "Rosa"
+
   }
 ])
 
-# Crear relaciones entre sectores y variedades
-# Usamos la asociación HABTM definida en Sector (y automáticamente se insertará en la tabla SectorsVarieties)
+# Asociar colores a cada variedad (relación variety_colors)
+varieties.each do |variety|
+  # Asignar de 2 a 3 colores aleatorios a la variedad
+  assigned_colors = colors.sample(rand(2..3))
+  variety.colors = assigned_colors
+end
+
+# Crear relaciones entre sectores y variedades (relación sector_varieties)
 sectors.each do |sector|
-  # Asignar 2-3 variedades aleatorias a cada sector
-  varieties.sample(rand(2..3)).each do |variety|
-    sector.varieties << variety unless sector.varieties.include?(variety)
+  # Asignar 2 a 3 variedades aleatorias a cada sector
+  selected_varieties = varieties.sample(rand(2..3))
+  selected_varieties.each do |variety|
+    unless sector.varieties.include?(variety)
+      sector.varieties << variety
+    end
+
+    # Para cada combinación sector-variedad, seleccionar aleatoriamente algunos de los colores de la variedad
+    available_colors = variety.colors
+    selected_colors = available_colors.sample(rand(1..available_colors.size))
+    selected_colors.each do |color|
+      SectorVarietyColor.find_or_create_by!(
+        sector: sector,
+        variety: variety,
+        color: color
+      )
+    end
   end
 end
 
@@ -147,12 +165,18 @@ Inventorie.create!([
 ])
 puts "Inventarios iniciales cargados exitosamente."
 
+# Mensajes finales de la semilla
 puts "Seeds creados exitosamente!"
 puts "Se crearon:"
 puts "- #{User.count} usuarios"
 puts "- #{Sector.count} sectores"
 puts "- #{Variety.count} variedades"
+puts "- #{Color.count} colores"
 
-# Para mostrar la cantidad de relaciones añadidas, sumamos las asociaciones de cada sector
+# Calcular y mostrar la cantidad de relaciones sector-variedad
 total_relations = sectors.map { |sector| sector.varieties.count }.sum
 puts "- #{total_relations} relaciones sector-variedad"
+
+# Mostrar cantidad total de asociaciones sector-variedad-color
+total_svc = SectorVarietyColor.count
+puts "- #{total_svc} relaciones sector-variedad-color"

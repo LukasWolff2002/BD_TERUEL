@@ -50,6 +50,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "colors", force: :cascade do |t|
+    t.string "nombre", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["nombre"], name: "index_colors_on_nombre", unique: true
+  end
+
   create_table "harvests", force: :cascade do |t|
     t.date "fecha"
     t.time "hora"
@@ -95,7 +102,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
 
   create_table "inventories", force: :cascade do |t|
     t.string "nombre", null: false
-    t.text "descripcion"
+    t.text "descripcion", null: false
     t.integer "cantidad", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -156,19 +163,27 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.index ["variety_id"], name: "index_receptions_on_variety_id"
   end
 
-  create_table "sector_varieties", force: :cascade do |t|
+  create_table "sector_varieties", id: false, force: :cascade do |t|
     t.bigint "sector_id", null: false
     t.bigint "variety_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["sector_id", "variety_id"], name: "index_sector_varieties_on_sector_id_and_variety_id", unique: true
     t.index ["sector_id"], name: "index_sector_varieties_on_sector_id"
     t.index ["variety_id"], name: "index_sector_varieties_on_variety_id"
   end
 
+  create_table "sector_variety_colors", force: :cascade do |t|
+    t.bigint "sector_id", null: false
+    t.bigint "variety_id", null: false
+    t.bigint "color_id", null: false
+    t.index ["color_id"], name: "index_sector_variety_colors_on_color_id"
+    t.index ["sector_id", "variety_id", "color_id"], name: "index_sector_variety_colors_on_all", unique: true
+    t.index ["sector_id"], name: "index_sector_variety_colors_on_sector_id"
+    t.index ["variety_id"], name: "index_sector_variety_colors_on_variety_id"
+  end
+
   create_table "sectors", force: :cascade do |t|
     t.string "nombre"
-    t.text "descripcion"
+    t.integer "hectareas"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_sectors_on_nombre", unique: true
@@ -178,6 +193,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.string "nombre"
     t.string "apellido"
     t.string "rut"
+    t.string "email"
     t.string "cargo"
     t.string "contrato"
     t.datetime "created_at", null: false
@@ -188,11 +204,17 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
 
   create_table "varieties", force: :cascade do |t|
     t.string "nombre"
-    t.text "descripcion"
-    t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_varieties_on_nombre", unique: true
+  end
+
+  create_table "variety_colors", id: false, force: :cascade do |t|
+    t.bigint "variety_id", null: false
+    t.bigint "color_id", null: false
+    t.index ["color_id"], name: "index_variety_colors_on_color_id"
+    t.index ["variety_id", "color_id"], name: "index_variety_colors_on_variety_id_and_color_id", unique: true
+    t.index ["variety_id"], name: "index_variety_colors_on_variety_id"
   end
 
   add_foreign_key "SectorsVarieties", "sectors"
@@ -212,4 +234,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   add_foreign_key "receptions", "varieties"
   add_foreign_key "sector_varieties", "sectors"
   add_foreign_key "sector_varieties", "varieties"
+  add_foreign_key "sector_variety_colors", "colors"
+  add_foreign_key "sector_variety_colors", "sectors"
+  add_foreign_key "sector_variety_colors", "varieties"
+  add_foreign_key "variety_colors", "colors"
+  add_foreign_key "variety_colors", "varieties"
 end

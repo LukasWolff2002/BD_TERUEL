@@ -1,6 +1,6 @@
 class VarietiesController < ApplicationController
   def index
-    @varieties = Variety.order(:nombre)
+    @varieties = Variety.all.order(:nombre)
   end
 
   def show
@@ -42,6 +42,6 @@ class VarietiesController < ApplicationController
   private
 
   def variety_params
-    params.require(:variety).permit(:nombre, :descripcion, :color)
+    params.require(:variety).permit(:nombre, color_ids: [])
   end
 end 

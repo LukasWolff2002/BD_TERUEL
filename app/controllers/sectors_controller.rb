@@ -1,8 +1,8 @@
 class SectorsController < ApplicationController
-  before_action :set_sector, only: [:edit, :update, :destroy, :edit_varieties, :update_varieties]
+  before_action :set_sector, only: [:edit, :update, :destroy]
 
   def index
-    @sectors = Sector.includes(:varieties).order(:nombre)
+    @sectors = Sector.all.order(:nombre)
   end
 
   def new
@@ -12,18 +12,40 @@ class SectorsController < ApplicationController
   def create
     @sector = Sector.new(sector_params)
     if @sector.save
-      redirect_to sectors_path, notice: 'Sector creado exitosamente.'
+      redirect_to sectors_path, notice: "Sector creado exitosamente."
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    # Gracias al before_action, @sector ya está asignado
   end
 
   def update
     if @sector.update(sector_params)
-      redirect_to sectors_path, notice: 'Sector actualizado correctamente.'
+      # Proceder a actualizar las asociaciones sin usar @sector.variety_ids=
+      @sector.sector_variety_colors.destroy_all
+
+      if params[:sector][:sector_variety_color_assignments].present?
+        params[:sector][:sector_variety_color_assignments].each do |variety_id, color_ids|
+          color_ids = color_ids.reject(&:blank?).map(&:to_i)
+          next if color_ids.empty?
+          variety = Variety.find_by(id: variety_id.to_i)
+          next unless variety.present?
+
+          color_ids.each do |color_id|
+            color = Color.find_by(id: color_id)
+            if color && variety.colors.exists?(id: color_id)
+              SectorVarietyColor.create!(sector: @sector, variety: variety, color: color)
+            else
+              Rails.logger.warn "El color #{color_id} no pertenece a la variedad #{variety.nombre}"
+            end
+          end
+        end
+      end
+
+      redirect_to sectors_path, notice: "Sector actualizado exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -31,49 +53,7 @@ class SectorsController < ApplicationController
 
   def destroy
     @sector.destroy
-    redirect_to sectors_path, notice: 'Sector eliminado correctamente.'
-  end
-
-  # Acción para presentar el formulario para agregar/quitar asociaciones de variedades
-  def edit_varieties
-    # @sector se carga en el callback
-  end
-
-  # Acción para actualizar las asociaciones de variedades
-  def update_varieties
-    if params[:sector] && params[:sector][:varieties_attributes]
-      # Extraemos las asociaciones desde el hash enviado.
-      # Cada entrada debe tener el atributo "id" (con el id de la variedad a asociar)
-      # y, opcionalmente, el flag _destroy si se marca para eliminación.
-      varieties_params = params[:sector][:varieties_attributes]
-      
-      # Recorremos los atributos, descartamos aquellos que tengan _destroy marcado
-      # y extraemos el id (descartamos entradas en blanco).
-      new_ids = varieties_params.values.reject { |attr| attr["_destroy"] == "1" }
-                                      .map { |attr| attr["id"] }
-                                      .reject(&:blank?)
-      
-      if @sector.update(variety_ids: new_ids)
-        redirect_to sectors_path, notice: 'Variedades actualizadas correctamente.'
-      else
-        render :edit_varieties, status: :unprocessable_entity
-      end
-    else
-      redirect_to sectors_path, notice: 'No se realizaron cambios.'
-    end
-  end
-
-  def varieties
-    sector = Sector.find(params[:id])
-    varieties = sector.varieties.map do |variety|
-      {
-        id: variety.id,
-        nombre: variety.nombre
-      }
-    end
-    
-    Rails.logger.debug "Enviando variedades: #{varieties.inspect}"
-    render json: varieties
+    redirect_to sectors_path, notice: "Sector eliminado exitosamente."
   end
 
   private
@@ -83,10 +63,7 @@ class SectorsController < ApplicationController
   end
 
   def sector_params
-    # Se permite un array de variety_ids para la asociación HABTM.
-    params.require(:sector).permit(:nombre, :descripcion, variety_ids: [])
+    params.require(:sector).permit(:nombre, :hectareas)
   end
 
-  # Ya no es necesario un método de parámetros anidados para variedades ya que
-  # la actualización se realiza manualmente en update_varieties.
 end 

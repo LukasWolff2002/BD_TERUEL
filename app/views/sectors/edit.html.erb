@@ -1,6 +1,6 @@
 <div class="container mt-4">
-  <h1>Nuevo Sector</h1>
-  
+  <h1>Editar Sector</h1>
+
   <%= form_with(model: @sector, local: true) do |f| %>
     <% if @sector.errors.any? %>
       <div class="alert alert-danger">
@@ -12,7 +12,7 @@
         </ul>
       </div>
     <% end %>
-    
+
     <!-- Datos básicos del Sector -->
     <div class="mb-3">
       <%= f.label :nombre, "Nombre", class: "form-label" %>
@@ -23,22 +23,24 @@
       <%= f.label :hectareas, "Hectáreas", class: "form-label" %>
       <%= f.number_field :hectareas, class: "form-control" %>
     </div>
-    
-    <!-- Sección para elegir Variedades y sus Colores -->
+
+    <!-- Sección para elegir Variedades y ajustar los Colores asignados -->
     <div class="mb-3">
       <h3>Variedades y sus Colores</h3>
       <%# Itera sobre todas las variedades existentes ordenadas por nombre %>
       <% Variety.order(:nombre).each do |variety| %>
         <div class="mb-2 border p-2">
           <!-- Checkbox para incluir la variedad en este sector -->
-          <%= check_box_tag "sector[variety_ids][]", variety.id, false, id: "variety_#{variety.id}" %>
+          <%= check_box_tag "sector[variety_ids][]", variety.id, @sector.variety_ids.include?(variety.id), id: "variety_#{variety.id}" %>
           <%= label_tag "variety_#{variety.id}", variety.nombre %>
-          
-          <!-- Itera sobre los colores de la variedad para seleccionar los que estén presentes en el sector -->
+
+          <!-- Itera sobre los colores de la variedad para configurar los checkboxes -->
           <div class="ms-4">
             <% variety.colors.each do |color| %>
               <div class="form-check form-check-inline">
-                <%= check_box_tag "sector[sector_variety_color_assignments][#{variety.id}][]", color.id, false, class: "form-check-input", id: "variety_#{variety.id}_color_#{color.id}" %>
+                <% # Verifica si en este sector se tiene asignado este color para la variedad actual %>
+                <% is_checked = @sector.sector_variety_colors.exists?(variety_id: variety.id, color_id: color.id) %>
+                <%= check_box_tag "sector[sector_variety_color_assignments][#{variety.id}][]", color.id, is_checked, class: "form-check-input", id: "variety_#{variety.id}_color_#{color.id}" %>
                 <%= label_tag "variety_#{variety.id}_color_#{color.id}", color.nombre, class: "form-check-label" %>
               </div>
             <% end %>
@@ -46,9 +48,9 @@
         </div>
       <% end %>
     </div>
-    
+
     <div class="actions">
-      <%= f.submit "Crear Sector", class: "btn btn-primary" %>
+      <%= f.submit "Actualizar Sector", class: "btn btn-primary" %>
       <%= link_to "Cancelar", sectors_path, class: "btn btn-secondary" %>
     </div>
   <% end %>

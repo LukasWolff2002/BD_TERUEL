@@ -32,4 +32,5 @@ Rails.application.routes.draw do
   resources :varieties, only: [:index, :new, :create, :edit, :update, :destroy]
   resources :irrigations
   resources :harvests
+  resources :colors
 end
