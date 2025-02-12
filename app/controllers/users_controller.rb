@@ -30,10 +30,10 @@ class UsersController < ApplicationController
       end
     end
 
+    # DELETE /users/:id
     def destroy
-      @user = User.find(params[:id])
       @user.destroy
-      redirect_to users_path, notice: 'Usuario eliminado exitosamente.', status: :see_other
+      redirect_to users_path, notice: "Usuario eliminado exitosamente."
     end
 
     private

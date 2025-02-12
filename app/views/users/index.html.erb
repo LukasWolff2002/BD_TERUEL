@@ -11,15 +11,18 @@
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
+            <th>ID</th>
             <th>Nombre</th>
             <th>Apellido</th>
             <th>RUT</th>
             <th>Cargo</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <% @users.each do |user| %>
             <tr>
+              <td><%= user.id %></td>
               <td><%= user.nombre %></td>
               <td><%= user.apellido %></td>
               <td><%= user.rut %></td>
@@ -27,6 +30,9 @@
                 <span class="badge <%= cargo_badge_class(user.cargo) %>">
                   <%= user.cargo %>
                 </span>
+              </td>
+              <td>
+                <%= link_to 'Editar', edit_user_path(user), class: 'btn btn-sm btn-secondary' %>
               </td>
             </tr>
           <% end %>
