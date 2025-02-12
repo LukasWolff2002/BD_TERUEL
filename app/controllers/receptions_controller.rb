@@ -10,12 +10,22 @@ class ReceptionsController < ApplicationController
   def new
     @reception = Reception.new
     @reception.fecha = Date.today
-    @reception.hora = Time.current
+    @reception.hora  = Time.current
   
-    # Precargar sectores y variedades
-    @sectors = Sector.includes(:varieties).all
+    # Carga los sectores junto con sus variedades y los colores asociados
+    @sectors = Sector.includes(varieties: :colors).all
+  
+    # Construye un hash para que cada sector tenga un arreglo de variedades,
+    # donde cada variedad es representada por un hash con sus atributos y un arreglo
+    # con los nombres de los colores asociados.
     @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
-      hash[sector.id] = sector.varieties.select(:id, :nombre, :color)
+      hash[sector.id] = sector.varieties.map do |variety|
+        {
+          id: variety.id,
+          nombre: variety.nombre,
+          colors: variety.colors.map(&:nombre)
+        }
+      end
     end
   end
   
