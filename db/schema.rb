@@ -144,16 +144,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   create_table "receptions", force: :cascade do |t|
     t.date "fecha", null: false
     t.time "hora", null: false
+    t.string "nro_guia_despacho", null: false
+    t.integer "pallets", null: false
+    t.integer "cajas", null: false
+    t.decimal "kilos_totales", precision: 10, scale: 2, null: false
     t.jsonb "reception_items", default: [], null: false
-    t.bigint "user_id", null: false
-    t.string "nro_guia_despacho"
-    t.integer "pallets"
-    t.integer "cajas"
-    t.decimal "kilos_totales", precision: 10, scale: 2
+    t.integer "supplier_id"
+    t.string "supplier_nombre"
+    t.string "supplier_rut"
+    t.integer "user_id"
     t.boolean "activo", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_receptions_on_user_id"
+    t.index ["supplier_id"], name: "index_receptions_on_supplier_id"
   end
 
   create_table "sector_varieties", id: false, force: :cascade do |t|
@@ -180,6 +183,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_sectors_on_nombre", unique: true
+  end
+
+  create_table "suppliers", force: :cascade do |t|
+    t.string "nombre"
+    t.string "rut"
   end
 
   create_table "users", force: :cascade do |t|
@@ -222,7 +230,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   add_foreign_key "inventorie_histories", "users"
   add_foreign_key "irrigations", "sectors"
   add_foreign_key "irrigations", "users"
-  add_foreign_key "receptions", "users"
   add_foreign_key "sector_varieties", "sectors"
   add_foreign_key "sector_varieties", "varieties"
   add_foreign_key "sector_variety_colors", "colors"

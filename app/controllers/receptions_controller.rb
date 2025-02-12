@@ -27,6 +27,9 @@ class ReceptionsController < ApplicationController
         }
       end
     end
+
+    # Cargar la lista de proveedores para el select. En cada recepción se elegirá un solo proveedor.
+    @suppliers = Supplier.all
   end
   
 
@@ -36,7 +39,8 @@ class ReceptionsController < ApplicationController
     if @reception.save
       redirect_to @reception, notice: 'Recepción creada exitosamente.'
     else
-      # Asigna nuevamente las variables que usa el formulario
+      # Re-cargar las colecciones necesarias para que el formulario pueda renderizarse 
+      # correctamente al presentar errores de validación.
       @sectors = Sector.includes(varieties: :colors).all
       @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
         hash[sector.id] = sector.varieties.map do |variety|
@@ -47,6 +51,7 @@ class ReceptionsController < ApplicationController
           }
         end
       end
+      @suppliers = Supplier.all
   
       render :new, status: :unprocessable_entity
     end
@@ -97,7 +102,8 @@ class ReceptionsController < ApplicationController
       :cajas,
       :kilos_totales,
       :guia_despacho,
-      reception_items: [:sector, :variety, :color, :firmeza, :calidad]
+      :supplier_id,    # Se permite la elección de un único proveedor
+      reception_items: [:sector, :variety, :color, :firmeza, :calidad]  # Múltiples productos
     )
   end
 end

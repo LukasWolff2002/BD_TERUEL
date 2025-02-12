@@ -30,6 +30,18 @@
                 <% end %>
               </td>
             </tr>
+              <th>Proveedor:</th>
+                <td>
+                  <% if @reception.supplier.present? %>
+                    <%= @reception.supplier.nombre %>
+                  <% else %>
+                    <em>Sin proveedor</em>
+                  <% end %>
+                </td>
+            <tr>
+              
+              
+            </tr>
           </table>
 
           <h4 class="mt-4">Detalles del Producto</h4>

@@ -1,54 +1,27 @@
 class CreateReceptions < ActiveRecord::Migration[7.1]
   def change
     create_table :receptions do |t|
-      #Una recepcion puede ser interna o externa, si es externa no trabaja sector, es decir, se selecciona directamente la variedad
-      #Agregar una clave que sea proveedor, por lo tanto hay que crear una tabla llamada provedor
+      t.date    :fecha,              null: false
+      t.time    :hora,               null: false
+      t.string  :nro_guia_despacho,  null: false
+      t.integer :pallets,            null: false
+      t.integer :cajas,              null: false
+      t.decimal :kilos_totales,      precision: 10, scale: 2, null: false
+      t.jsonb   :reception_items,    default: [], null: false
 
-      #Tabla provedor
-      #nombre del proveedor
-      #rut del proveedor
+      # Datos del proveedor (denormalizados)
+      t.integer :supplier_id
+      t.string  :supplier_nombre
+      t.string  :supplier_rut
 
-      t.date :fecha, null: false
-      t.time :hora, null: false
-      
-      # Campo para almacenar los items de recepción.
-      # Cada item es un hash con los siguientes atributos:
-      #   "sector"  => nombre del sector (string)
-      #   "variety" => nombre de la variedad (string)
-      #   "color"   => color (string)
-      #   "firmeza" => firmeza del producto (string)
-      #   "calidad" => calidad del producto (string)
-      #
-      # Ejemplo:
-      # [
-      #   {
-      #     "sector" => "Sector A",
-      #     "variety" => "Variedad 1",
-      #     "color" => "Rojo",
-      #     "firmeza" => "Alta",
-      #     "calidad" => "Excelente"
-      #   },
-      #   {
-      #     "sector" => "Sector B",
-      #     "variety" => "Variedad 2",
-      #     "color" => "Verde",
-      #     "firmeza" => "Media",
-      #     "calidad" => "Buena"
-      #   }
-      # ]
-      t.jsonb :reception_items, null: false, default: []
-      
-      # Se mantiene la referencia al usuario que registra la recepción.
-      t.references :user, null: false, foreign_key: true
-      
-      # Otros campos propios de la recepción (si son globales)
-      t.string  :nro_guia_despacho
-      t.integer :pallets
-      t.integer :cajas
-      t.decimal :kilos_totales, precision: 10, scale: 2
-      t.boolean :activo, default: true
+      # Relación con el usuario que crea la recepción
+      t.integer :user_id
+
+      t.boolean :activo,             default: true
 
       t.timestamps
     end
+
+    add_index :receptions, :supplier_id
   end
 end

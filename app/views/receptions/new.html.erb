@@ -25,6 +25,14 @@
           <%= f.label :hora, class: "form-label" %>
           <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.current.strftime("%H:%M") %>
         </div>
+        <!-- Selección del Proveedor (único) -->
+    <div class="mb-3">
+      <%= f.label :supplier_id, "Proveedor", class: "form-label" %>
+      <%= f.select :supplier_id, 
+                   options_from_collection_for_select(@suppliers, "id", "nombre", @reception.supplier_id), 
+                   { include_blank: "Seleccione un proveedor" },
+                   { class: "form-select" } %>
+    </div>
         <div class="mb-3">
           <%= f.label :nro_guia_despacho, "Número de Guía de Despacho", class: "form-label" %>
           <%= f.text_field :nro_guia_despacho, class: "form-control" %>

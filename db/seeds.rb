@@ -9,6 +9,7 @@ Sector.delete_all
 Variety.delete_all
 Color.delete_all
 User.delete_all
+Supplier.delete_all
 
 puts "Creando usuarios..."
 User.create!([
@@ -25,6 +26,17 @@ User.create!([
     rut: "87.654.321-0",
     cargo: "Administrativo",
     contrato: "externo"
+  }
+])
+
+Supplier.create!([
+  {
+    nombre: "Supplier 1",
+    rut: "12.345.678-9"
+  },
+  {
+    nombre: "Supplier 2",
+    rut: "87.654.321-0"
   }
 ])
 

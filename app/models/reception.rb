@@ -1,6 +1,7 @@
 class Reception < ApplicationRecord
     
     belongs_to :user, optional: true
+    belongs_to :supplier, optional: true
     has_one_attached :guia_despacho
     has_many :images, dependent: :destroy
   
@@ -34,5 +35,15 @@ class Reception < ApplicationRecord
       self.user_nombre  = user.nombre      if self.respond_to?(:user_nombre)
       self.user_apellido = user.apellido    if self.respond_to?(:user_apellido)
       self.user_rut     = user.rut         if self.respond_to?(:user_rut)
+    end
+
+    # Callback para copiar los datos actuales del proveedor seleccionado
+    def copiar_datos_supplier
+      return unless supplier_id.present?
+      supplier_record = Supplier.find_by(id: supplier_id)
+      if supplier_record.present?
+        self.supplier_nombre = supplier_record.nombre if self.respond_to?(:supplier_nombre)
+        self.supplier_rut    = supplier_record.rut if self.respond_to?(:supplier_rut)
+      end
     end
   end
