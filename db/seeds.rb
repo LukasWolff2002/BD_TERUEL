@@ -1,7 +1,16 @@
 # Este archivo se encarga de crear los registros necesarios para que la aplicación funcione en
 # cualquier entorno. Es idempotente en el sentido de que se pueden ejecutar varias veces para configurar la base.
 
-# Crear usuarios de ejemplo
+puts "Reiniciando la base de datos..."
+
+# Eliminamos registros sin disparar callbacks para evitar problemas con asociaciones incorrectas.
+SectorVarietyColor.delete_all
+Sector.delete_all
+Variety.delete_all
+Color.delete_all
+User.delete_all
+
+puts "Creando usuarios..."
 User.create!([
   {
     nombre: "Juan",
@@ -13,126 +22,68 @@ User.create!([
   {
     nombre: "María",
     apellido: "González",
-    rut: "11.222.333-4",
-    cargo: "Jefe de Campo",
-    contrato: "interno"
-  },
-  {
-    nombre: "Carlos",
-    apellido: "Rodríguez",
-    rut: "14.555.666-7",
-    cargo: "Jefe Tecnico",
-    contrato: "interno"
-  },
-  {
-    nombre: "Ana",
-    apellido: "Martínez",
-    rut: "13.777.888-5",
-    cargo: "Jefe Packing",
-    contrato: "interno"
-  },
-  {
-    nombre: "Pedro",
-    apellido: "Sánchez",
-    rut: "15.999.000-1",
-    cargo: "Riego",
-    contrato: "externo"
-  },
-  {
-    nombre: "Laura",
-    apellido: "Muñoz",
-    rut: "16.111.222-3",
-    cargo: "Cosechador",
-    contrato: "externo"
-  },
-  {
-    nombre: "Diego",
-    apellido: "Silva",
-    rut: "17.333.444-5",
-    cargo: "Volante",
+    rut: "87.654.321-0",
+    cargo: "Administrativo",
     contrato: "externo"
   }
 ])
 
+puts "Creando variedades..."
+variety1 = Variety.create!(nombre: "Variedad 1")
+variety2 = Variety.create!(nombre: "Variedad 2")
+variety3 = Variety.create!(nombre: "Variedad 3")
 
-# Crear colores disponibles
-colors = Color.create!([
-  { nombre: "Rojo" },
-  { nombre: "Verde" },
-  { nombre: "Amarillo" },
-  { nombre: "Marrón" },
-  { nombre: "Rosa" },
-  { nombre: "Naranja" }
-])
+puts "Creando colores..."
+color_rojo     = Color.create!(nombre: "Rojo")
+color_verde    = Color.create!(nombre: "Verde")
+color_azul     = Color.create!(nombre: "Azul")
+color_amarillo = Color.create!(nombre: "Amarillo")
 
-# Crear variedades de tomates
-varieties = Variety.create!([
-  {
-    nombre: "RAF",
-    
-  },
-  {
-    nombre: "Corazón de Buey",
-   
-  },
-  {
-    nombre: "Cherry",
-   
-  },
-  {
-    nombre: "Kumato",
- 
-  },
-  {
-    nombre: "Pera",
+puts "Asociando colores a las variedades..."
+# Asociar los colores a las variedades para asegurar que la validación se cumpla
+variety1.colors << color_rojo   unless variety1.colors.exists?(color_rojo.id)
+variety1.colors << color_verde  unless variety1.colors.exists?(color_verde.id)
 
-  },
-  {
-    nombre: "Rosa",
+variety2.colors << color_azul   unless variety2.colors.exists?(color_azul.id)
 
-  }
-])
+variety3.colors << color_amarillo  unless variety3.colors.exists?(color_amarillo.id)
+variety3.colors << color_rojo        unless variety3.colors.exists?(color_rojo.id)
 
-# Asociar colores a cada variedad (relación variety_colors)
-varieties.each do |variety|
-  # Asignar de 2 a 3 colores aleatorios a la variedad
-  assigned_colors = colors.sample(rand(2..3))
-  variety.colors = assigned_colors
+puts "Creando sectores..."
+sector_a = Sector.create!(nombre: "Sector A", hectareas: 100)
+sector_b = Sector.create!(nombre: "Sector B", hectareas: 50)
+
+puts "Creando asociaciones SectorVarietyColor..."
+# Para cada asociación se verifica que el color ya esté vinculado a la variedad
+
+if variety1.colors.exists?(color_rojo.id)
+  SectorVarietyColor.create!(sector: sector_a, variety: variety1, color: color_rojo)
+else
+  puts "WARNING: El color #{color_rojo.nombre} no está asociado a la variedad #{variety1.nombre}"
 end
 
+if variety1.colors.exists?(color_verde.id)
+  SectorVarietyColor.create!(sector: sector_a, variety: variety1, color: color_verde)
+else
+  puts "WARNING: El color #{color_verde.nombre} no está asociado a la variedad #{variety1.nombre}"
+end
 
-# Crear inventarios
-Inventorie.create!([
-  {
-    nombre: "Producto A",
-    descripcion: "Inventario base para Producto A",
-    cantidad: 100
-  },
-  {
-    nombre: "Producto B",
-    descripcion: "Inventario base para Producto B",
-    cantidad: 50
-  },
-  {
-    nombre: "Producto C",
-    descripcion: "Inventario base para Producto C",
-    cantidad: 25
-  }
-])
-puts "Inventarios iniciales cargados exitosamente."
+if variety2.colors.exists?(color_azul.id)
+  SectorVarietyColor.create!(sector: sector_b, variety: variety2, color: color_azul)
+else
+  puts "WARNING: El color #{color_azul.nombre} no está asociado a la variedad #{variety2.nombre}"
+end
 
-# Mensajes finales de la semilla
-puts "Seeds creados exitosamente!"
-puts "Se crearon:"
-puts "- #{User.count} usuarios"
-puts "- #{Sector.count} sectores"
-puts "- #{Variety.count} variedades"
-puts "- #{Color.count} colores"
+if variety3.colors.exists?(color_amarillo.id)
+  SectorVarietyColor.create!(sector: sector_b, variety: variety3, color: color_amarillo)
+else
+  puts "WARNING: El color #{color_amarillo.nombre} no está asociado a la variedad #{variety3.nombre}"
+end
 
-# Calcular y mostrar la cantidad de relaciones sector-variedad
-total_relations = sectors.map { |sector| sector.varieties.count }.sum
-puts "- #{total_relations} relaciones sector-variedad"
+if variety3.colors.exists?(color_rojo.id)
+  SectorVarietyColor.create!(sector: sector_a, variety: variety3, color: color_rojo)
+else
+  puts "WARNING: El color #{color_rojo.nombre} no está asociado a la variedad #{variety3.nombre}"
+end
 
-# Mostrar cantidad total de asociaciones sector-variedad-color
-total_svc = SectorVarietyColor.count
-puts "- #{total_svc} relaciones sector-variedad-color"
+puts "Seed completado exitosamente!"

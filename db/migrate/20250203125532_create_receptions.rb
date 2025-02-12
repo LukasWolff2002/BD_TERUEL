@@ -10,22 +10,42 @@ class CreateReceptions < ActiveRecord::Migration[7.1]
 
       t.date :fecha, null: false
       t.time :hora, null: false
-      t.references :sector, null: false, foreign_key: true
-      #En una recepcion pueden haber multiples variedades
-      t.references :variety, null: false, foreign_key: true
-      t.references :user, null: false, foreign_key: true
-      t.string :color
-      t.string :nro_guia_despacho
-      t.string :firmeza
-      t.string :calidad #modificar la calidad
       
+      # Campo para almacenar los items de recepción.
+      # Cada item es un hash con los siguientes atributos:
+      #   "sector"  => nombre del sector (string)
+      #   "variety" => nombre de la variedad (string)
+      #   "color"   => color (string)
+      #   "firmeza" => firmeza del producto (string)
+      #   "calidad" => calidad del producto (string)
+      #
+      # Ejemplo:
+      # [
+      #   {
+      #     "sector" => "Sector A",
+      #     "variety" => "Variedad 1",
+      #     "color" => "Rojo",
+      #     "firmeza" => "Alta",
+      #     "calidad" => "Excelente"
+      #   },
+      #   {
+      #     "sector" => "Sector B",
+      #     "variety" => "Variedad 2",
+      #     "color" => "Verde",
+      #     "firmeza" => "Media",
+      #     "calidad" => "Buena"
+      #   }
+      # ]
+      t.jsonb :reception_items, null: false, default: []
+      
+      # Se mantiene la referencia al usuario que registra la recepción.
+      t.references :user, null: false, foreign_key: true
+      
+      # Otros campos propios de la recepción (si son globales)
+      t.string  :nro_guia_despacho
       t.integer :pallets
       t.integer :cajas
-      #Los palets y las cajas son por el total
-
-      t.decimal :kilos_cajas, precision: 5, scale: 2 #Eliminar esta columna
-      t.decimal :kilos_totales, precision: 10, scale: 2  # Agregamos esta columna
-      #Los kilos totales son por cada variedad
+      t.decimal :kilos_totales, precision: 10, scale: 2
       t.boolean :activo, default: true
 
       t.timestamps

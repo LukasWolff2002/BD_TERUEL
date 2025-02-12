@@ -17,38 +17,51 @@
               <td><%= @reception.hora.strftime("%H:%M") %></td>
             </tr>
             <tr>
-              <th>Sector:</th>
-              <td><%= @reception.sector.nombre %></td>
-            </tr>
-            <tr>
               <th>N° Guía Despacho:</th>
               <td><%= @reception.nro_guia_despacho %></td>
             </tr>
             <tr>
               <th>Evaluador:</th>
-              <td><%= "#{@reception.user.nombre} #{@reception.user.apellido}" %></td>
+              <td>
+                <% if @reception.user.present? %>
+                  <%= "#{@reception.user.nombre} #{@reception.user.apellido}" %>
+                <% else %>
+                  <em>Sin evaluador</em>
+                <% end %>
+              </td>
             </tr>
           </table>
 
           <h4 class="mt-4">Detalles del Producto</h4>
-          <table class="table">
-            <tr>
-              <th>Firmeza:</th>
-              <td><%= @reception.firmeza %></td>
-            </tr>
-            <tr>
-              <th>Calidad:</th>
-              <td><%= @reception.calidad %></td>
-            </tr>
-            <tr>
-              <th>Color:</th>
-              <td><%= @reception.color %></td>
-            </tr>
-            <tr>
-              <th>Variedad:</th>
-              <td><%= @reception.variety.nombre %></td>
-            </tr>
-          </table>
+          <% if @reception.reception_items.present? %>
+            <% @reception.reception_items.each_with_index do |item, index| %>
+              <h5>Producto <%= index + 1 %>:</h5>
+              <table class="table table-sm">
+                <tr>
+                  <th>Sector:</th>
+                  <td><%= item['sector'] %></td>
+                </tr>
+                <tr>
+                  <th>Variedad:</th>
+                  <td><%= item['variety'] %></td>
+                </tr>
+                <tr>
+                  <th>Color:</th>
+                  <td><%= item['color'] %></td>
+                </tr>
+                <tr>
+                  <th>Firmeza:</th>
+                  <td><%= item['firmeza'] %></td>
+                </tr>
+                <tr>
+                  <th>Calidad:</th>
+                  <td><%= item['calidad'] %></td>
+                </tr>
+              </table>
+            <% end %>
+          <% else %>
+            <p>No se han agregado detalles del producto.</p>
+          <% end %>
 
           <h4 class="mt-4">Cantidades</h4>
           <table class="table">
@@ -59,10 +72,6 @@
             <tr>
               <th>Cajas:</th>
               <td><%= @reception.cajas %></td>
-            </tr>
-            <tr>
-              <th>Kilos por Caja:</th>
-              <td><%= number_with_precision(@reception.kilos_cajas, precision: 2) %> kg</td>
             </tr>
             <tr>
               <th>Kilos Totales:</th>

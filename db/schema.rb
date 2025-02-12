@@ -144,23 +144,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   create_table "receptions", force: :cascade do |t|
     t.date "fecha", null: false
     t.time "hora", null: false
-    t.bigint "sector_id", null: false
-    t.bigint "variety_id", null: false
+    t.jsonb "reception_items", default: [], null: false
     t.bigint "user_id", null: false
-    t.string "color"
     t.string "nro_guia_despacho"
-    t.string "firmeza"
-    t.string "calidad"
     t.integer "pallets"
     t.integer "cajas"
-    t.decimal "kilos_cajas", precision: 5, scale: 2
     t.decimal "kilos_totales", precision: 10, scale: 2
     t.boolean "activo", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["sector_id"], name: "index_receptions_on_sector_id"
     t.index ["user_id"], name: "index_receptions_on_user_id"
-    t.index ["variety_id"], name: "index_receptions_on_variety_id"
   end
 
   create_table "sector_varieties", id: false, force: :cascade do |t|
@@ -229,9 +222,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141542) do
   add_foreign_key "inventorie_histories", "users"
   add_foreign_key "irrigations", "sectors"
   add_foreign_key "irrigations", "users"
-  add_foreign_key "receptions", "sectors"
   add_foreign_key "receptions", "users"
-  add_foreign_key "receptions", "varieties"
   add_foreign_key "sector_varieties", "sectors"
   add_foreign_key "sector_varieties", "varieties"
   add_foreign_key "sector_variety_colors", "colors"

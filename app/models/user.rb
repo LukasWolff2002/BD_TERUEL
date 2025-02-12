@@ -1,9 +1,13 @@
 class User < ApplicationRecord
-    has_many :images, dependent: :destroy
-    has_many :receptions, dependent: :destroy  # Como evaluador
-    has_many :irrigations, dependent: :destroy  # Como evaluador
-    has_many :harvests, dependent: :destroy  # Como evaluador
-    has_many :inventorie_historys, dependent: :destroy
+    # Si la tabla images no tiene la columna user_id, se debe quitar o modificar esta asociación:
+    # has_many :images, dependent: :destroy
+
+    # Queremos que al eliminar un usuario las recepciones, irrigations, harvests, etc. permanezcan,
+    # por lo que se retira `dependent: :destroy` para esas asociaciones.
+    has_many :receptions           # Se elimina `dependent: :destroy`
+    has_many :irrigations           # Se elimina `dependent: :destroy`
+    has_many :harvests              # Se elimina `dependent: :destroy`
+    has_many :inventorie_historys, dependent: :destroy # Si para este caso deseas eliminar el historial, puedes dejarlo
     validates :rut, presence: true, uniqueness: true
     validates :nombre, presence: true
     validates :apellido, presence: true

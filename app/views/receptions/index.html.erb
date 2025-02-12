@@ -10,16 +10,11 @@
         <tr>
           <th>Fecha</th>
           <th>Hora</th>
-          <th>Sector</th>
           <th>N° Guía</th>
-          <th>Firmeza</th>
-          <th>Calidad</th>
+          <th>Productos</th>
           <th>Pallets</th>
           <th>Cajas</th>
-          <th>Kilos/Caja</th>
           <th>Kilos Totales</th>
-          <th>Color</th>
-          <th>Variedad</th>
           <th>Evaluador</th>
           <th>Acciones</th>
         </tr>
@@ -29,17 +24,33 @@
           <tr>
             <td><%= reception.fecha.strftime("%d/%m/%Y") %></td>
             <td><%= reception.hora.strftime("%H:%M") %></td>
-            <td><%= reception.sector.nombre %></td>
             <td><%= reception.nro_guia_despacho %></td>
-            <td><%= reception.firmeza %></td>
-            <td><%= reception.calidad %></td>
+            <td>
+              <% if reception.reception_items.present? %>
+                <% reception.reception_items.each_with_index do |item, index| %>
+                  <div>
+                    <strong>Producto <%= index + 1 %>:</strong>
+                    Sector: <%= item['sector'] %>,
+                    Variedad: <%= item['variety'] %>,
+                    Color: <%= item['color'] %>,
+                    Firmeza: <%= item['firmeza'] %>,
+                    Calidad: <%= item['calidad'] %>
+                  </div>
+                <% end %>
+              <% else %>
+                <em>No hay productos</em>
+              <% end %>
+            </td>
             <td><%= reception.pallets %></td>
             <td><%= reception.cajas %></td>
-            <td><%= number_with_precision(reception.kilos_cajas, precision: 2) %></td>
-            <td><%= number_with_precision(reception.kilos_totales, precision: 2) %></td>
-            <td><%= reception.color %></td>
-            <td><%= reception.variety.nombre %></td>
-            <td><%= "#{reception.user.nombre} #{reception.user.apellido}" %></td>
+            <td><%= number_with_precision(reception.kilos_totales, precision: 2) %> kg</td>
+            <td>
+              <% if reception.user.present? %>
+                <%= "#{reception.user.nombre} #{reception.user.apellido}" %>
+              <% else %>
+                <em>Sin evaluador</em>
+              <% end %>
+            </td>
             <td>
               <%= link_to reception_path(reception), class: "btn btn-sm btn-info me-1" do %>
                 <i class="bi bi-eye"></i> Ver
