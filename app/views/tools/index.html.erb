@@ -1,0 +1,27 @@
+<div class="container mt-4">
+  <h1>Herramientas</h1>
+
+  <%= link_to 'Nueva Herramienta', new_tool_path, class: 'btn btn-primary mb-3' %>
+  <%= link_to 'Historial de Herramientas', tool_histories_path, class: 'btn btn-secondary mb-3' %>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Cantidad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @tools.each do |tool| %>
+        <tr>
+          <td><%= tool.nombre %></td>
+          <td><%= tool.cantidad %></td>
+          <td>
+            <%= link_to 'Modificar Cantidad', new_tool_tool_history_path(tool), class: 'btn btn-secondary btn-sm' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div> 

@@ -36,6 +36,14 @@ Rails.application.routes.draw do
   resources :applications
   resources :suppliers
   resources :agrochemical_divisions
+  resources :tools do
+    resources :tool_histories, only: [:index, :new, :create]
+  end
+  resources :tool_histories
+  resources :fertilizers do
+    resources :fertilizer_histories, only: [:index, :new, :create]
+  end
+  resources :fertilizer_histories
   resources :agrochemicals do
     member do
       get 'edit_quantity'

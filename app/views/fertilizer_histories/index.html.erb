@@ -1,0 +1,29 @@
+<div class="container mt-4">
+  <h1>Historial Global de Fertilizantes</h1>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fertilizante</th>
+        <th>Usuario</th>
+        <th>Cantidad Modificada</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @fertilizer_histories.each do |history| %>
+        <tr>
+          <td><%= history.id %></td>
+          <td><%= history.fertilizer.nombre %></td>
+          <td><%= history.usuario %></td>
+          <td><%= history.cantidad_cambiada %></td>
+          <td><%= history.created_at.strftime("%d-%m-%Y %H:%M") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= link_to 'Volver a Fertilizantes', fertilizers_path, class: 'btn btn-secondary' %>
+</div> 
+

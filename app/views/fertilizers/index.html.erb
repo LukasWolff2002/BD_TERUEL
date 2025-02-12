@@ -1,0 +1,27 @@
+<div class="container mt-4">
+  <h1>Fertilizantes</h1>
+
+  <%= link_to 'Nuevo Fertilizante', new_fertilizer_path, class: 'btn btn-primary mb-3' %>
+  <%= link_to 'Historial de Fertilizantes', fertilizer_histories_path, class: 'btn btn-secondary mb-3' %>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Cantidad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @fertilizers.each do |fertilizer| %>
+        <tr>
+          <td><%= fertilizer.nombre %></td>
+          <td><%= fertilizer.cantidad %></td>
+          <td>
+            <%= link_to 'Modificar Cantidad', new_fertilizer_fertilizer_history_path(fertilizer), class: 'btn btn-secondary btn-sm' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div> 

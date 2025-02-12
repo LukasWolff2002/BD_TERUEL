@@ -14,6 +14,8 @@ User.delete_all
 Supplier.delete_all
 Agrochemical.delete_all
 AgrochemicalDivision.delete_all
+Tool.delete_all
+Fertilizer.delete_all
 
 puts "Creando usuarios..."
 User.create!([
@@ -107,6 +109,10 @@ divisions = AgrochemicalDivision.create!([
   { division: "Reguladores de Crecimiento" }
 ])
 
+Fertilizer.create!(nombre: "Nitrogen", cantidad: 50)
+Fertilizer.create!(nombre: "Phosphorus", cantidad: 30)
+Fertilizer.create!(nombre: "Potassium", cantidad: 20)
+
 # Creamos los agroquímicos con todos los atributos requeridos
 Agrochemical.create!([
   {
@@ -193,6 +199,12 @@ Supplier.create!([
     rut: "87.654.321-0"
   }
 ])
+
+# Crear registros en la tabla tools
+Tool.create!(nombre: "Hammer", cantidad: 10)
+Tool.create!(nombre: "Screwdriver", cantidad: 15)
+Tool.create!(nombre: "Wrench", cantidad: 7)
+Tool.create!(nombre: "Drill", cantidad: 4)
 
 puts "Creando variedades..."
 variety1 = Variety.create!(nombre: "Variedad 1")

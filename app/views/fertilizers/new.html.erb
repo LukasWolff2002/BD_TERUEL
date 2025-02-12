@@ -1,0 +1,30 @@
+<div class="container mt-4">
+  <h1>Nuevo Fertilizante</h1>
+
+  <%= form_with model: @fertilizer, local: true do |f| %>
+    <div class="mb-3">
+      <%= f.label :nombre, "Nombre del Fertilizante", class: "form-label" %>
+      <%= f.text_field :nombre, class: "form-control", placeholder: "Ingrese el nombre del fertilizante" %>
+      <% if @fertilizer.errors[:nombre].any? %>
+        <div class="text-danger">
+          <%= @fertilizer.errors[:nombre].first %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :cantidad, "Cantidad", class: "form-label" %>
+      <%= f.number_field :cantidad, class: "form-control", placeholder: "Ingrese la cantidad", step: 1 %>
+      <% if @fertilizer.errors[:cantidad].any? %>
+        <div class="text-danger">
+          <%= @fertilizer.errors[:cantidad].first %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="d-flex">
+      <%= f.submit "Crear Fertilizante", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", fertilizers_path, class: "btn btn-secondary ms-2" %>
+    </div>
+  <% end %>
+</div> 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -114,6 +114,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
     t.index ["nombre"], name: "index_colors_on_nombre", unique: true
   end
 
+  create_table "fertilizer_histories", force: :cascade do |t|
+    t.string "usuario", null: false, comment: "Nombre o identificador del usuario que realizó el cambio"
+    t.bigint "fertilizer_id", null: false
+    t.integer "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fertilizer_id"], name: "index_fertilizer_histories_on_fertilizer_id"
+  end
+
+  create_table "fertilizers", force: :cascade do |t|
+    t.string "nombre", null: false
+    t.integer "cantidad", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "harvests", force: :cascade do |t|
     t.date "fecha"
     t.time "hora"
@@ -144,17 +160,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["reception_id"], name: "index_images_on_reception_id"
-  end
-
-  create_table "inventorie_histories", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "inventorie_id", null: false
-    t.integer "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
-    t.string "descripcion", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["inventorie_id"], name: "index_inventorie_histories_on_inventorie_id"
-    t.index ["user_id"], name: "index_inventorie_histories_on_user_id"
   end
 
   create_table "inventories", force: :cascade do |t|
@@ -247,6 +252,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
     t.string "rut"
   end
 
+  create_table "tool_histories", force: :cascade do |t|
+    t.string "usuario", null: false, comment: "Nombre o identificador del usuario que realizó el cambio"
+    t.bigint "tool_id", null: false
+    t.integer "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tool_id"], name: "index_tool_histories_on_tool_id"
+  end
+
+  create_table "tools", force: :cascade do |t|
+    t.string "nombre", null: false
+    t.integer "cantidad", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "nombre"
     t.string "apellido"
@@ -281,12 +302,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "agrochemical_histories", "agrochemicals"
   add_foreign_key "agrochemicals", "agrochemical_divisions"
+  add_foreign_key "fertilizer_histories", "fertilizers"
   add_foreign_key "harvests", "sectors"
   add_foreign_key "harvests", "users"
   add_foreign_key "harvests", "varieties"
   add_foreign_key "images", "receptions"
-  add_foreign_key "inventorie_histories", "inventories", column: "inventorie_id"
-  add_foreign_key "inventorie_histories", "users"
   add_foreign_key "irrigations", "sectors"
   add_foreign_key "irrigations", "users"
   add_foreign_key "sector_varieties", "sectors"
@@ -294,6 +314,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141543) do
   add_foreign_key "sector_variety_colors", "colors"
   add_foreign_key "sector_variety_colors", "sectors"
   add_foreign_key "sector_variety_colors", "varieties"
+  add_foreign_key "tool_histories", "tools"
   add_foreign_key "variety_colors", "colors"
   add_foreign_key "variety_colors", "varieties"
 end

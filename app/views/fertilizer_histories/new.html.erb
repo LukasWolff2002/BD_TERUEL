@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h1>Modificar Cantidad del Fertilizante: <%= @fertilizer.nombre %></h1>
+  <p><strong>Cantidad actual:</strong> <%= @fertilizer.cantidad %></p>
+  <p><strong>Usuario:</strong> <%= current_user.nombre_completo %></p>
+
+  <%= form_with(model: [@fertilizer, @fertilizer_history], local: true) do |f| %>
+    <div class="mb-3">
+      <%= f.label :cantidad_cambiada, "Cantidad a Modificar", class: "form-label" %>
+      <%= f.number_field :cantidad_cambiada, class: "form-control", placeholder: "Ingrese una cantidad (positiva o negativa)" %>
+      <small class="form-text text-muted">
+        Ingrese un número positivo para aumentar o negativo para disminuir la cantidad.
+      </small>
+      <% if @fertilizer_history.errors[:cantidad_cambiada].any? %>
+        <div class="text-danger">
+          <%= @fertilizer_history.errors[:cantidad_cambiada].first %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="d-flex">
+      <%= f.submit "Modificar Cantidad", class: "btn btn-primary me-2" %>
+      <%= link_to "Cancelar", fertilizers_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div> 

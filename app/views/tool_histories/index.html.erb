@@ -1,0 +1,24 @@
+<div class="container mt-4">
+  <h1>Historial General de Cambios</h1>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Herramienta</th>
+        <th>Usuario</th>
+        <th>Cantidad Modificada</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @tool_histories.each do |history| %>
+        <tr>
+          <td><%= history.tool.nombre %></td>
+          <td><%= history.usuario %></td>
+          <td><%= history.cantidad_cambiada %></td>
+          <td><%= history.created_at.strftime("%d-%m-%Y %H:%M") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div> 
