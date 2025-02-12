@@ -3,6 +3,7 @@
   
   <div class="mb-3">
     <%= link_to "Nuevo Agroquímico", new_agrochemical_path, class: "btn btn-primary" %>
+    <%= link_to "Divisiones Agroquímicas", agrochemical_divisions_path, class: "btn btn-primary" %>
     <%= link_to "Historial de Agroquímicos", agrochemical_histories_path, class: "btn btn-primary" %>
   </div>
   
@@ -26,6 +27,7 @@
             <td><%= agro.agrochemical_division.division if agro.agrochemical_division %></td>
             <td>
               <%= link_to "Modificar Cantidad", new_agrochemical_history_path(agrochemical_id: agro.id), class: "btn btn-sm btn-secondary" %>
+              <%= link_to "Ver", agrochemical_path(agro), class: "btn btn-sm btn-info" %>
             </td>
           </tr>
         <% end %>

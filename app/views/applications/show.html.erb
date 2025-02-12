@@ -1,0 +1,109 @@
+<div class="container mt-4">
+  <h1>Detalle de la Aplicación</h1>
+  
+  <div class="card">
+    <div class="card-header">
+      Detalle de la Aplicación (ID: <%= @application.id %>)
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <th>Fecha de Aplicación</th>
+            <td><%= @application.fecha_aplicacion %></td>
+          </tr>
+          <tr>
+            <th>Operador Tractor</th>
+            <td><%= @application.operador_tractor %></td>
+          </tr>
+          <tr>
+            <th>Aplicadores</th>
+            <td><%= @application.aplicadores %></td>
+          </tr>
+          <tr>
+            <th>Sector</th>
+            <td><%= @application.sector %></td>
+          </tr>
+          <tr>
+            <th>Motivo</th>
+            <td><%= @application.motivo %></td>
+          </tr>
+          <tr>
+            <th>Uso de Protección</th>
+            <td><%= @application.uso_de_proteccion ? "Sí" : "No" %></td>
+          </tr>
+          <tr>
+            <th>Observaciones</th>
+            <td><%= @application.observaciones %></td>
+          </tr>
+          <tr>
+            <th>Agroquímicos</th>
+            <td><%= @application.agroquimicos %></td>
+          </tr>
+          <tr>
+            <th>Dosificación</th>
+            <td>
+              <% if @application.dosis_en_100_l.present? %>
+                <%= @application.dosis_en_100_l %>
+              <% else %>
+                No definida
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <th>Maquinaria</th>
+            <td><%= @application.maquinaria %></td>
+          </tr>
+          <tr>
+            <th>Fecha de Liberación</th>
+            <td><%= @application.fecha_de_liberacion %></td>
+          </tr>
+          <tr>
+            <th>Mojamiento Relativo</th>
+            <td><%= @application.mojamiento_relativo %></td>
+          </tr>
+          <tr>
+            <th>Mojamiento Real</th>
+            <td><%= @application.mojamiento_real %></td>
+          </tr>
+          <tr>
+            <th>Encargado de Aplicación</th>
+            <td><%= @application.encargado_aplicacion %></td>
+          </tr>
+          <tr>
+            <th>Lavado de Equipo</th>
+            <td><%= @application.lavado_de_equipo ? "Sí" : "No" %></td>
+          </tr>
+          <tr>
+            <th>Temperatura</th>
+            <td><%= @application.temperature %></td>
+          </tr>
+          <tr>
+            <th>Humedad</th>
+            <td><%= @application.humidity %></td>
+          </tr>
+          <tr>
+            <th>Nubosidad</th>
+            <td><%= @application.nubosidad %></td>
+          </tr>
+          <tr>
+            <th>Viento</th>
+            <td><%= @application.viento %></td>
+          </tr>
+          <tr>
+            <th>Hora de Inicio</th>
+            <td><%= @application.hora_inicio.strftime("%H:%M") if @application.hora_inicio %></td>
+          </tr>
+          <tr>
+            <th>Hora de Fin</th>
+            <td><%= @application.hora_fin.strftime("%H:%M") if @application.hora_fin %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer">
+      
+      <%= link_to "Volver", applications_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+</div> 

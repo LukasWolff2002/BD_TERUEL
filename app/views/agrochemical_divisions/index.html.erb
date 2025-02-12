@@ -1,0 +1,28 @@
+<div class="container mt-4">
+  <h1>Divisiones Agroquímicas</h1>
+  
+  <% if @agrochemical_divisions.any? %>
+    <table class="table table-bordered table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>División</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @agrochemical_divisions.each do |division| %>
+          <tr>
+           
+            <td><%= division.division %></td>
+            
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>No existen divisiones agroquímicas registradas.</p>
+  <% end %>
+  
+  <div class="mt-3">
+    <%= link_to "Nueva División Agroquímica", new_agrochemical_division_path, class: "btn btn-primary" %>
+  </div>
+</div> 

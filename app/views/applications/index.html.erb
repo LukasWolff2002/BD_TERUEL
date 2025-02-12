@@ -29,11 +29,9 @@
             <td><%= app.agroquimicos %></td>
             <td><%= app.mojamiento_real %></td>
             <td><%= app.fecha_de_liberacion %></td>
-            <td><%= app.dosis_en_100_l %></td>
+            <td><%= app.dosis_en_100_l if app.dosis_en_100_l.present? %></td>
             <td>
               <%= link_to "Ver", application_path(app), class: "btn btn-sm btn-info" %>
-              <%= link_to "Editar", edit_application_path(app), class: "btn btn-sm btn-secondary" %>
-              <%= link_to "Eliminar", application_path(app), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "btn btn-sm btn-danger" %>
             </td>
           </tr>
         <% end %>

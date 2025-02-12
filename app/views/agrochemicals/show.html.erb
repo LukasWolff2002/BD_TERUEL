@@ -1,0 +1,24 @@
+<div class="container mt-4">
+  <h1>Detalle de Agroquímico</h1>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3><%= @agrochemical.nombre %></h3>
+    </div>
+    <div class="card-body">
+      <p><strong>Cantidad:</strong> <%= @agrochemical.cantidad %></p>
+      <p><strong>Ingrediente Activo:</strong> <%= @agrochemical.ingrediente_activo %></p>
+      <p><strong>Objetivo:</strong> <%= @agrochemical.objetivo %></p>
+      <p><strong>División:</strong> <%= @agrochemical.agrochemical_division.division %></p>
+      <p><strong>pH:</strong> <%= @agrochemical.ph %></p>
+      <p><strong>Incompatibilidades:</strong> <%= @agrochemical.incomatibilidad %></p>
+      <p><strong>Carencias:</strong> <%= @agrochemical.carencias %></p>
+      <p><strong>Reingreso:</strong> <%= @agrochemical.reingreso %> días</p>
+      <p><strong>Daño a Abejorros:</strong> <%= @agrochemical.daño_a_abejorros %></p>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <%= link_to "Volver", agrochemicals_path, class: "btn btn-primary" %>
+  </div>
+</div> 

@@ -1,0 +1,26 @@
+<div class="container mt-4">
+  <h1>Nueva División Agroquímica</h1>
+  
+  <%= form_with(model: @agrochemical_division, local: true) do |f| %>
+    <% if @agrochemical_division.errors.any? %>
+      <div class="alert alert-danger">
+        <h4>Se encontraron errores:</h4>
+        <ul>
+          <% @agrochemical_division.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  
+    <div class="form-group">
+      <%= f.label :division, "División" %>
+      <%= f.text_field :division, class: "form-control" %>
+    </div>
+  
+    <div class="mt-3">
+      <%= f.submit "Crear División", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", agrochemical_divisions_path, class: "btn btn-secondary ml-2" %>
+    </div>
+  <% end %>
+</div> 

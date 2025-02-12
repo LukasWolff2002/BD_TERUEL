@@ -19,9 +19,17 @@
       <%= f.date_field :fecha_aplicacion, class: "form-control" %>
     </div>
 
+    <!-- Sector con atributo data (hectáreas) -->
     <div class="form-group">
-      <%= f.label :sector, "Sector" %>
-      <%= f.select :sector, options_for_select(Sector.pluck(:nombre)), { include_blank: 'Seleccione un sector' }, class: "form-control" %>
+    <%= f.label :sector, "Sector" %>
+    <% sector_options = Sector.all.map { |s| [ s.nombre, s.nombre, { "data-hectareas" => s.hectareas } ] } %>
+    <%= f.select :sector, options_for_select(sector_options), { include_blank: 'Seleccione un sector' }, class: "form-control", id: "application_sector" %>
+    </div>
+
+    <!-- Hectáreas: se autocompleta según sector seleccionado, solo se muestra y no es modificable -->
+    <div class="form-group">
+    <%= f.label :hectareas, "Hectáreas" %>
+    <%= f.number_field :hectareas, class: "form-control", step: :any, id: "application_hectareas", readonly: true %>
     </div>
 
     <div class="form-group">
@@ -66,14 +74,19 @@
       <small class="form-text text-muted">
         Seleccione agroquímicos de la lista y asigne la dosis en 100 L correspondiente.
       </small>
-      <!-- Campos ocultos para almacenar los datos combinados -->
+      <!-- Campo oculto para almacenar la lista de agroquímicos (ej: nombres) -->
       <%= f.hidden_field :agroquimicos, id: "agroquimicos-field" %>
-      <%= f.hidden_field :dosis_en_100_l, id: "dosis-field" %>
+      <!-- Contenedor para generar dinámicamente múltiples campos ocultos de dosificación -->
+      <div id="dosificacion-fields-container" style="display: none;"></div>
     </div>
 
+    <!-- Maquinaria con opciones concretas -->
     <div class="form-group">
       <%= f.label :maquinaria, "Maquinaria" %>
-      <%= f.text_field :maquinaria, class: "form-control" %>
+      <%= f.select :maquinaria, 
+                   options_for_select(["Tractor con nebulizadora", "Pulverizadora", "Maquina de espalda"]), 
+                   { include_blank: 'Seleccione la maquinaria' }, 
+                   class: "form-control" %>
     </div>
 
     <!-- Datos para Cálculos -->
@@ -81,16 +94,13 @@
       <%= f.label :mojamiento_relativo, "Mojamiento Relativo" %>
       <%= f.number_field :mojamiento_relativo, class: "form-control", step: :any %>
     </div>
-    <div class="form-group">
-      <%= f.label :hectareas, "Hectáreas" %>
-      <%= f.number_field :hectareas, class: "form-control", step: :any %>
-    </div>
 
-    <!-- Datos Adicionales -->
-    <div class="form-group">
-      <%= f.label :encargado_aplicacion, "Encargado de Aplicación" %>
-      <%= f.text_field :encargado_aplicacion, class: "form-control" %>
-    </div>
+    <!-- Campo Encargado de Aplicación: se muestra el current_user y se envía mediante un campo oculto -->
+<div class="form-group">
+  <%= f.label :encargado_aplicacion, "Encargado de Aplicación" %>
+  <%= text_field_tag :encargado_aplicacion_display, current_user.nombre, class: "form-control", disabled: true %>
+  <%= f.hidden_field :encargado_aplicacion, value: current_user.nombre %>
+</div>
     <div class="form-group">
       <%= f.label :lavado_de_equipo, "Lavado de Equipo" %>
       <%= f.check_box :lavado_de_equipo %>
@@ -151,9 +161,19 @@
   </div>
 </div>
 
-<!-- JavaScript para agregar/quitar agroquímicos y compilar los datos -->
+<!-- JavaScript para agregar/quitar agroquímicos, compilar la lista de agroquímicos y crear los campos ocultos para la dosificación -->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
+    // Actualizar hectáreas según sector seleccionado
+    var sectorSelect = document.getElementById("application_sector");
+    var hectareasField = document.getElementById("application_hectareas");
+    sectorSelect.addEventListener("change", function() {
+      var selectedOption = sectorSelect.options[sectorSelect.selectedIndex];
+      var hectareas = selectedOption.getAttribute("data-hectareas");
+      hectareasField.value = hectareas || "";
+    });
+
+    // Manejo de agroquímicos
     const addButton = document.getElementById("add-agrochemical");
     const container = document.getElementById("agrochemicals-container");
     const template = document.getElementById("agrochemical-template").innerHTML;
@@ -168,21 +188,34 @@
       }
     });
     
-    // Al enviar el formulario, se compilan los valores de cada fila en los campos ocultos
+    // Al enviar el formulario, se compilan los valores:
+    // - Se junta la lista de agroquímicos seleccionados.
+    // - Se generan, para cada agroquímico, un campo oculto para la dosis.
     const form = document.querySelector("form");
     form.addEventListener("submit", function() {
       let agroValues = [];
-      let doseValues = [];
+      const dosificacionContainer = document.getElementById("dosificacion-fields-container");
+      // Limpiar cualquier campo oculto previamente generado
+      dosificacionContainer.innerHTML = "";
+
       container.querySelectorAll(".agrochemical-row").forEach(function(row) {
-        const select = row.querySelector(".agrochemical-select");
+        const agroSelect = row.querySelector(".agrochemical-select");
         const doseInput = row.querySelector(".agrochemical-dose");
-        if (select.value.trim() !== "") {
-          agroValues.push(select.value);
-          doseValues.push(doseInput.value);
+        if (agroSelect.value.trim() !== "") {
+          agroValues.push(agroSelect.value);
+          const dose = parseFloat(doseInput.value);
+          if (!isNaN(dose)) {
+            // Crear un hidden input para la dosis de este agroquímico.
+            let inputHidden = document.createElement("input");
+            inputHidden.type = "hidden";
+            // Usamos la notación [] para que Rails lo trate como arreglo
+            inputHidden.name = "application[dosificacion][]";
+            inputHidden.value = dose;
+            dosificacionContainer.appendChild(inputHidden);
+          }
         }
       });
       document.getElementById("agroquimicos-field").value = agroValues.join(", ");
-      document.getElementById("dosis-field").value = doseValues.join(", ");
     });
   });
 </script> 

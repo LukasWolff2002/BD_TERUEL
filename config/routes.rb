@@ -35,6 +35,7 @@ Rails.application.routes.draw do
   resources :colors
   resources :applications
   resources :suppliers
+  resources :agrochemical_divisions
   resources :agrochemicals do
     member do
       get 'edit_quantity'
