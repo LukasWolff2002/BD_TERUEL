@@ -1,80 +1,76 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
-          <h2>Editar Usuario</h2>
+    <div class="col-lg-6 col-md-8 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #cfe2ff;">
+          <h2 class="fw-bold mb-0">Editar Usuario</h2>
         </div>
-        
-        <div class="card-body">
+
+        <div class="card-body p-4">
           <%= form_with(model: @user, local: true) do |f| %>
+
             <% if @user.errors.any? %>
-              <div class="alert alert-danger">
-                <h4><%= pluralize(@user.errors.count, "error") %> impidieron actualizar este usuario:</h4>
-                <ul>
-                  <% @user.errors.full_messages.each do |msg| %>
-                    <li><%= msg %></li>
-                  <% end %>
-                </ul>
+              <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-1"><%= pluralize(@user.errors.count, "error") %> impidieron actualizar este usuario:</h6>
+                  <ul class="mb-0 ps-3">
+                    <% @user.errors.full_messages.each do |msg| %>
+                      <li><%= msg %></li>
+                    <% end %>
+                  </ul>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             <% end %>
 
             <div class="mb-3">
-              <%= f.label :nombre, "Nombre", class: "form-label" %>
-              <%= f.text_field :nombre, class: "form-control", placeholder: "Ingrese nombre" %>
+              <%= f.label :nombre, "Nombre", class: "form-label fw-bold text-primary" %>
+              <%= f.text_field :nombre, class: "form-control shadow-sm border-0", placeholder: "Ingrese nombre" %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :apellido, "Apellido", class: "form-label" %>
-              <%= f.text_field :apellido, class: "form-control", placeholder: "Ingrese apellido" %>
-            </div>
-            
-            <div class="mb-3">
-              <%= f.label :email, "Email", class: "form-label" %>
-              <%= f.email_field :email, class: "form-control", placeholder: "Ingrese email" %>
+              <%= f.label :apellido, "Apellido", class: "form-label fw-bold text-primary" %>
+              <%= f.text_field :apellido, class: "form-control shadow-sm border-0", placeholder: "Ingrese apellido" %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :rut, "RUT", class: "form-label" %>
-              <%= f.text_field :rut, class: "form-control", placeholder: "Ej: 12.345.678-9" %>
+              <%= f.label :email, "Email", class: "form-label fw-bold text-primary" %>
+              <%= f.email_field :email, class: "form-control shadow-sm border-0", placeholder: "Ingrese email" %>
             </div>
 
             <div class="mb-3">
-              <%= f.label :cargo, "Cargo", class: "form-label" %>
+              <%= f.label :rut, "RUT", class: "form-label fw-bold text-primary" %>
+              <%= f.text_field :rut, class: "form-control shadow-sm border-0", placeholder: "Ej: 12.345.678-9" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :cargo, "Cargo", class: "form-label fw-bold text-primary" %>
               <%= f.select :cargo, 
-                  [
-                    'Administrativo',
-                    'Jefe de Campo',
-                    'Jefe Tecnico',
-                    'Jefe Packing',
-                    'Riego',
-                    'Cosechador',
-                    'Volante'
-                  ],
+                  ['Administrativo', 'Jefe de Campo', 'Jefe Tecnico', 'Jefe Packing', 'Riego', 'Cosechador', 'Volante'],
                   { prompt: 'Seleccione un cargo' },
-                  class: "form-select"
+                  class: "form-select shadow-sm border-0"
               %>
             </div>
 
-            <div class="mb-3">
-              <%= f.label :contrato, "Tipo de Contrato", class: "form-label" %>
+            <div class="mb-4">
+              <%= f.label :contrato, "Tipo de Contrato", class: "form-label fw-bold text-primary" %>
               <%= f.select :contrato,
-                  [
-                    ['Interno', 'interno'],
-                    ['Externo', 'externo']
-                  ],
+                  [['Interno', 'interno'], ['Externo', 'externo']],
                   { prompt: 'Seleccione tipo de contrato' },
-                  class: "form-select"
+                  class: "form-select shadow-sm border-0"
               %>
             </div>
 
-            <div class="d-grid gap-2">
-              <%= f.submit "Actualizar Usuario", class: "btn btn-primary" %>
-              <%= link_to "Cancelar", users_path, class: "btn btn-secondary mt-2" %>
+            <div class="d-grid gap-3">
+              <%= f.submit "Actualizar Usuario", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #cfe2ff;" %>
+
+              <%= link_to "Cancelar", users_path, class: "btn btn-outline-primary btn-lg shadow-sm w-100" %>
             </div>
+
           <% end %>
         </div>
       </div>
     </div>
   </div>
-</div> 
+</div>

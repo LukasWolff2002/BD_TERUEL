@@ -1,37 +1,48 @@
 <div class="container mt-4">
-  <h1 class="mb-4">Listado de Agroquímicos</h1>
-  
-  <div class="mb-3">
-    <%= link_to "Nuevo Agroquímico", new_agrochemical_path, class: "btn btn-primary" %>
-    <%= link_to "Divisiones Agroquímicas", agrochemical_divisions_path, class: "btn btn-primary" %>
-    <%= link_to "Historial de Agroquímicos", agrochemical_histories_path, class: "btn btn-primary" %>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <!-- Título en morado oscuro (#6f42c1) -->
+    <h1 class="fw-bold" style="color: #6f42c1;">Agroquímicos</h1>
+    <%= link_to new_agrochemical_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #e2d4f0;" do %>
+      <i class="bi bi-plus-circle me-2"></i> Nuevo Agroquímico
+    <% end %>
   </div>
   
-  <% if @agrochemicals.empty? %>
-    <p>No hay agroquímicos registrados.</p>
-  <% else %>
-    <table class="table table-bordered table-hover">
-      <thead class="thead-light">
-        <tr>
-          <th>Nombre</th>
-          <th>Cantidad</th>
-          <th>División</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @agrochemicals.each do |agro| %>
+  <% if @agrochemicals.any? %>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm" style="background-color: #e2d4f0;">
+        <thead class="table-success text-center">
           <tr>
-            <td><%= agro.nombre %></td>
-            <td><%= agro.cantidad %></td>
-            <td><%= agro.agrochemical_division.division if agro.agrochemical_division %></td>
-            <td>
-              <%= link_to "Modificar Cantidad", new_agrochemical_history_path(agrochemical_id: agro.id), class: "btn btn-sm btn-secondary" %>
-              <%= link_to "Ver", agrochemical_path(agro), class: "btn btn-sm btn-info" %>
-            </td>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>División</th>
+            <th>Acciones</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @agrochemicals.each do |agro| %>
+            <tr>
+              <td class="text-center"><%= agro.nombre %></td>
+              <td class="text-center"><%= agro.cantidad %></td>
+              <td class="text-center"><%= agro.agrochemical_division.division if agro.agrochemical_division %></td>
+              <td class="text-center d-flex justify-content-center gap-2">
+                <%= link_to new_agrochemical_history_path(agrochemical_id: agro.id), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-pencil-square"></i>
+                  <span class="d-none d-md-inline ms-1">Modificar Cantidad</span>
+                <% end %>
+                <%= link_to agrochemical_path(agro), class: "btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-eye"></i>
+                  <span class="d-none d-md-inline ms-1">Ver</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-warning text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No hay agroquímicos registrados.</p>
+    </div>
   <% end %>
-</div> 
+</div>

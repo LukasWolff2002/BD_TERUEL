@@ -1,57 +1,70 @@
 <div class="container mt-4">
-  <h1>Editar Sector</h1>
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #d1e7dd;">
+          <h2 class="fw-bold mb-0">Editar Sector</h2>
+        </div>
 
-  <%= form_with(model: @sector, local: true) do |f| %>
-    <% if @sector.errors.any? %>
-      <div class="alert alert-danger">
-        <h2><%= pluralize(@sector.errors.count, "error") %> impidieron guardar el sector:</h2>
-        <ul>
-          <% @sector.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+        <div class="card-body p-4">
+          <%= form_with(model: @sector, local: true) do |f| %>
 
-    <!-- Datos básicos del Sector -->
-    <div class="mb-3">
-      <%= f.label :nombre, "Nombre", class: "form-label" %>
-      <%= f.text_field :nombre, class: "form-control" %>
-    </div>
-
-    <div class="mb-3">
-      <%= f.label :hectareas, "Hectáreas", class: "form-label" %>
-      <%= f.number_field :hectareas, class: "form-control" %>
-    </div>
-
-    <!-- Sección para elegir Variedades y ajustar los Colores asignados -->
-    <div class="mb-3">
-      <h3>Variedades y sus Colores</h3>
-      <%# Itera sobre todas las variedades existentes ordenadas por nombre %>
-      <% Variety.order(:nombre).each do |variety| %>
-        <div class="mb-2 border p-2">
-          <!-- Checkbox para incluir la variedad en este sector -->
-          <%= check_box_tag "sector[variety_ids][]", variety.id, @sector.variety_ids.include?(variety.id), id: "variety_#{variety.id}" %>
-          <%= label_tag "variety_#{variety.id}", variety.nombre %>
-
-          <!-- Itera sobre los colores de la variedad para configurar los checkboxes -->
-          <div class="ms-4">
-            <% variety.colors.each do |color| %>
-              <div class="form-check form-check-inline">
-                <% # Verifica si en este sector se tiene asignado este color para la variedad actual %>
-                <% is_checked = @sector.sector_variety_colors.exists?(variety_id: variety.id, color_id: color.id) %>
-                <%= check_box_tag "sector[sector_variety_color_assignments][#{variety.id}][]", color.id, is_checked, class: "form-check-input", id: "variety_#{variety.id}_color_#{color.id}" %>
-                <%= label_tag "variety_#{variety.id}_color_#{color.id}", color.nombre, class: "form-check-label" %>
+            <% if @sector.errors.any? %>
+              <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-1"><%= pluralize(@sector.errors.count, "error") %> impidieron actualizar este sector:</h6>
+                  <ul class="mb-0 ps-3">
+                    <% @sector.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             <% end %>
-          </div>
-        </div>
-      <% end %>
-    </div>
 
-    <div class="actions">
-      <%= f.submit "Actualizar Sector", class: "btn btn-primary" %>
-      <%= link_to "Cancelar", sectors_path, class: "btn btn-secondary" %>
+            <!-- Datos básicos del Sector -->
+            <div class="mb-3">
+              <%= f.label :nombre, "Nombre", class: "form-label fw-bold text-success" %>
+              <%= f.text_field :nombre, class: "form-control shadow-sm border-0", placeholder: "Ingrese el nombre del sector" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :hectareas, "Hectáreas", class: "form-label fw-bold text-success" %>
+              <%= f.number_field :hectareas, class: "form-control shadow-sm border-0", placeholder: "Ingrese el número de hectáreas" %>
+            </div>
+
+            <!-- Sección para elegir Variedades y ajustar los Colores asignados -->
+            <div class="mb-3">
+              <h3 class="fw-bold text-success">Variedades y sus Colores</h3>
+              <% Variety.order(:nombre).each do |variety| %>
+                <div class="mb-2 p-3 rounded shadow-sm" style="background-color: #d1e7dd;">
+                  <%= check_box_tag "sector[variety_ids][]", variety.id, @sector.variety_ids.include?(variety.id), id: "variety_#{variety.id}", class: "form-check-input" %>
+                  <%= label_tag "variety_#{variety.id}", variety.nombre, class: "fw-bold text-success" %>
+
+                  <div class="ms-4 mt-2">
+                    <% variety.colors.each do |color| %>
+                      <div class="form-check form-check-inline">
+                        <% is_checked = @sector.sector_variety_colors.exists?(variety_id: variety.id, color_id: color.id) %>
+                        <%= check_box_tag "sector[sector_variety_color_assignments][#{variety.id}][]", color.id, is_checked, class: "form-check-input", id: "variety_#{variety.id}_color_#{color.id}" %>
+                        <%= label_tag "variety_#{variety.id}_color_#{color.id}", color.nombre, class: "form-check-label" %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="d-grid gap-3">
+              <%= f.submit "Actualizar Sector", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #d1e7dd;" %>
+
+              <%= link_to "Cancelar", sectors_path, class: "btn btn-outline-success btn-lg shadow-sm w-100" %>
+            </div>
+
+          <% end %>
+        </div>
+      </div>
     </div>
-  <% end %>
-</div> 
+  </div>
+</div>

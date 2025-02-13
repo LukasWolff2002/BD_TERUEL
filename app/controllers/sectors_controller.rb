@@ -5,6 +5,10 @@ class SectorsController < ApplicationController
     @sectors = Sector.all.order(:nombre)
   end
 
+  def show
+    @sector = Sector.find(params[:id])
+  end
+
   def new
     @sector = Sector.new
   end

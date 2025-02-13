@@ -29,7 +29,7 @@ Rails.application.routes.draw do
       patch :update_varieties
     end
   end
-  resources :varieties, only: [:index, :new, :create, :edit, :update, :destroy]
+  resources :varieties
   resources :irrigations
   resources :harvests
   resources :colors

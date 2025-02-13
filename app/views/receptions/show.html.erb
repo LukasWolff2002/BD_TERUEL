@@ -30,17 +30,15 @@
                 <% end %>
               </td>
             </tr>
-              <th>Proveedor:</th>
-                <td>
-                  <% if @reception.supplier.present? %>
-                    <%= @reception.supplier.nombre %>
-                  <% else %>
-                    <em>Sin proveedor</em>
-                  <% end %>
-                </td>
             <tr>
-              
-              
+              <th>Proveedor:</th>
+              <td>
+                <% if @reception.supplier.present? %>
+                  <%= @reception.supplier.nombre %>
+                <% else %>
+                  <em>Sin proveedor</em>
+                <% end %>
+              </td>
             </tr>
           </table>
 
@@ -69,21 +67,37 @@
                   <th>Calidad:</th>
                   <td><%= item['calidad'] %></td>
                 </tr>
+                <tr>
+                  <th>Palets:</th>
+                  <td><%= item['pallets'] %></td>
+                </tr>
+                <tr>
+                  <th>Cajas:</th>
+                  <td><%= item['cajas'] %></td>
+                </tr>
+                <tr>
+                  <th>Kilos:</th>
+                  <td><%= number_with_precision(item['kilos'].to_d, precision: 2) %> kg</td>
+                </tr>
               </table>
             <% end %>
           <% else %>
             <p>No se han agregado detalles del producto.</p>
           <% end %>
 
-          <h4 class="mt-4">Cantidades</h4>
+          <%# Calculamos totales globales a partir de los items %>
+          <% total_palets = @reception.reception_items.sum { |item| item['pallets'].to_i } %>
+          <% total_cajas = @reception.reception_items.sum { |item| item['cajas'].to_i } %>
+
+          <h4 class="mt-4">Totales Globales</h4>
           <table class="table">
             <tr>
-              <th>Pallets:</th>
-              <td><%= @reception.pallets %></td>
+              <th>Total Palets:</th>
+              <td><%= total_palets %></td>
             </tr>
             <tr>
-              <th>Cajas:</th>
-              <td><%= @reception.cajas %></td>
+              <th>Total Cajas:</th>
+              <td><%= total_cajas %></td>
             </tr>
             <tr>
               <th>Kilos Totales:</th>

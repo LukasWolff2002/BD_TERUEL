@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #f8d7da;">
+          <h2 class="fw-bold mb-0">Detalles de la Variedad</h2>
+        </div>
+
+        <div class="card-body p-4">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Nombre:</strong> <%= @variety.nombre %>
+            </li>
+            <li class="list-group-item">
+              <strong>Colores Asociados:</strong>
+              <div class="mt-2">
+                <% if @variety.colors.any? %>
+                  <% @variety.colors.each do |color| %>
+                    <span class="badge bg-secondary"><%= color.nombre %></span>
+                  <% end %>
+                <% else %>
+                  <em class="text-muted">No tiene colores asociados</em>
+                <% end %>
+              </div>
+            </li>
+          </ul>
+
+          <div class="d-grid gap-3 mt-4">
+            <%= link_to "Editar Variedad", edit_variety_path(@variety), class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #f8d7da;" %>
+            <%= link_to "Volver", varieties_path, class: "btn btn-outline-danger btn-lg shadow-sm w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

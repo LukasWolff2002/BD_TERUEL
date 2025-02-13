@@ -7,7 +7,7 @@ puts "Reiniciando la base de datos..."
 SectorVarietyColor.delete_all
 VarietyColor.delete_all
 Sector.delete_all
-
+Reception.delete_all
 Color.delete_all
 Variety.delete_all
 User.delete_all
@@ -15,6 +15,7 @@ Supplier.delete_all
 Agrochemical.delete_all
 AgrochemicalDivision.delete_all
 Tool.delete_all
+FertilizerHistory.delete_all
 Fertilizer.delete_all
 
 puts "Creando usuarios..."

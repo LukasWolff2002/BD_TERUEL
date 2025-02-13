@@ -170,17 +170,25 @@
 
 <!-- JavaScript para gestión de sector y agroquímicos -->
 <script>
-  // Si usas Rails 7 con Turbo, es preferible reemplazar 'DOMContentLoaded' por 'turbo:load'
+  // Usa 'turbo:load' para asegurarte de que el código se ejecute en Rails 7 con Turbo
   document.addEventListener("turbo:load", function() {
-    // Actualizar el campo de hectáreas según el sector seleccionado
+    // Actualizar hectáreas según sector seleccionado
     var sectorSelect = document.getElementById("application_sector");
     var hectareasField = document.getElementById("application_hectareas");
-    sectorSelect.addEventListener("change", function() {
-      var selectedOption = sectorSelect.options[sectorSelect.selectedIndex];
-      var hectareas = selectedOption.getAttribute("data-hectareas");
-      hectareasField.value = hectareas || "";
-    });
-
+    if(sectorSelect && hectareasField) {
+      // Función para actualizar el campo de hectáreas
+      const actualizarHectareas = function() {
+        var selectedOption = sectorSelect.options[sectorSelect.selectedIndex];
+        var hectareas = selectedOption.getAttribute("data-hectareas") || "";
+        console.log("Sector seleccionado:", selectedOption.value, "=> Hectáreas:", hectareas);
+        hectareasField.value = hectareas;
+      };
+      // Asignar evento change
+      sectorSelect.addEventListener("change", actualizarHectareas);
+      // Actualiza si ya hay un valor seleccionado inicialmente
+      actualizarHectareas();
+    }
+    
     // Gestión de agroquímicos
     const addButton = document.getElementById("add-agrochemical");
     const container = document.getElementById("agrochemicals-container");
@@ -196,16 +204,13 @@
       }
     });
     
-    // Al enviar el formulario, compilar la lista de agroquímicos y la dosificación
+    // Al enviar el formulario, compilar agroquímicos y dosis
     const form = document.querySelector("form");
     form.addEventListener("submit", function() {
       let agroValues = [];
       const dosificacionContainer = document.getElementById("dosificacion-fields-container");
-      // Limpiar campos ocultos previamente generados
+      // Limpiar campos ocultos previos
       dosificacionContainer.innerHTML = "";
-      
-      // Para depuración
-      console.log("Número de filas de agroquímicos:", container.querySelectorAll(".agrochemical-row").length);
       
       container.querySelectorAll(".agrochemical-row").forEach(function(row) {
         const agroSelect = row.querySelector(".agrochemical-select");
@@ -222,8 +227,7 @@
           }
         }
       });
-      console.log("Agroquímicos seleccionados:", agroValues);
       document.getElementById("agroquimicos-field").value = agroValues.join(", ");
     });
   });
-</script>
+</script> 

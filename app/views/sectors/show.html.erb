@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #d1e7dd;">
+          <h2 class="fw-bold mb-0">Detalles del Sector</h2>
+        </div>
+
+        <div class="card-body p-4">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Nombre:</strong> <%= @sector.nombre %>
+            </li>
+            <li class="list-group-item">
+              <strong>Hectáreas:</strong> <%= @sector.hectareas %>
+            </li>
+            <li class="list-group-item">
+              <strong>Variedades y Colores:</strong>
+              <ul class="mt-2">
+                <% grouped = @sector.sector_variety_colors.group_by(&:variety) %>
+                <% if grouped.present? %>
+                  <% grouped.each do |variety, svc_records| %>
+                    <li class="mb-2">
+                      <strong><%= variety.nombre %>:</strong>
+                      <% svc_records.map { |svc| svc.color.nombre }.uniq.each do |color| %>
+                        <span class="badge bg-secondary"><%= color %></span>
+                      <% end %>
+                    </li>
+                  <% end %>
+                <% else %>
+                  <p class="text-muted">No hay variedades asociadas</p>
+                <% end %>
+              </ul>
+            </li>
+          </ul>
+
+          <div class="d-grid gap-3 mt-4">
+            <%= link_to "Editar Sector", edit_sector_path(@sector), class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #d1e7dd;" %>
+            <%= link_to "Volver", sectors_path, class: "btn btn-outline-success btn-lg shadow-sm w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,43 +1,35 @@
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Sectores</h1>
-    <%= link_to "Nuevo Sector", new_sector_path, class: "btn btn-primary" %>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="fw-bold text-success mb-3 mb-md-0">Sectores</h1>
+    <%= link_to new_sector_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7dd;" do %>
+      <i class="bi bi-plus-circle me-2"></i> Nuevo Sector
+    <% end %>
   </div>
 
   <% if @sectors.any? %>
-    <div class="table-responsive">
-      <table class="table table-striped table-hover">
-        <thead class="table-dark">
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm" style="background-color: #d1e7dd;">
+        <thead class="table-success text-center">
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Hectáreas</th>
-            <th>Variedades y Colores</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <% @sectors.each do |sector| %>
             <tr>
-              <td><%= sector.id %></td>
-              <td><%= sector.nombre %></td>
-              <td><%= sector.hectareas %></td>
-              <td>
-                <% grouped = sector.sector_variety_colors.group_by(&:variety) %>
-                <% if grouped.present? %>
-                  <% grouped.each do |variety, svc_records| %>
-                    <div>
-                      <strong><%= variety.nombre %>:</strong>
-                      <%= svc_records.map { |svc| svc.color.nombre }.uniq.join(", ") %>
-                     
-                    </div>
-                  <% end %>
-                <% else %>
-                  <em>No hay variedades asociadas</em>
+              <td class="text-center"><%= sector.nombre %></td>
+              <td class="text-center"><%= sector.hectareas %></td>
+              <td class="text-center d-flex justify-content-center gap-2">
+                <%= link_to edit_sector_path(sector), class: "btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-pencil-square"></i>
+                  <span class="d-none d-md-inline ms-1">Editar</span>
                 <% end %>
-              </td>
-              <td>
-                <%= link_to "Editar Sector", edit_sector_path(sector), class: "btn btn-sm btn-warning" %>
+                <%= link_to sector, class: "btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-eye"></i>
+                  <span class="d-none d-md-inline ms-1">Ver</span>
+                <% end %>
               </td>
             </tr>
           <% end %>
@@ -45,8 +37,9 @@
       </table>
     </div>
   <% else %>
-    <div class="alert alert-info">
-      <i class="bi bi-info-circle"></i> No hay sectores registrados.
+    <div class="alert alert-warning text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No hay sectores registrados.</p>
     </div>
   <% end %>
-</div> 
+</div>

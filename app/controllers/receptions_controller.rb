@@ -1,4 +1,7 @@
 class ReceptionsController < ApplicationController
+  # Se asegura que estas variables se carguen en nuevas recepciones o cuando hay errores en create
+  before_action :load_collections, only: [:new, :create]
+
   def index
     @receptions = Reception.activos.order(created_at: :desc)
   end
@@ -11,58 +14,14 @@ class ReceptionsController < ApplicationController
     @reception = Reception.new
     @reception.fecha = Date.today
     @reception.hora  = Time.current
-  
-    # Carga los sectores junto con sus variedades y los colores asociados
-    @sectors = Sector.includes(varieties: :colors).all
-  
-    # Construye un hash para que cada sector tenga un arreglo de variedades únicas,
-    # donde cada variedad es representada por un hash que contiene:
-    # - id de la variedad,
-    # - nombre de la variedad,
-    # - los colores específicos presentes para esa combinación de sector y variedad.
-    @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
-      hash[sector.id] = sector.varieties.distinct.map do |variety|
-        colors = Color.joins(:sector_variety_colors)
-                      .where(sector_variety_colors: { sector_id: sector.id, variety_id: variety.id })
-                      .distinct
-                      .pluck(:nombre)
-        {
-          id: variety.id,
-          nombre: variety.nombre,
-          colors: colors
-        }
-      end
-    end
-
-    # Cargar la lista de proveedores para el select. En cada recepción se elegirá un solo proveedor.
-    @suppliers = Supplier.all
   end
-  
 
   def create
     @reception = Reception.new(reception_params)
-  
+
     if @reception.save
       redirect_to @reception, notice: 'Recepción creada exitosamente.'
     else
-      # Re-cargar las colecciones necesarias para que el formulario pueda renderizarse 
-      # correctamente al presentar errores de validación.
-      @sectors = Sector.includes(varieties: :colors).all
-      @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
-        hash[sector.id] = sector.varieties.distinct.map do |variety|
-          colors = Color.joins(:sector_variety_colors)
-                        .where(sector_variety_colors: { sector_id: sector.id, variety_id: variety.id })
-                        .distinct
-                        .pluck(:nombre)
-          {
-            id: variety.id,
-            nombre: variety.nombre,
-            colors: colors
-          }
-        end
-      end
-      @suppliers = Supplier.all
-  
       render :new, status: :unprocessable_entity
     end
   end
@@ -102,18 +61,48 @@ class ReceptionsController < ApplicationController
 
   private
 
+  def load_collections
+    # Carga de sectores para proveedor Agricola Teruel
+    @sectors = Sector.includes(varieties: :colors).all
+    @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
+      hash[sector.id] = sector.varieties.distinct.map do |variety|
+        colors = Color.joins(:sector_variety_colors)
+                      .where(sector_variety_colors: { sector_id: sector.id, variety_id: variety.id })
+                      .distinct
+                      .pluck(:nombre)
+        { id: variety.id, nombre: variety.nombre, colors: colors }
+      end
+    end
+
+    # Para proveedores distintos a Agricola Teruel, se listan todas las variedades globalmente
+    @all_varieties = Variety.includes(:colors).distinct.map do |variety|
+      { id: variety.id, nombre: variety.nombre, colors: variety.colors.pluck(:nombre).uniq }
+    end
+
+    # Cargar la lista de proveedores
+    @suppliers = Supplier.all
+  end
+
   def reception_params
-    params.require(:reception).permit(
+    # Procesamos el arreglo de reception_items para asegurarnos
+    # de que contenga siempre las claves :pallets, :cajas y :kilos.
+    raw_params = params.require(:reception).to_unsafe_h
+    raw_params["reception_items"] = Array.wrap(raw_params["reception_items"]).map do |item|
+      item = item.to_h.stringify_keys
+      item["pallets"] = "0" if item["pallets"].blank?
+      item["cajas"]   = "0" if item["cajas"].blank?
+      item["kilos"]   = "0" if item["kilos"].blank?
+      item
+    end
+
+    ActionController::Parameters.new(raw_params).permit(
       :fecha,
       :hora,
       :user_id,
       :nro_guia_despacho,
-      :pallets,
-      :cajas,
-      :kilos_totales,
       :guia_despacho,
-      :supplier_id,    # Se permite la elección de un único proveedor
-      reception_items: [:sector, :variety, :color, :firmeza, :calidad]  # Múltiples productos
+      :supplier_id,
+      reception_items: [:sector, :variety, :color, :firmeza, :calidad, :pallets, :cajas, :kilos]
     )
   end
 end

@@ -4,9 +4,11 @@ class CreateReceptions < ActiveRecord::Migration[7.1]
       t.date    :fecha,              null: false
       t.time    :hora,               null: false
       t.string  :nro_guia_despacho,  null: false
-      t.integer :pallets,            null: false
-      t.integer :cajas,              null: false
-      t.decimal :kilos_totales,      precision: 10, scale: 2, null: false
+
+      # Se elimina el almacenamiento de pallets y cajas a nivel global.
+      # Ahora estos datos se guardarán dentro de cada item en el campo JSONB.
+      
+      t.decimal :kilos_totales,      precision: 10, scale: 2, null: false, default: 0.0
       t.jsonb   :reception_items,    default: [], null: false
 
       # Datos del proveedor (denormalizados)

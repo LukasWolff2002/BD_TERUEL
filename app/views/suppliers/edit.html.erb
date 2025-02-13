@@ -3,7 +3,7 @@
     <div class="col-lg-6 col-md-8 col-12">
       <div class="card border-0 shadow-sm rounded-3">
         <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #fde2c2;">
-          <h2 class="fw-bold mb-0">Nuevo Proveedor</h2>
+          <h2 class="fw-bold mb-0">Editar Proveedor</h2>
         </div>
         <div class="card-body p-4">
           <%= form_with(model: @supplier, local: true) do |f| %>
@@ -34,7 +34,7 @@
             </div>
             
             <div class="d-grid gap-3">
-              <%= f.submit "Crear Proveedor", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #fde2c2;" %>
+              <%= f.submit "Actualizar Proveedor", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #fde2c2;" %>
               <%= link_to "Cancelar", suppliers_path, class: "btn btn-outline-warning btn-lg shadow-sm w-100" %>
             </div>
             
