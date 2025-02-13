@@ -15,15 +15,21 @@ class ReceptionsController < ApplicationController
     # Carga los sectores junto con sus variedades y los colores asociados
     @sectors = Sector.includes(varieties: :colors).all
   
-    # Construye un hash para que cada sector tenga un arreglo de variedades,
-    # donde cada variedad es representada por un hash con sus atributos y un arreglo
-    # con los nombres de los colores asociados.
+    # Construye un hash para que cada sector tenga un arreglo de variedades únicas,
+    # donde cada variedad es representada por un hash que contiene:
+    # - id de la variedad,
+    # - nombre de la variedad,
+    # - los colores específicos presentes para esa combinación de sector y variedad.
     @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
-      hash[sector.id] = sector.varieties.map do |variety|
+      hash[sector.id] = sector.varieties.distinct.map do |variety|
+        colors = Color.joins(:sector_variety_colors)
+                      .where(sector_variety_colors: { sector_id: sector.id, variety_id: variety.id })
+                      .distinct
+                      .pluck(:nombre)
         {
           id: variety.id,
           nombre: variety.nombre,
-          colors: variety.colors.map(&:nombre)
+          colors: colors
         }
       end
     end
@@ -43,11 +49,15 @@ class ReceptionsController < ApplicationController
       # correctamente al presentar errores de validación.
       @sectors = Sector.includes(varieties: :colors).all
       @varieties_by_sector = @sectors.each_with_object({}) do |sector, hash|
-        hash[sector.id] = sector.varieties.map do |variety|
+        hash[sector.id] = sector.varieties.distinct.map do |variety|
+          colors = Color.joins(:sector_variety_colors)
+                        .where(sector_variety_colors: { sector_id: sector.id, variety_id: variety.id })
+                        .distinct
+                        .pluck(:nombre)
           {
             id: variety.id,
             nombre: variety.nombre,
-            colors: variety.colors.map(&:nombre)
+            colors: colors
           }
         end
       end

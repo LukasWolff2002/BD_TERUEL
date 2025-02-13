@@ -1,0 +1,20 @@
+<div class="container mt-4">
+  <h1>Modificar Cantidad de <%= @agrochemical.nombre %></h1>
+
+  <p>Cantidad actual: <strong><%= @agrochemical.cantidad %></strong></p>
+
+  <%= form_with url: update_quantity_agrochemical_path(@agrochemical), local: true, method: :patch do %>
+    <div class="form-group">
+      <%= label_tag "agrochemical_cantidad_cambiada", "Cantidad a agregar (valor positivo) o quitar (valor negativo):" %>
+      <%= number_field_tag "agrochemical[cantidad_cambiada]", nil, class: "form-control", required: true %>
+    </div>
+
+    <div class="form-group mt-3">
+      <%= submit_tag "Actualizar cantidad", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+  <div class="mt-3">
+    <%= link_to "Volver", agrochemicals_path, class: "btn btn-secondary" %>
+  </div>
+</div> 
