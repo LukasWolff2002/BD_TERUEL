@@ -1,6 +1,6 @@
 class ReceptionsController < ApplicationController
   # Se asegura que estas variables se carguen en nuevas recepciones o cuando hay errores en create
-  before_action :load_collections, only: [:new, :create]
+  before_action :load_collections, only: [:new, :create, :informe, :export_confirm]
 
   def index
     @receptions = Reception.activos.order(created_at: :desc)
@@ -28,34 +28,69 @@ class ReceptionsController < ApplicationController
 
   # Acción para el informe con filtros
   def informe
-    @receptions = Reception.all
-
-    # Filtrar por rango de fechas
-    if params[:fecha_inicio].present? && params[:fecha_fin].present?
+    Rails.logger.debug "Accediendo a la acción informe"
+    Rails.logger.debug "Parametros recibidos: #{params.inspect}"
+  
+    @receptions = Reception.activos
+  
+    if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
+      Rails.logger.debug "Aplicando filtros de recepción"
       @receptions = @receptions.where(fecha: params[:fecha_inicio]..params[:fecha_fin])
-    elsif params[:fecha_inicio].present?
-      @receptions = @receptions.where("fecha >= ?", params[:fecha_inicio])
-    elsif params[:fecha_fin].present?
-      @receptions = @receptions.where("fecha <= ?", params[:fecha_fin])
-    end
-
-    # Filtrar por sector (usando JOIN con la tabla sectors)
-    if params[:sector].present?
-      @receptions = @receptions.joins(:sector).where("sectors.nombre ILIKE ?", "%#{params[:sector]}%")
-    end
-
-    # Filtrar por nombre (búsqueda parcial sobre el campo 'nombre' de Reception)
-    if params[:nombre].present?
-      @receptions = @receptions.where("nombre ILIKE ?", "%#{params[:nombre]}%")
-    end
-
-    @receptions = @receptions.order(fecha: :desc)
-
-    respond_to do |format|
-      format.html
-      format.xlsx do
-        response.headers["Content-Disposition"] = "attachment; filename=recepciones_#{Time.now.strftime('%Y%m%d%H%M%S')}.xlsx"
+      @receptions = @receptions.where(supplier_id: params[:supplier_id])
+      @receptions = @receptions.order(fecha: :desc)
+  
+      respond_to do |format|
+        format.html
+        format.xlsx do
+          if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
+            response.headers["Content-Disposition"] = "attachment; filename=recepciones_#{Time.now.strftime('%Y%m%d%H%M%S')}.xlsx"
+          else
+            redirect_to informe_receptions_path, alert: 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.'
+          end
+        end
       end
+    else
+      Rails.logger.debug "Faltan parámetros, mostrando formulario sin filtrar"
+      flash.now[:alert] = 'Por favor, complete todos los filtros para generar el informe.' if request.get?
+      respond_to do |format|
+        format.html
+        format.xlsx { redirect_to informe_receptions_path, alert: 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.' }
+      end
+    end
+  end
+
+  # app/controllers/receptions_controller.rb
+  def export_confirm
+    Rails.logger.debug "Parametros recibidos: #{params.inspect}"
+  
+    @fecha_inicio = params[:fecha_inicio]
+    @fecha_fin = params[:fecha_fin]
+    @supplier_id = params[:supplier_id]
+  
+    # Validar la presencia de los parámetros
+    unless @fecha_inicio.present? && @fecha_fin.present? && @supplier_id.present?
+      flash[:alert] = 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar.'
+      redirect_to informe_receptions_path
+      return
+    end
+  
+    # Obtener las recepciones filtradas SIN includes(:reception_items)
+    @receptions = Reception.activos.where(fecha: @fecha_inicio..@fecha_fin, supplier_id: @supplier_id)
+                                 .order(fecha: :asc) # Ordenar por fecha ascendente
+  
+    # Agrupar las recepciones por fecha
+    @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
+      recepciones.flat_map do |reception|
+        reception.reception_items.map do |item|
+          { variety: item["variety"], price_per_kilogram: item["price_per_kilogram"].to_f }
+        end
+      end.uniq { |variedad| variedad[:variety] } # Eliminar duplicados por variedad
+    end
+  
+    # Manejar el caso donde no hay variedades
+    if @variedades_por_dia.values.flatten.empty?
+      flash[:alert] = 'No se encontraron variedades para exportar con los filtros proporcionados.'
+      redirect_to informe_receptions_path
     end
   end
 
@@ -81,6 +116,7 @@ class ReceptionsController < ApplicationController
 
     # Cargar la lista de proveedores
     @suppliers = Supplier.all
+    Rails.logger.debug "@suppliers cargados: #{@suppliers.inspect}"
   end
 
   def reception_params

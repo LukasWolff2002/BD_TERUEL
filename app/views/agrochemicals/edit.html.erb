@@ -3,7 +3,7 @@
     <div class="col-lg-8 col-md-10 col-12">
       <div class="card border-0 shadow-sm rounded-3">
         <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #d1e7dd;">
-          <h2 class="fw-bold mb-0">Nuevo Agroquímico</h2>
+          <h2 class="fw-bold mb-0">Editar Agroquímico</h2>
         </div>
 
         <div class="card-body p-4">
@@ -13,7 +13,7 @@
               <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
                 <div>
-                  <h6 class="fw-bold mb-1"><%= pluralize(@agrochemical.errors.count, "error") %> impiden que se guarde el agroquímico:</h6>
+                  <h6 class="fw-bold mb-1">Se encontraron los siguientes errores:</h6>
                   <ul class="mb-0 ps-3">
                     <% @agrochemical.errors.full_messages.each do |message| %>
                       <li><%= message %></li>
@@ -24,10 +24,9 @@
               </div>
             <% end %>
 
-            <!-- Campos del formulario -->
             <div class="mb-3">
               <%= form.label :nombre, "Nombre", class: "form-label fw-bold text-success" %>
-              <%= form.text_field :nombre, class: "form-control shadow-sm border-0", placeholder: "Ingrese el nombre" %>
+              <%= form.text_field :nombre, class: "form-control shadow-sm border-0", placeholder: "Ingrese el nombre del agroquímico" %>
             </div>
 
             <div class="mb-3">
@@ -42,12 +41,13 @@
 
             <div class="mb-3">
               <%= form.label :objetivo, "Objetivo", class: "form-label fw-bold text-success" %>
-              <%= form.text_area :objetivo, class: "form-control shadow-sm border-0", placeholder: "Ingrese el objetivo" %>
+              <%= form.text_area :objetivo, class: "form-control shadow-sm border-0", placeholder: "Ingrese el objetivo del agroquímico" %>
             </div>
 
             <div class="mb-3">
               <%= form.label :agrochemical_division_id, "División", class: "form-label fw-bold text-success" %>
-              <%= form.collection_select :agrochemical_division_id, AgrochemicalDivision.all, :id, :division, { prompt: "Selecciona una división" }, class: "form-select shadow-sm border-0" %>
+              <%= form.collection_select :agrochemical_division_id, AgrochemicalDivision.all, :id, :division, 
+                  { prompt: "Selecciona una división" }, { class: "form-select shadow-sm border-0" } %>
             </div>
 
             <div class="mb-3">
@@ -56,8 +56,8 @@
             </div>
 
             <div class="mb-3">
-              <%= form.label :incomatibilidad, "Incompatibilidad", class: "form-label fw-bold text-success" %>
-              <%= form.text_area :incomatibilidad, class: "form-control shadow-sm border-0", placeholder: "Ingrese la incompatibilidad" %>
+              <%= form.label :incomatibilidad, "Incompatibilidades", class: "form-label fw-bold text-success" %>
+              <%= form.text_area :incomatibilidad, class: "form-control shadow-sm border-0", placeholder: "Ingrese las incompatibilidades" %>
             </div>
 
             <div class="mb-3">
@@ -66,18 +66,18 @@
             </div>
 
             <div class="mb-3">
-              <%= form.label :reingreso, "Reingreso", class: "form-label fw-bold text-success" %>
-              <%= form.number_field :reingreso, class: "form-control shadow-sm border-0", placeholder: "Ingrese el tiempo de reingreso" %>
+              <%= form.label :reingreso, "Reingreso (en días)", class: "form-label fw-bold text-success" %>
+              <%= form.number_field :reingreso, class: "form-control shadow-sm border-0", placeholder: "Ingrese los días de reingreso" %>
             </div>
 
             <div class="mb-3">
               <%= form.label :daño_a_abejorros, "Daño a Abejorros", class: "form-label fw-bold text-success" %>
-              <%= form.text_area :daño_a_abejorros, class: "form-control shadow-sm border-0", placeholder: "Ingrese el daño a abejorros" %>
+              <%= form.text_area :daño_a_abejorros, class: "form-control shadow-sm border-0", placeholder: "Describa el daño a abejorros" %>
             </div>
 
-            <div class="d-grid gap-3">
-              <%= form.submit "Crear Agroquímico", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #d1e7dd;" %>
-              <%= link_to "Volver", agrochemicals_path, class: "btn btn-outline-success btn-lg shadow-sm w-100" %>
+            <div class="d-grid gap-3 mt-4">
+              <%= form.submit "Actualizar Agroquímico", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
+              <%= link_to "Cancelar", agrochemicals_path, class: "btn btn-outline-success btn-lg shadow-sm w-100", style: "border-color: #198754; color: #198754;" %>
             </div>
 
           <% end %>

@@ -17,7 +17,8 @@ Rails.application.routes.draw do
   resources :images
   resources :receptions do
     collection do
-      get 'informe'
+      get :informe
+      get :export_confirm  # Nueva ruta para confirmar la exportación
     end
   end
   resources :inventories

@@ -1,54 +1,45 @@
+# app/views/receptions/informe.xlsx.axlsx
 wb = xlsx_package.workbook
 
-wb.add_worksheet(name: "Recepciones") do |sheet|
-  # Definición de encabezados (puedes ajustar o agregar columnas según tus requerimientos)
-  headers = [
-    "ID", "Fecha", "Hora", "Sector", "Variedad", "Usuario", "Color",
-    "Nro Guia Despacho", "Firmeza", "Calidad", "Pallets", "Cajas",
-    "Kilos Cajas", "Kilos Totales", "Activo", "Creado", "Actualizado", "Imagen"
-  ]
-  sheet.add_row headers
+wb.add_worksheet(name: "Informe de Recepciones") do |sheet|
+  # Definir encabezados
+  headers = ["Fecha", "Hora", "Sector", "Variedad", "Usuario", "Color", "Cajas", "Kilos", "Calidad", "Firmeza", "Pallets"]
+  sheet.add_row(headers)
 
-  @receptions.each_with_index do |reception, idx|
-    # Prepara los datos de la fila, dejando en blanco la última columna (imagen)
-    row_data = [
-      reception.id,
-      reception.fecha.present? ? reception.fecha.strftime("%d/%m/%Y") : "",
-      reception.hora.present? ? reception.hora.strftime("%H:%M:%S") : "",
-      reception.sector.present? ? reception.sector.nombre : "",
-      reception.variety.present? ? reception.variety.nombre : "",
-      reception.user.present? ? "#{reception.user.nombre} #{reception.user.apellido}" : "",
-      reception.color,
-      reception.nro_guia_despacho,
-      reception.firmeza,
-      reception.calidad,
-      reception.pallets,
-      reception.cajas,
-      reception.kilos_cajas,
-      reception.kilos_totales,
-      reception.activo.to_s,
-      reception.created_at.strftime("%d/%m/%Y %H:%M:%S"),
-      reception.updated_at.strftime("%d/%m/%Y %H:%M:%S"),
-      ""  # Lugar reservador para la imagen
-    ]
-    
-    sheet.add_row row_data
-
-    # Inserta la imagen en la última columna (índice = headers.size - 1) de la fila correspondiente,
-    # siempre que exista un attachment en el campo `imagen`
-    if reception.respond_to?(:imagen) && reception.imagen.attached?
-      # Para servicios Disk, podemos obtener la ruta física de la imagen de la siguiente forma:
-      image_path = ActiveStorage::Blob.service.send(:path_for, reception.imagen.key)
-      
-      # Determinar posición: la columna para la imagen será la última y la fila es el índice + 1 (por el encabezado)
-      col_index = headers.size - 1  # 0-indexado
-      row_index = idx + 1             # La fila 0 es el encabezado
-      
-      sheet.add_image(image_src: image_path, noSelect: true, noMove: true) do |image|
-        image.width = 50
-        image.height = 50
-        image.start_at col_index, row_index
+  # Iterar sobre cada reception y sus reception_items
+  @receptions.each do |reception|
+    # Verificar si reception_items está presente y es un array
+    if reception.reception_items.present? && reception.reception_items.is_a?(Array)
+      reception.reception_items.each do |item|
+        sheet.add_row([
+          reception.fecha.present? ? reception.fecha.strftime("%d/%m/%Y") : "",
+          reception.hora.present? ? reception.hora.strftime("%H:%M:%S") : "",
+          item["sector"].present? ? item["sector"] : "",
+          item["variety"].present? ? item["variety"] : "",
+          reception.user.present? ? "#{reception.user.nombre} #{reception.user.apellido}" : "",
+          item["color"].present? ? item["color"] : "",
+          item["cajas"].present? ? item["cajas"] : "",
+          item["kilos"].present? ? item["kilos"] : "",
+          item["calidad"].present? ? item["calidad"] : "",
+          item["firmeza"].present? ? item["firmeza"] : "",
+          item["pallets"].present? ? item["pallets"] : ""
+        ])
       end
+    else
+      # Si no hay reception_items, agregar una fila vacía o con datos generales
+      sheet.add_row([
+        reception.fecha.present? ? reception.fecha.strftime("%d/%m/%Y") : "",
+        reception.hora.present? ? reception.hora.strftime("%H:%M:%S") : "",
+        "", # Sector vacío
+        "", # Variedad vacía
+        reception.user.present? ? "#{reception.user.nombre} #{reception.user.apellido}" : "",
+        "", # Color vacío
+        "", # Cajas vacío
+        "", # Kilos vacío
+        "", # Calidad vacío
+        "", # Firmeza vacío
+        ""  # Pallets vacío
+      ])
     end
   end
-end 
+end

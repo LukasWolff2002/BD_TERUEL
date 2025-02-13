@@ -1,32 +1,38 @@
 <div class="container mt-4">
-  <h1 class="mb-4">Historial de Modificaciones de Agroquímicos</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="fw-bold text-success mb-3 mb-md-0">Historial de Agroquímicos</h1>
+  </div>
 
   <% if @agrochemical_histories.any? %>
-    <table class="table table-bordered table-striped">
-      <thead class="thead-light">
-        <tr>
-          <th>Agroquímico</th>
-          <th>Usuario</th>
-          <th>Cantidad Cambiada</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @agrochemical_histories.each do |history| %>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm">
+        <thead class="table-success text-center">
           <tr>
-            <td><%= history.agrochemical.nombre %></td>
-            <td><%= history.usuario %></td>
-            <td><%= history.cantidad_cambiada %></td>
-            <td><%= l(history.created_at, format: :short) %></td>
+            <th>Agroquímico</th>
+            <th>Usuario</th>
+            <th>Cambio de Cantidad</th>
+            <th>Fecha</th>
+            
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @agrochemical_histories.each do |history| %>
+            <tr>
+              <td class="text-center"><%= history.agrochemical.nombre %></td>
+              <td class="text-center"><%= history.usuario %></td>
+              <td class="text-center fw-bold <%= history.cantidad_cambiada.positive? ? 'text-success' : 'text-danger' %>">
+                <%= history.cantidad_cambiada %>
+              </td>
+              <td class="text-center"><%= l(history.created_at, format: :short) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   <% else %>
-    <p>No se han registrado modificaciones en el inventario de agroquímicos.</p>
+    <div class="alert alert-warning text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No hay registros en el historial de agroquímicos.</p>
+    </div>
   <% end %>
-
-  <div class="mt-3">
-    <%= link_to 'Volver a Agroquímicos', agrochemicals_path, class: "btn btn-secondary ml-2" %>
-  </div>
-</div> 
+</div>

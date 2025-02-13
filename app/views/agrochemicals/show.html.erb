@@ -1,24 +1,31 @@
 <div class="container mt-4">
-  <h1>Detalle de Agroquímico</h1>
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #d1e7dd;">
+          <h2 class="fw-bold mb-0">Detalles del Agroquímico</h2>
+        </div>
 
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3><%= @agrochemical.nombre %></h3>
-    </div>
-    <div class="card-body">
-      <p><strong>Cantidad:</strong> <%= @agrochemical.cantidad %></p>
-      <p><strong>Ingrediente Activo:</strong> <%= @agrochemical.ingrediente_activo %></p>
-      <p><strong>Objetivo:</strong> <%= @agrochemical.objetivo %></p>
-      <p><strong>División:</strong> <%= @agrochemical.agrochemical_division.division %></p>
-      <p><strong>pH:</strong> <%= @agrochemical.ph %></p>
-      <p><strong>Incompatibilidades:</strong> <%= @agrochemical.incomatibilidad %></p>
-      <p><strong>Carencias:</strong> <%= @agrochemical.carencias %></p>
-      <p><strong>Reingreso:</strong> <%= @agrochemical.reingreso %> días</p>
-      <p><strong>Daño a Abejorros:</strong> <%= @agrochemical.daño_a_abejorros %></p>
+        <div class="card-body p-4">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Nombre:</strong> <%= @agrochemical.nombre %></li>
+            <li class="list-group-item"><strong>Cantidad:</strong> <%= @agrochemical.cantidad %></li>
+            <li class="list-group-item"><strong>Ingrediente Activo:</strong> <%= @agrochemical.ingrediente_activo.presence || "No especificado" %></li>
+            <li class="list-group-item"><strong>Objetivo:</strong> <%= @agrochemical.objetivo.presence || "No especificado" %></li>
+            <li class="list-group-item"><strong>División:</strong> <%= @agrochemical.agrochemical_division&.division || "No especificado" %></li>
+            <li class="list-group-item"><strong>pH:</strong> <%= @agrochemical.ph.presence || "No especificado" %></li>
+            <li class="list-group-item"><strong>Incompatibilidades:</strong> <%= @agrochemical.incomatibilidad.presence || "No especificado" %></li>
+            <li class="list-group-item"><strong>Carencias:</strong> <%= @agrochemical.carencias.presence || "No especificado" %></li>
+            <li class="list-group-item"><strong>Reingreso:</strong> <%= @agrochemical.reingreso.present? ? "#{@agrochemical.reingreso} días" : "No especificado" %></li>
+            <li class="list-group-item"><strong>Daño a Abejorros:</strong> <%= @agrochemical.daño_a_abejorros.presence || "No especificado" %></li>
+          </ul>
+
+          <div class="d-grid gap-3 mt-4">
+            <%= link_to "Editar Agroquímico", edit_agrochemical_path(@agrochemical), class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #d1e7dd;" %>
+            <%= link_to "Volver", agrochemicals_path, class: "btn btn-outline-success btn-lg shadow-sm w-100", style: "border-color: #198754; color: #198754;" %>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="mb-4">
-    <%= link_to "Volver", agrochemicals_path, class: "btn btn-primary" %>
-  </div>
-</div> 
+</div>

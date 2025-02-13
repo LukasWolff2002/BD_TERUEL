@@ -1,20 +1,19 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <!-- Título en morado oscuro (#6f42c1) -->
-    <h1 class="fw-bold" style="color: #6f42c1;">Agroquímicos</h1>
-    <%= link_to new_agrochemical_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #e2d4f0;" do %>
+    <h1 class="fw-bold text-success mb-3 mb-md-0">Agroquímicos</h1>
+    <%= link_to new_agrochemical_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7dd;" do %>
       <i class="bi bi-plus-circle me-2"></i> Nuevo Agroquímico
     <% end %>
   </div>
-  
+
   <% if @agrochemicals.any? %>
     <div class="table-responsive shadow-sm rounded">
-      <table class="table table-hover align-middle table-sm" style="background-color: #e2d4f0;">
+      <table class="table table-hover align-middle table-sm">
         <thead class="table-success text-center">
           <tr>
             <th>Nombre</th>
             <th>Cantidad</th>
-            <th>División</th>
+            <th class="d-none d-md-table-cell">División</th> <!-- Ocultar en móvil -->
             <th>Acciones</th>
           </tr>
         </thead>
@@ -23,7 +22,7 @@
             <tr>
               <td class="text-center"><%= agro.nombre %></td>
               <td class="text-center"><%= agro.cantidad %></td>
-              <td class="text-center"><%= agro.agrochemical_division.division if agro.agrochemical_division %></td>
+              <td class="text-center d-none d-md-table-cell"><%= agro.agrochemical_division&.division || "No especificado" %></td> <!-- Ocultar en móvil -->
               <td class="text-center d-flex justify-content-center gap-2">
                 <%= link_to new_agrochemical_history_path(agrochemical_id: agro.id), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" do %>
                   <i class="bi bi-pencil-square"></i>
@@ -45,4 +44,11 @@
       <p class="mt-2 mb-0 fw-bold">No hay agroquímicos registrados.</p>
     </div>
   <% end %>
+
+  <div class="d-flex justify-content-center mt-4">
+    <%= link_to "Historial", agrochemical_histories_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
+  </div>
+  <div class="d-flex justify-content-center mt-4">
+    <%= link_to "Diviciones", agrochemical_divisions_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
+  </div>
 </div>

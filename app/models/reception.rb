@@ -28,6 +28,10 @@ class Reception < ApplicationRecord
     def to_s
       "Recepción ##{id}"
     end
+
+    def total_cost
+      reception_items.sum { |item| item["kilos"].to_f * item["price_per_kilogram"].to_f }
+    end
   
     private
   

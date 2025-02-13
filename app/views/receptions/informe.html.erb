@@ -2,30 +2,28 @@
 
 <%= form_with url: informe_receptions_path, method: :get, local: true do |f| %>
   <div class="row mb-3">
-    <!-- Filtros por rango de fechas -->
+    <!-- Filtros obligatorios: Fecha de Inicio, Fecha de Fin y Proveedor -->
     <div class="col-md-4">
       <%= f.label :fecha_inicio, "Fecha de Inicio" %>
-      <%= f.date_field :fecha_inicio, value: params[:fecha_inicio], class: "form-control" %>
+      <%= f.date_field :fecha_inicio, value: params[:fecha_inicio], class: "form-control", required: true %>
     </div>
     <div class="col-md-4">
       <%= f.label :fecha_fin, "Fecha de Fin" %>
-      <%= f.date_field :fecha_fin, value: params[:fecha_fin], class: "form-control" %>
+      <%= f.date_field :fecha_fin, value: params[:fecha_fin], class: "form-control", required: true %>
     </div>
-    <!-- Filtro por sector (Dropdown) -->
     <div class="col-md-4">
-      <%= f.label :sector, "Sector" %>
-      <%= f.select :sector, 
-            options_from_collection_for_select(Sector.all, :nombre, :nombre, params[:sector]), 
-            { include_blank: 'Todos' }, 
-            class: "form-control" %>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <!-- Filtro por nombre -->
-    <div class="col-md-6">
-      <%= f.label :nombre, "Nombre" %>
-      <%= f.text_field :nombre, value: params[:nombre], class: "form-control", placeholder: "Ingrese el nombre" %>
+      <%= f.label :supplier_id, "Proveedor" %>
+      <% if @suppliers.present? && @suppliers.any? %>
+        <%= f.select :supplier_id, 
+              options_from_collection_for_select(@suppliers, :id, :nombre, selected: params[:supplier_id]), 
+              { include_blank: 'Seleccione un Proveedor' }, 
+              class: "form-control", 
+              required: true %>
+      <% else %>
+        <div class="alert alert-warning">
+          No hay proveedores disponibles. Por favor, crea un proveedor antes de generar el informe.
+        </div>
+      <% end %>
     </div>
   </div>
 
@@ -36,42 +34,45 @@
   </div>
 <% end %>
 
-<% if @receptions.any? %>
-  <table class="table table-bordered table-hover">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Sector</th>
-        <th>Variedad</th>
-        <th>Calidad</th>
-        <th>Cajas</th>
-        <th>Kilos Totales</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @receptions.each do |reception| %>
+<% if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present? %>
+  <% if @receptions.any? %>
+    <table class="table table-bordered table-hover">
+      <thead>
         <tr>
-          <td><%= reception.fecha.strftime("%d/%m/%Y") if reception.fecha %></td>
-          <td><%= reception.sector.nombre if reception.sector.present? %></td>
-          <td><%= reception.variety.nombre if reception.variety.present? %></td>
-          <td><%= reception.calidad %></td>
-          <td><%= reception.cajas %></td>
-          <td><%= reception.kilos_totales %></td>
-          <td>
-            <%= link_to "Ver Detalle", reception_path(reception), class: "btn btn-sm btn-info" %>
-          </td>
+          <th>Fecha</th>
+          <th>Proveedor</th>
+          <th>Kilos Totales</th>
+          <th>Acciones</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @receptions.each do |reception| %>
+          <tr>
+            <td><%= reception.fecha.strftime("%d/%m/%Y") if reception.fecha %></td>
+            <td><%= reception.supplier.present? ? reception.supplier : "N/A" %></td>
+            <td><%= number_with_precision(reception.kilos_totales, precision: 2) %> kg</td>
+            <td>
+              <%= link_to "Ver Detalle", reception_path(reception), class: "btn btn-sm btn-info" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <!-- Botón para exportar a Excel -->
+    <div class="mt-3">
+      <%= link_to "Exportar a Excel", export_confirm_receptions_path(
+            fecha_inicio: params[:fecha_inicio],
+            fecha_fin: params[:fecha_fin],
+            supplier_id: params[:supplier_id]
+          ), class: "btn btn-success" %>
+    </div>
+  <% else %>
+    <div class="alert alert-warning">
+      No hay recepciones que cumplan con los filtros seleccionados.
+    </div>
+  <% end %>
 <% else %>
-  <div class="alert alert-warning">
-    No hay recepciones que cumplan con los filtros seleccionados.
+  <div class="alert alert-info">
+    Complete los filtros para generar el informe.
   </div>
 <% end %>
-
-<!-- Botón para exportar a Excel -->
-<div class="mt-3">
-  <%= link_to "Exportar a Excel", informe_receptions_path(request.query_parameters.merge(format: :xlsx)), class: "btn btn-success" %>
-</div>

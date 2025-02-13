@@ -15,7 +15,7 @@ class ToolHistoriesController < ApplicationController
   # POST /tools/:tool_id/tool_histories
   def create
     @tool_history = @tool.tool_histories.new(tool_history_params)
-    @tool_history.usuario = current_user.name
+    @tool_history.usuario = current_user.nombre_completo
     if @tool_history.save
       redirect_to tool_tool_histories_path(@tool), notice: "Historial creado y la herramienta actualizada exitosamente."
     else

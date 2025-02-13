@@ -1,31 +1,49 @@
 <div class="container mt-4">
-  <h1 class="mb-4">Nuevo Registro de Modificación de Agroquímicos</h1>
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #d1e7dd;">
+          <h2 class="fw-bold mb-0">Nuevo Registro de Modificación</h2>
+        </div>
 
-  <%= form_with(model: @agrochemical_history, local: true) do |form| %>
-    <% if @agrochemical_history.errors.any? %>
-      <div class="alert alert-danger">
-        <h4>Se encontraron los siguientes errores:</h4>
-        <ul>
-          <% @agrochemical_history.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
+        <div class="card-body p-4">
+          <%= form_with(model: @agrochemical_history, local: true) do |form| %>
+
+            <% if @agrochemical_history.errors.any? %>
+              <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-1">Se encontraron los siguientes errores:</h6>
+                  <ul class="mb-0 ps-3">
+                    <% @agrochemical_history.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= form.label :agrochemical_id, "Agroquímico", class: "form-label fw-bold text-success" %>
+              <%= form.collection_select :agrochemical_id, Agrochemical.order(:nombre), :id, :nombre, 
+                  { prompt: "Selecciona un agroquímico", selected: params[:agrochemical_id] }, 
+                  { class: "form-select shadow-sm border-0", disabled: params[:agrochemical_id].present? } %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :cantidad_cambiada, "Cantidad a modificar (positivo para sumar, negativo para restar)", class: "form-label fw-bold text-success" %>
+              <%= form.number_field :cantidad_cambiada, class: "form-control shadow-sm border-0", required: true %>
+            </div>
+
+            <div class="d-grid gap-3 mt-4">
+              <%= form.submit "Guardar Modificación", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
+              <%= link_to "Cancelar", agrochemicals_path, class: "btn btn-outline-success btn-lg shadow-sm w-100", style: "border-color: #198754; color: #198754;" %>
+            </div>
+
           <% end %>
-        </ul>
+        </div>
       </div>
-    <% end %>
-
-    <div class="form-group">
-      <%= form.label :agrochemical_id, "Agroquímico" %>
-      <%= form.collection_select :agrochemical_id, Agrochemical.order(:nombre), :id, :nombre, { prompt: "Selecciona un agroquímico", selected: params[:agrochemical_id] }, { class: "form-control", disabled: params[:agrochemical_id].present? } %>
     </div>
-
-    <div class="form-group">
-      <%= form.label :cantidad_cambiada, "Cantidad a modificar, debe ser un número positivo" %>
-      <%= form.number_field :cantidad_cambiada, class: "form-control", required: true %>
-    </div>
-
-    <div class="form-group mt-3">
-      <%= form.submit "Guardar Modificación", class: "btn btn-primary" %>
-      <%= link_to 'Cancelar', agrochemicals_path, class: "btn btn-secondary ml-2" %>
-    </div>
-  <% end %>
-</div> 
+  </div>
+</div>
