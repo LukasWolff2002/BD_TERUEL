@@ -2,34 +2,40 @@
 
 wb = xlsx_package.workbook
 
-wb.add_worksheet(name: "Informe de Recepciones") do |sheet|
-  # Definir estilos opcionales
-  header_style = sheet.styles.add_style(
-    b: true,
-    bg_color: "FFFF00",
-    alignment: { horizontal: :center },
-    border: { style: :thin, color: "000000" }
-  )
+@receptions.each do |reception|
+  # Crear una nueva hoja para cada recepción
+  wb.add_worksheet(name: "Recepción #{reception.id}") do |sheet|
+    # Definir estilos opcionales
+    header_style = sheet.styles.add_style(
+      b: true,
+      bg_color: "FFFF00",
+      alignment: { horizontal: :center },
+      border: { style: :thin, color: "000000" }
+    )
 
-  # Encabezados
-  headers = [
-    "Fecha",
-    "Hora",
-    "Sector",
-    "Variedad",
-    "Usuario",
-    "Color",
-    "Cajas",
-    "Kilos",
-    "Calidad",
-    "Firmeza",
-    "Pallets",
-    "Precio por Kilogramo (€)"
-  ]
-  sheet.add_row headers, style: header_style
+    # Encabezados
+    headers = [
+      "Fecha",
+      "Hora",
+      "Sector",
+      "Variedad",
+      "Usuario",
+      "Color",
+      "Cajas",
+      "Kilos",
+      "Calidad",
+      "Firmeza",
+      "Pallets",
+      "Precio por Kilogramo ($)",
+      "Imagen"
+    ]
+    sheet.add_row headers, style: header_style
 
-  # Datos
-  @receptions.each do |reception|
+    # Buscar la imagen asociada a la recepción en la tabla `images`
+    image_record = Image.find_by(reception_id: reception.id)
+    image_url = image_record.present? ? "https://bd-teruel-96ddf5b95194.herokuapp.com/images/#{image_record.id}" : "No disponible"
+
+    # Datos de la recepción actual
     reception.reception_items.each do |item|
       precio = @variedades_por_dia[reception.fecha].find { |v| v[:variety] == item["variety"] }&.dig(:price_per_kilogram) || "N/A"
       sheet.add_row [
@@ -44,7 +50,8 @@ wb.add_worksheet(name: "Informe de Recepciones") do |sheet|
         item["calidad"] || "",
         item["firmeza"] || "",
         item["pallets"] || 0,
-        precio
+        precio,
+        image_url
       ]
     end
   end

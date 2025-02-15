@@ -54,9 +54,11 @@
 
         <div class="col-md-6">
           <h4 class="fw-bold text-warning">Guía de Despacho</h4>
-          <% if @reception.guia_despacho.attached? %>
+          <% if @reception.images.any? %>
             <div class="text-center">
-              <%= image_tag @reception.guia_despacho, class: "img-fluid img-thumbnail border rounded shadow-sm" %>
+              <% @reception.images.each do |image| %>
+                <%= image_tag "data:image/png;base64,#{Base64.strict_encode64(image.image)}", class: "img-fluid img-thumbnail border rounded shadow-sm mb-2", style: "max-width: 300px;" %>
+              <% end %>
             </div>
           <% else %>
             <p class="text-muted">No hay imagen de guía de despacho adjunta.</p>

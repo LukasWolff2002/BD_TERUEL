@@ -19,5 +19,17 @@ module ApplicationHelper
       'bg-light text-dark'  # Un color por defecto para evitar blanco
     end
   end
+
+  require 'base64'
+
+  def url_for_image(image)
+    return nil unless image.image.present?
+
+    # Detectar el tipo de imagen (asume PNG por defecto, ajusta según tus necesidades)
+    mime_type = "image/png" # También puedes hacer una detección más avanzada si es necesario
+
+    # Convertir binario a Base64
+    "data:#{mime_type};base64,#{Base64.strict_encode64(image.image)}"
+  end
   
 end

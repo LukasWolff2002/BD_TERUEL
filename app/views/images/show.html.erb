@@ -1,0 +1,19 @@
+<div class="container mt-4">
+  
+
+    <div class="card-body text-center">
+      <% if @image.image.present? %>
+        <div class="d-flex justify-content-center">
+          <%= image_tag "data:image/png;base64,#{Base64.strict_encode64(@image.image)}", class: "img-fluid img-thumbnail border rounded shadow-sm", style: "max-width: 500px;" %>
+        </div>
+      <% else %>
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-circle"></i> No hay imagen disponible.
+        </div>
+      <% end %>
+
+      
+
+
+  </div>
+</div>

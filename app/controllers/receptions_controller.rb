@@ -18,13 +18,32 @@ class ReceptionsController < ApplicationController
 
   def create
     @reception = Reception.new(reception_params)
-
+  
     if @reception.save
+      # Guardar la imagen en la tabla `images`
+      if params[:reception][:image].present?
+        uploaded_file = params[:reception][:image]
+        image_data = uploaded_file.read
+        
+        @image = Image.new(
+          reception: @reception,
+          image: image_data,
+          filename: uploaded_file.original_filename,
+          content_type: uploaded_file.content_type
+        )
+  
+        unless @image.save
+          flash[:alert] = "Error al guardar la imagen: #{@image.errors.full_messages.join(", ")}"
+        end
+      end
+  
       redirect_to @reception, notice: 'Recepción creada exitosamente.'
     else
       render :new, status: :unprocessable_entity
     end
   end
+  
+  
 
   # Acción para el informe con filtros
   def informe

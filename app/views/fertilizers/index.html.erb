@@ -1,27 +1,48 @@
 <div class="container mt-4">
-  <h1>Fertilizantes</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="fw-bold text-primary mb-3 mb-md-0">Fertilizantes</h1>
+    <%= link_to new_fertilizer_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7fd;" do %>
+      <i class="bi bi-plus-circle me-2"></i> Nuevo Fertilizante
+    <% end %>
+  </div>
 
-  <%= link_to 'Nuevo Fertilizante', new_fertilizer_path, class: 'btn btn-primary mb-3' %>
-  <%= link_to 'Historial de Fertilizantes', fertilizer_histories_path, class: 'btn btn-secondary mb-3' %>
+  <% if @fertilizers.any? %>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm" style="background-color: #d1e7fd;">
+        <thead class="table-primary text-center">
+          <tr>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @fertilizers.each do |fertilizer| %>
+            <tr>
+              <td class="text-center"><%= fertilizer.nombre %></td>
+              <td class="text-center"><%= fertilizer.cantidad %></td>
+              <td class="text-center">
+                <%= link_to new_fertilizer_fertilizer_history_path(fertilizer), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-pencil-square"></i>
+                  <span class="d-none d-md-inline ms-1">Modificar Cantidad</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No hay fertilizantes registrados.</p>
+    </div>
+  <% end %>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Cantidad</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @fertilizers.each do |fertilizer| %>
-        <tr>
-          <td><%= fertilizer.nombre %></td>
-          <td><%= fertilizer.cantidad %></td>
-          <td>
-            <%= link_to 'Modificar Cantidad', new_fertilizer_fertilizer_history_path(fertilizer), class: 'btn btn-secondary btn-sm' %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div> 
+  <!-- Botón de Historial debajo de la tabla -->
+  <div class="d-flex justify-content-center mt-4">
+    <%= link_to fertilizer_histories_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7fd;" do %>
+      <i class="bi bi-clock-history me-2"></i> Historial de Fertilizantes
+    <% end %>
+  </div>
+</div>

@@ -1,12 +1,10 @@
 class ImagesController < ApplicationController
     def index
-      @images = Image.all.includes(:reception).order(created_at: :desc)
-      
-      # Para debugging, agrega esto temporalmente:
-      Rails.logger.debug "Número de imágenes encontradas: #{@images.count}"
-      @images.each do |image|
-        Rails.logger.debug "Image ID: #{image.id}, Reception ID: #{image.reception_id}, Tiene imagen adjunta: #{image.image.attached?}"
-      end
+      @images = Image.all
+    end
+
+    def show
+        @image = Image.find(params[:id])
     end
 
 
