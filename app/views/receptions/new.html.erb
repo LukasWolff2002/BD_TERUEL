@@ -1,49 +1,58 @@
 <div class="container mt-4">
-  <h1>Nueva Recepción</h1>
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #fff3cd;">
+      <h2 class="fw-bold mb-0">Nueva Recepción</h2>
+    </div>
 
-  <%= form_with(model: @reception, local: true) do |f| %>
-    <% if @reception.errors.any? %>
-      <div class="alert alert-danger">
-        <h2><%= pluralize(@reception.errors.count, "error") %> impidieron guardar esta recepción:</h2>
-        <ul>
-          <% @reception.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+  <div class="card-body p-4">
+      <%= form_with(model: @reception, local: true) do |f| %>
+
+        <% if @reception.errors.any? %>
+          <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div>
+              <h6 class="fw-bold mb-1"><%= pluralize(@reception.errors.count, "error") %> impidieron guardar esta recepción:</h6>
+              <ul class="mb-0 ps-3">
+                <% @reception.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
 
     <!-- DATOS GLOBALES DE LA RECEPCIÓN -->
     <div class="row">
       <div class="col-md-6">
         <div class="mb-3">
-          <%= f.label :fecha, class: "form-label" %>
+          <%= f.label :fecha, class: "form-label fw-bold text-warning" %>
           <%= f.date_field :fecha, class: "form-control", readonly: true, value: Date.today %>
         </div>
         <div class="mb-3">
-          <%= f.label :hora, class: "form-label" %>
+          <%= f.label :hora, class: "form-label fw-bold text-warning" %>
           <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.current.strftime("%H:%M") %>
         </div>
         <div class="mb-3">
-          <%= f.label :supplier_id, "Proveedor", class: "form-label" %>
-          <%= f.select :supplier_id, 
-                       options_from_collection_for_select(@suppliers, "id", "nombre", @reception.supplier_id), 
-                       { include_blank: "Seleccione un proveedor" },
-                       { id: "supplier-select", class: "form-select" } %>
-        </div>
+              <%= f.label :supplier_id, "Proveedor", class: "form-label fw-bold text-warning" %>
+              <%= f.select :supplier_id, 
+                           options_from_collection_for_select(@suppliers, "id", "nombre", @reception.supplier_id), 
+                           { include_blank: "Seleccione un proveedor" },
+                           { id: "supplier-select", class: "form-select shadow-sm border-0" } %>
+            </div>
         <div class="mb-3">
-          <%= f.label :nro_guia_despacho, "Número de Guía de Despacho", class: "form-label" %>
+          <%= f.label :nro_guia_despacho, "Número de Guía de Despacho ", class: "form-label fw-bold text-warning" %>
           <%= f.text_field :nro_guia_despacho, class: "form-control" %>
         </div>
       </div>
       <div class="col-md-6">
         <div class="mb-3">
-          <%= f.label :user_id, "Evaluador", class: "form-label" %>
+          <%= f.label :user_id, "Evaluador", class: "form-label fw-bold text-warning" %>
           <p><strong><%= current_user.nombre_completo %></strong></p>
           <%= f.hidden_field :user_id, value: current_user.id %>
         </div>
         <div class="mb-3">
-          <%= f.label :guia_despacho, "Imagen de Guía de Despacho", class: "form-label" %>
+          <%= f.label :guia_despacho, "Imagen de Guía de Despacho", class: "form-label fw-bold text-warning" %>
           <%= f.file_field :guia_despacho, class: "form-control" %>
         </div>
       </div>
@@ -52,10 +61,10 @@
     <hr>
 
     <!-- SECCIÓN: Ítems DE RECEPCIÓN -->
-    <h3>Items de Recepción</h3>
+    <h4 class="fw-bold text-warning">Ítems de Recepción</h4>
     <div id="reception-items-container">
       <!-- Cada ítem contendrá dos bloques: uno para "Agricola Teruel" y otro para "otros" -->
-      <div class="reception-item border p-3 mb-3">
+      <div class="reception-item border p-3 mb-3 rounded shadow-sm" style="background-color: #fff3cd;">
         <!-- Bloque para proveedor Agricola Teruel -->
         <div class="selection-agricola provider-agricola-block">
           <div class="row">
@@ -146,9 +155,6 @@
                 <% end %>
               </select>
             </div>
-            <div class="col-md-8 text-end">
-              <button type="button" class="btn btn-danger remove-item-btn">Eliminar ítem</button>
-            </div>
           </div>
         </div>
 
@@ -167,20 +173,23 @@
             <input type="number" step="0.01" name="reception[reception_items][][kilos]" class="form-control" min="0">
           </div>
         </div>
+        <div class="row mt-3">
+          <div class="col-12 text-md-end text-center">
+            <button type="button" class="btn btn-outline-danger remove-item-btn">
+              <i class="bi bi-trash-fill"></i> Eliminar ítem
+            </button>
+          </div>
+        </div>
       </div>
+      
     </div>
 
     <!-- Botón para agregar nuevos ítems -->
-    <div class="mb-3">
-      <button type="button" id="add-item-btn" class="btn btn-secondary">Agregar ítem</button>
-    </div>
-
-    <div class="row mt-3">
-      <div class="col-12">
-        <%= f.submit "Crear Recepción", class: "btn btn-primary" %>
-        <%= link_to 'Volver', receptions_path, class: 'btn btn-secondary ms-2' %>
-      </div>
-    </div>
+    <div class="d-grid gap-3 mt-4">
+          <button type="button" id="add-item-btn" class="btn btn-warning shadow-sm">Agregar Ítem</button>
+          <%= f.submit "Crear Recepción", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
+          <%= link_to "Volver", receptions_path, class: "btn btn-outline-warning btn-lg shadow-sm w-100", style: "border-color: #d39e00; color: #d39e00;" %>
+        </div>
   <% end %>
 </div>
 

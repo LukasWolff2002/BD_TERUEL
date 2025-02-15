@@ -94,6 +94,66 @@ class ReceptionsController < ApplicationController
     end
   end
 
+  def export
+    Rails.logger.debug "Acción 'export' iniciada."
+    @receptions = Reception.activos
+  
+    if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
+      @receptions = @receptions.where(
+        fecha: params[:fecha_inicio]..params[:fecha_fin],
+        supplier_id: params[:supplier_id]
+      ).order(fecha: :desc)
+  
+      # Permitir y convertir 'precios' a hash puro
+      modified_prices = params.require(:precios).permit!.to_h
+      Rails.logger.debug "Precios modificados recibidos: #{modified_prices.inspect}"
+  
+      # Validar precios positivos
+      invalid_prices = modified_prices.select { |_, price| price.to_f < 0 }
+      if invalid_prices.any?
+        Rails.logger.debug "Precios inválidos detectados: #{invalid_prices.inspect}"
+        flash[:alert] = 'Todos los precios deben ser números positivos.'
+        redirect_to export_confirm_receptions_path(fecha_inicio: params[:fecha_inicio], fecha_fin: params[:fecha_fin], supplier_id: params[:supplier_id])
+        return
+      end
+  
+      @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
+        recepciones.flat_map do |reception|
+          reception.reception_items.map do |item|
+            variedad = item["variety"]
+            updated_price = modified_prices[variedad] || item["price_per_kilogram"]
+            { variety: variedad, price_per_kilogram: updated_price.to_f }
+          end
+        end.uniq { |variedad| variedad[:variety] }
+      end
+  
+      Rails.logger.debug "Variedades por día después de actualizar precios: #{@variedades_por_dia.inspect}"
+  
+      # Agregar un chequeo para evitar el error
+      if @variedades_por_dia.values.flatten.empty?
+        flash[:alert] = 'No se encontraron variedades para exportar con los filtros proporcionados.'
+        redirect_to informe_receptions_path
+        return
+      end
+  
+      respond_to do |format|
+        format.xlsx do
+          Rails.logger.debug "Se está intentando renderizar el Excel."
+          render xlsx: 'informe', disposition: 'attachment'
+        end
+      end
+  
+    else
+      Rails.logger.debug "Parámetros faltantes: fecha_inicio=#{params[:fecha_inicio]}, fecha_fin=#{params[:fecha_fin]}, supplier_id=#{params[:supplier_id]}"
+      flash[:alert] = 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.'
+      redirect_to informe_receptions_path
+    end
+  rescue => e
+    Rails.logger.error "Error en la acción 'export': #{e.message}"
+    flash[:alert] = 'Ocurrió un error al generar el informe Excel. Por favor, intenta nuevamente.'
+    redirect_to informe_receptions_path
+  end
+
   private
 
   def load_collections

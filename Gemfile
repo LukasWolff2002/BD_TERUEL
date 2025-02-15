@@ -29,7 +29,8 @@ gem "cssbundling-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-gem 'axlsx_rails'
+gem 'caxlsx'
+gem 'caxlsx_rails'
 
 gem 'sassc-rails'
 

@@ -15,6 +15,7 @@ class Reception < ApplicationRecord
     
     validates :nro_guia_despacho, presence: true
     validates :kilos_totales, presence: true, numericality: { greater_than: 0 }
+    validates :reception_items, presence: true
   
     # Callback para denormalizar la información del usuario en la recepción,
     # permitiendo conservar dichos datos aunque el usuario se elimine más adelante.
@@ -66,4 +67,17 @@ class Reception < ApplicationRecord
       end
       self.kilos_totales = total
     end
+
+    def validate_reception_items
+      if reception_items.present? && reception_items.is_a?(Array)
+        reception_items.each do |item|
+          unless item["variety"].present? && item["price_per_kilogram"].present? && item["price_per_kilogram"].to_f > 0
+            errors.add(:reception_items, "Cada item debe tener variedad y precio por kilogramo válido.")
+          end
+        end
+      else
+        errors.add(:reception_items, "Debe haber al menos un item de recepción.")
+      end
+    end
+    
   end

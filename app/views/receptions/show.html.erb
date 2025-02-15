@@ -1,116 +1,62 @@
 <div class="container mt-4">
-  <div class="card">
-    <div class="card-header">
-      <h2>Recepción #<%= @reception.id %></h2>
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #fff3cd;">
+      <h2 class="fw-bold mb-0">Recepción #<%= @reception.id %></h2>
     </div>
-    <div class="card-body">
+
+    <div class="card-body p-4">
       <div class="row">
         <div class="col-md-6">
-          <h4>Información General</h4>
-          <table class="table">
-            <tr>
-              <th>Fecha:</th>
-              <td><%= @reception.fecha.strftime("%d/%m/%Y") %></td>
-            </tr>
-            <tr>
-              <th>Hora:</th>
-              <td><%= @reception.hora.strftime("%H:%M") %></td>
-            </tr>
-            <tr>
-              <th>N° Guía Despacho:</th>
-              <td><%= @reception.nro_guia_despacho %></td>
-            </tr>
+          <h4 class="fw-bold text-warning">Información General</h4>
+          <table class="table table-sm table-warning">
+            <tr><th>Fecha:</th><td><%= @reception.fecha.strftime("%d/%m/%Y") %></td></tr>
+            <tr><th>Hora:</th><td><%= @reception.hora.strftime("%H:%M") %></td></tr>
+            <tr><th>N° Guía Despacho:</th><td><%= @reception.nro_guia_despacho %></td></tr>
             <tr>
               <th>Evaluador:</th>
-              <td>
-                <% if @reception.user.present? %>
-                  <%= "#{@reception.user.nombre} #{@reception.user.apellido}" %>
-                <% else %>
-                  <em>Sin evaluador</em>
-                <% end %>
-              </td>
+              <td><%= @reception.user ? "#{@reception.user.nombre} #{@reception.user.apellido}" : "<em>Sin evaluador</em>".html_safe %></td>
             </tr>
             <tr>
               <th>Proveedor:</th>
-              <td>
-                <% if @reception.supplier.present? %>
-                  <%= @reception.supplier.nombre %>
-                <% else %>
-                  <em>Sin proveedor</em>
-                <% end %>
-              </td>
+              <td><%= @reception.supplier&.nombre || "<em>Sin proveedor</em>".html_safe %></td>
             </tr>
           </table>
 
-          <h4 class="mt-4">Detalles del Producto</h4>
+          <h4 class="fw-bold text-warning mt-4">Detalles del Producto</h4>
           <% if @reception.reception_items.present? %>
             <% @reception.reception_items.each_with_index do |item, index| %>
-              <h5>Producto <%= index + 1 %>:</h5>
-              <table class="table table-sm">
-                <tr>
-                  <th>Sector:</th>
-                  <td><%= item['sector'] %></td>
-                </tr>
-                <tr>
-                  <th>Variedad:</th>
-                  <td><%= item['variety'] %></td>
-                </tr>
-                <tr>
-                  <th>Color:</th>
-                  <td><%= item['color'] %></td>
-                </tr>
-                <tr>
-                  <th>Firmeza:</th>
-                  <td><%= item['firmeza'] %></td>
-                </tr>
-                <tr>
-                  <th>Calidad:</th>
-                  <td><%= item['calidad'] %></td>
-                </tr>
-                <tr>
-                  <th>Palets:</th>
-                  <td><%= item['pallets'] %></td>
-                </tr>
-                <tr>
-                  <th>Cajas:</th>
-                  <td><%= item['cajas'] %></td>
-                </tr>
-                <tr>
-                  <th>Kilos:</th>
-                  <td><%= number_with_precision(item['kilos'].to_d, precision: 2) %> kg</td>
-                </tr>
+              <h5 class="text-primary fw-bold">Producto <%= index + 1 %>:</h5>
+              <table class="table table-sm table-bordered">
+                <tr><th>Sector:</th><td><%= item['sector'] %></td></tr>
+                <tr><th>Variedad:</th><td><%= item['variety'] %></td></tr>
+                <tr><th>Color:</th><td><%= item['color'] %></td></tr>
+                <tr><th>Firmeza:</th><td><%= item['firmeza'] %></td></tr>
+                <tr><th>Calidad:</th><td><%= item['calidad'] %></td></tr>
+                <tr><th>Palets:</th><td><%= item['pallets'] %></td></tr>
+                <tr><th>Cajas:</th><td><%= item['cajas'] %></td></tr>
+                <tr><th>Kilos:</th><td><%= number_with_precision(item['kilos'].to_d, precision: 2) %> kg</td></tr>
               </table>
             <% end %>
           <% else %>
-            <p>No se han agregado detalles del producto.</p>
+            <p class="text-muted">No se han agregado detalles del producto.</p>
           <% end %>
 
-          <%# Calculamos totales globales a partir de los items %>
           <% total_palets = @reception.reception_items.sum { |item| item['pallets'].to_i } %>
           <% total_cajas = @reception.reception_items.sum { |item| item['cajas'].to_i } %>
 
-          <h4 class="mt-4">Totales Globales</h4>
-          <table class="table">
-            <tr>
-              <th>Total Palets:</th>
-              <td><%= total_palets %></td>
-            </tr>
-            <tr>
-              <th>Total Cajas:</th>
-              <td><%= total_cajas %></td>
-            </tr>
-            <tr>
-              <th>Kilos Totales:</th>
-              <td><%= number_with_precision(@reception.kilos_totales, precision: 2) %> kg</td>
-            </tr>
+          <h4 class="fw-bold text-warning mt-4">Totales Globales</h4>
+          <table class="table table-warning">
+            <tr><th>Total Palets:</th><td><%= total_palets %></td></tr>
+            <tr><th>Total Cajas:</th><td><%= total_cajas %></td></tr>
+            <tr><th>Kilos Totales:</th><td><%= number_with_precision(@reception.kilos_totales, precision: 2) %> kg</td></tr>
           </table>
         </div>
 
         <div class="col-md-6">
-          <h4>Guía de Despacho</h4>
+          <h4 class="fw-bold text-warning">Guía de Despacho</h4>
           <% if @reception.guia_despacho.attached? %>
             <div class="text-center">
-              <%= image_tag @reception.guia_despacho, class: "img-fluid border rounded" %>
+              <%= image_tag @reception.guia_despacho, class: "img-fluid img-thumbnail border rounded shadow-sm" %>
             </div>
           <% else %>
             <p class="text-muted">No hay imagen de guía de despacho adjunta.</p>
@@ -118,8 +64,9 @@
         </div>
       </div>
     </div>
-    <div class="card-footer"> 
-      <%= link_to 'Volver', receptions_path, class: 'btn btn-secondary ms-2' %>
+
+    <div class="card-footer text-center">
+      <%= link_to 'Volver', receptions_path, class: 'btn btn-outline-warning btn-lg shadow-sm w-100', style: 'border-color: #d39e00; color: #d39e00;' %>
     </div>
   </div>
-</div> 
+</div>

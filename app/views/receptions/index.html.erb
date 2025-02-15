@@ -1,66 +1,60 @@
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Recepciones</h1>
-    <%= link_to 'Nueva Recepción', new_reception_path, class: 'btn btn-primary' %>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="fw-bold text-warning mb-3 mb-md-0">Recepciones</h1>
+    <%= link_to new_reception_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #fff3cd;" do %>
+      <i class="bi bi-plus-circle me-2"></i> Nueva Recepción
+    <% end %>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-striped table-hover">
-      <thead class="table-dark">
-        <tr>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>N° Guía</th>
-          <th>Productos</th>
-          <th>Proveedor</th>
-          <th>Evaluador</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @receptions.each do |reception| %>
+  <% if @receptions.any? %>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm">
+        <thead class="table-warning text-center">
           <tr>
-            <td><%= reception.fecha.strftime("%d/%m/%Y") %></td>
-            <td><%= reception.hora.strftime("%H:%M") %></td>
-            <td><%= reception.nro_guia_despacho %></td>
-            <td>
-              <% if reception.reception_items.present? %>
-                <% reception.reception_items.each_with_index do |item, index| %>
-                  <div>
-                    <strong>Producto <%= index + 1 %>:</strong>
-                    Sector: <%= item['sector'] %>,
-                    Variedad: <%= item['variety'] %>,
-                    Color: <%= item['color'] %>,
-                    Firmeza: <%= item['firmeza'] %>,
-                    Calidad: <%= item['calidad'] %>
-                  </div>
-                <% end %>
-              <% else %>
-                <em>No hay productos</em>
-              <% end %>
-            </td>
-            <td>
-              <% if reception.supplier.present? %>
-                <%= reception.supplier.nombre %>
-              <% else %>
-                <em>Sin proveedor</em>
-              <% end %>
-            </td>
-            <td>
-              <% if reception.user.present? %>
-                <%= "#{reception.user.nombre} #{reception.user.apellido}" %>
-              <% else %>
-                <em>Sin evaluador</em>
-              <% end %>
-            </td>
-            <td>
-              <%= link_to reception_path(reception), class: "btn btn-sm btn-info me-1" do %>
-                <i class="bi bi-eye"></i> Ver
-              <% end %>
-            </td>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>N° Guía</th>
+            <th class="d-none d-md-table-cell">Productos</th>
+            <th>Proveedor</th>
+            <th>Evaluador</th>
+            <th>Acciones</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          <% @receptions.each do |reception| %>
+            <tr>
+              <td class="text-center"><%= reception.fecha.strftime("%d/%m/%Y") %></td>
+              <td class="text-center"><%= reception.hora.strftime("%H:%M") %></td>
+              <td class="text-center"><%= reception.nro_guia_despacho %></td>
+              <td class="d-none d-md-table-cell">
+                <% if reception.reception_items.present? %>
+                  <% reception.reception_items.each_with_index do |item, index| %>
+                    <div class="small">
+                      <strong>Producto <%= index + 1 %>:</strong>
+                      <span class="fw-bold text-primary"><%= item['variety'] %></span> 
+                    </div>
+                  <% end %>
+                <% else %>
+                  <em class="text-muted">No hay productos</em>
+                <% end %>
+              </td>
+              <td class="text-center"><%= reception.supplier&.nombre || "<em>Sin proveedor</em>".html_safe %></td>
+              <td class="text-center"><%= reception.user ? "#{reception.user.nombre} #{reception.user.apellido}" : "<em>Sin evaluador</em>".html_safe %></td>
+              <td class="text-center">
+                <%= link_to reception_path(reception), class: "btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-eye"></i>
+                  <span class="d-none d-md-inline ms-1">Ver</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-warning text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No hay recepciones registradas.</p>
+    </div>
+  <% end %>
 </div>

@@ -1,45 +1,60 @@
-<h1>Confirmar Exportación a Excel</h1>
+<div class="container mt-4">
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #fff3cd;">
+      <h2 class="fw-bold mb-0">Confirmar Exportación a Excel</h2>
+    </div>
 
-<% if @variedades_por_dia.present? && @variedades_por_dia.any? %>
-  <p>Se exportarán las siguientes variedades por día con sus precios por kilogramo:</p>
+    <div class="card-body p-4">
+      <%= form_with url: export_receptions_path(format: :xlsx), method: :post, local: true do |f| %>
+        <% if @variedades_por_dia.present? && @variedades_por_dia.any? %>
+          <p class="fw-bold">Se exportarán las siguientes variedades por día con sus precios por kilogramo. Puedes modificar los precios antes de exportar.</p>
 
-  <% @variedades_por_dia.each do |fecha, variedades| %>
-    <h3>Fecha: <%= l(fecha, format: "%d/%m/%Y (%A)") %></h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Variedad</th>
-          <th>Precio por Kilogramo (€)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% variedades.each do |variedad| %>
-          <tr>
-            <td><%= variedad[:variety] %></td>
-            <td><%= number_to_currency(variedad[:price_per_kilogram], unit: "€") %></td>
-          </tr>
+          <!-- Incluir Campos Ocultos para Fecha y Proveedor -->
+          <%= hidden_field_tag :fecha_inicio, params[:fecha_inicio] %>
+          <%= hidden_field_tag :fecha_fin, params[:fecha_fin] %>
+          <%= hidden_field_tag :supplier_id, params[:supplier_id] %>
+
+          <% @variedades_por_dia.each do |fecha, variedades| %>
+            <h4 class="fw-bold text-warning mt-3">Fecha: <%= l(fecha, format: "%d/%m/%Y (%A)") %></h4>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover shadow-sm">
+                <thead class="table-warning text-center">
+                  <tr>
+                    <th>Variedad</th>
+                    <th>Precio por Kilogramo (€)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% variedades.each do |variedad| %>
+                    <tr>
+                      <td class="text-center"><%= variedad[:variety] %></td>
+                      <td>
+                        <%= number_field_tag "precios[#{variedad[:variety]}]", variedad[:price_per_kilogram], step: 0.01, class: "form-control shadow-sm border-0 text-center fw-bold", required: true %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+
+          <div class="d-grid gap-3 mt-4">
+            <!-- Botón para confirmar y exportar a Excel -->
+            <%= f.submit "Confirmar y Exportar a Excel", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
+
+            <!-- Botón para cancelar y regresar -->
+            <%= link_to "Cancelar", informe_receptions_path, class: "btn btn-outline-warning btn-lg shadow-sm w-100" %>
+          </div>
+        <% else %>
+          <div class="alert alert-warning text-center p-4 shadow-sm border-0">
+            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+            <p class="mt-2 mb-0 fw-bold">No se encontraron variedades para exportar con los filtros proporcionados.</p>
+          </div>
+          <div class="d-grid gap-3 mt-4">
+            <%= link_to "Regresar al Informe", informe_receptions_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
+          </div>
         <% end %>
-      </tbody>
-    </table>
-  <% end %>
-
-  <div class="mt-3">
-    <!-- Botón para confirmar y exportar a Excel -->
-    <%= link_to "Confirmar y Exportar a Excel", informe_receptions_path(
-          fecha_inicio: @fecha_inicio,
-          fecha_fin: @fecha_fin,
-          supplier_id: @supplier_id,
-          format: :xlsx
-        ), class: "btn btn-success" %>
-
-    <!-- Botón para cancelar y regresar -->
-    <%= link_to "Cancelar", informe_receptions_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
   </div>
-<% else %>
-  <div class="alert alert-warning">
-    No se encontraron variedades para exportar con los filtros proporcionados.
-  </div>
-  <div class="mt-3">
-    <%= link_to "Regresar al Informe", informe_receptions_path, class: "btn btn-primary" %>
-  </div>
-<% end %>
+</div>

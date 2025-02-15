@@ -19,8 +19,12 @@ Rails.application.routes.draw do
     collection do
       get :informe
       get :export_confirm  # Nueva ruta para confirmar la exportación
+      post :export, defaults: { format: :xlsx }  
     end
   end
+
+  
+  
   resources :inventories
   resources :inventorie_histories
   resources :sectors do
@@ -52,4 +56,6 @@ Rails.application.routes.draw do
     end
   end
   resources :agrochemical_histories, only: [:index, :new, :create]
+
+  
 end
