@@ -1,5 +1,16 @@
 # config/locales/es.yml
 es:
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              blank: "no puede estar en blanco"
+              taken: "ya está en uso"
+      messages:
+        blank: "no puede estar vacío"
+        taken: "ya fue tomado"
   date:
     day_names:
       - Domingo
