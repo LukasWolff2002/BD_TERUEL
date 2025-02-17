@@ -17,10 +17,10 @@ class AgrochemicalHistoriesController < ApplicationController
     @agrochemical_history.usuario = nombre_usuario
 
     # Solo se permite aumentar la cantidad; la cantidad a modificar debe ser mayor que 0
-    if @agrochemical_history.cantidad_cambiada <= 0
-      @agrochemical_history.errors.add(:cantidad_cambiada, "debe ser un número positivo para aumentar el inventario.")
-      return render :new, status: :unprocessable_entity
-    end
+    #if @agrochemical_history.cantidad_cambiada <= 0
+    #  @agrochemical_history.errors.add(:cantidad_cambiada, "debe ser un número positivo para aumentar el inventario.")
+    #  return render :new, status: :unprocessable_entity
+    #end
 
     ActiveRecord::Base.transaction do
       if @agrochemical_history.save

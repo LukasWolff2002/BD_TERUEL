@@ -59,7 +59,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
   create_table "agrochemical_histories", force: :cascade do |t|
     t.string "usuario", null: false, comment: "Nombre o identificador del usuario que realizó el cambio"
     t.bigint "agrochemical_id", null: false
-    t.integer "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
+    t.decimal "cantidad_cambiada", null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["agrochemical_id"], name: "index_agrochemical_histories_on_agrochemical_id"
@@ -67,7 +67,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
 
   create_table "agrochemicals", force: :cascade do |t|
     t.string "nombre", null: false
-    t.integer "cantidad", null: false
+    t.decimal "cantidad", null: false
     t.text "ingrediente_activo", null: false
     t.text "objetivo", null: false
     t.bigint "agrochemical_division_id", null: false

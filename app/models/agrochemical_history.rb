@@ -3,5 +3,5 @@ class AgrochemicalHistory < ApplicationRecord
 
   # Validaciones para asegurar que se guarde la información requerida
   validates :usuario, presence: true
-  validates :cantidad_cambiada, presence: true, numericality: { only_integer: true }
+  validates :cantidad_cambiada, presence: true
 end 

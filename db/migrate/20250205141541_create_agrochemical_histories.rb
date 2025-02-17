@@ -6,7 +6,7 @@ class CreateAgrochemicalHistories < ActiveRecord::Migration[6.1]
       t.string :usuario, null: false, comment: "Nombre o identificador del usuario que realizó el cambio"
       
       t.references :agrochemical, null: false, foreign_key: true
-      t.integer :cantidad_cambiada, null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
+      t.decimal :cantidad_cambiada, null: false, comment: "Cantidad agregada (valor positivo) o cantidad removida (valor negativo)"
 
       t.timestamps
     end

@@ -1,6 +1,8 @@
 # app/controllers/applications_controller.rb
 class ApplicationsController < ApplicationController
   before_action :set_application, only: [:show]
+  before_action :set_sectors, only: [:new, :create]
+
 
   # GET /applications
   def index
@@ -53,6 +55,10 @@ class ApplicationsController < ApplicationController
   # Busca el registro para las acciones que lo requieren
   def set_application
     @application = Application.find(params[:id])
+  end
+
+  def set_sectors
+    @sectors = Sector.all
   end
 
   # Strong parameters: se permite un array nativo para los campos que lo requieren
