@@ -1,109 +1,120 @@
 <div class="container mt-4">
-  <h1>Detalle de la Aplicación</h1>
-  
-  <div class="card">
-    <div class="card-header">
-      Detalle de la Aplicación (ID: <%= @application.id %>)
+  <h1 class="mb-4">Detalle de la Aplicación</h1>
+
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Aplicación ID: <%= @application.id %></h5>
     </div>
     <div class="card-body">
-      <table class="table table-striped">
+      <table class="table table-bordered">
         <tbody>
           <tr>
-            <th>Fecha de Aplicación</th>
-            <td><%= @application.fecha_aplicacion %></td>
+            <th class="bg-light">Fecha de Aplicación</th>
+            <td><%= @application.fecha_aplicacion || "No definida" %></td>
           </tr>
           <tr>
-            <th>Operador Tractor</th>
-            <td><%= @application.operador_tractor %></td>
+            <th class="bg-light">Operador Tractor</th>
+            <td><%= @application.operador_tractor.presence || "No definido" %></td>
           </tr>
           <tr>
-            <th>Aplicadores</th>
-            <td><%= @application.aplicadores %></td>
-          </tr>
-          <tr>
-            <th>Sector</th>
-            <td><%= @application.sector %></td>
-          </tr>
-          <tr>
-            <th>Motivo</th>
-            <td><%= @application.motivo %></td>
-          </tr>
-          <tr>
-            <th>Uso de Protección</th>
-            <td><%= @application.uso_de_proteccion ? "Sí" : "No" %></td>
-          </tr>
-          <tr>
-            <th>Observaciones</th>
-            <td><%= @application.observaciones %></td>
-          </tr>
-          <tr>
-            <th>Agroquímicos</th>
-            <td><%= @application.agroquimicos %></td>
-          </tr>
-          <tr>
-            <th>Dosificación</th>
+            <th class="bg-light">Aplicadores</th>
             <td>
-              <% if @application.dosis_en_100_l.present? %>
-                <%= @application.dosis_en_100_l %>
+              <% if @application.aplicadores.present? %>
+                <ul class="list-unstyled mb-0">
+                  <% @application.aplicadores.each do |aplicador| %>
+                    <li><%= aplicador %></li>
+                  <% end %>
+                </ul>
               <% else %>
-                No definida
+                <span class="text-muted">No definido</span>
               <% end %>
             </td>
           </tr>
           <tr>
-            <th>Maquinaria</th>
-            <td><%= @application.maquinaria %></td>
+            <th class="bg-light">Sector</th>
+            <td><%= @application.sector.presence || "No definido" %></td>
           </tr>
           <tr>
-            <th>Fecha de Liberación</th>
-            <td><%= @application.fecha_de_liberacion %></td>
+            <th class="bg-light">Motivo</th>
+            <td><%= @application.motivo.presence || "No definido" %></td>
           </tr>
           <tr>
-            <th>Mojamiento Relativo</th>
-            <td><%= @application.mojamiento_relativo %></td>
+            <th class="bg-light">Uso de Protección</th>
+            <td><%= @application.uso_de_proteccion ? "Sí" : "No" %></td>
           </tr>
           <tr>
-            <th>Mojamiento Real</th>
-            <td><%= @application.mojamiento_real %></td>
+            <th class="bg-light">Observaciones</th>
+            <td><%= @application.observaciones.presence || "No hay observaciones" %></td>
           </tr>
           <tr>
-            <th>Encargado de Aplicación</th>
-            <td><%= @application.encargado_aplicacion %></td>
+            <th class="bg-light">Agroquímicos y Dosis</th>
+            <td>
+              <% if @application.agroquimicos.present? %>
+                <ul class="list-unstyled mb-0">
+                  <% @application.agroquimicos.each_with_index do |agro, index| %>
+                    <li><strong><%= agro %></strong> - <span class="text-primary">
+                      <%= @application.dosis_en_100_l[index] %> L/100L
+                    </span></li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <span class="text-muted">No definidos</span>
+              <% end %>
+            </td>
           </tr>
           <tr>
-            <th>Lavado de Equipo</th>
+            <th class="bg-light">Maquinaria</th>
+            <td><%= @application.maquinaria.presence || "No definida" %></td>
+          </tr>
+          <tr>
+            <th class="bg-light">Fecha de Liberación</th>
+            <td><%= @application.fecha_de_liberacion || "No definida" %></td>
+          </tr>
+          <tr>
+            <th class="bg-light">Mojamiento Relativo</th>
+            <td><%= @application.mojamiento_relativo.presence || "No definido" %></td>
+          </tr>
+          <tr>
+            <th class="bg-light">Mojamiento Real</th>
+            <td><%= @application.mojamiento_real.presence || "No definido" %></td>
+          </tr>
+          <tr>
+            <th class="bg-light">Encargado de Aplicación</th>
+            <td><%= @application.encargado_aplicacion.presence || "No definido" %></td>
+          </tr>
+          <tr>
+            <th class="bg-light">Lavado de Equipo</th>
             <td><%= @application.lavado_de_equipo ? "Sí" : "No" %></td>
           </tr>
           <tr>
-            <th>Temperatura</th>
-            <td><%= @application.temperature %></td>
+            <th class="bg-light">Temperatura</th>
+            <td><%= @application.temperature.presence || "No definida" %> °C</td>
           </tr>
           <tr>
-            <th>Humedad</th>
-            <td><%= @application.humidity %></td>
+            <th class="bg-light">Humedad</th>
+            <td><%= @application.humidity.presence || "No definida" %> %</td>
           </tr>
           <tr>
-            <th>Nubosidad</th>
-            <td><%= @application.nubosidad %></td>
+            <th class="bg-light">Nubosidad</th>
+            <td><%= @application.nubosidad.presence || "No definida" %> %</td>
           </tr>
           <tr>
-            <th>Viento</th>
-            <td><%= @application.viento %></td>
+            <th class="bg-light">Viento</th>
+            <td><%= @application.viento.presence || "No definido" %> km/h</td>
           </tr>
           <tr>
-            <th>Hora de Inicio</th>
-            <td><%= @application.hora_inicio.strftime("%H:%M") if @application.hora_inicio %></td>
+            <th class="bg-light">Hora de Inicio</th>
+            <td><%= @application.hora_inicio&.strftime("%H:%M") || "No definida" %></td>
           </tr>
           <tr>
-            <th>Hora de Fin</th>
-            <td><%= @application.hora_fin.strftime("%H:%M") if @application.hora_fin %></td>
+            <th class="bg-light">Hora de Fin</th>
+            <td><%= @application.hora_fin&.strftime("%H:%M") || "No definida" %></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="card-footer">
-      
+    <div class="card-footer text-right">
       <%= link_to "Volver", applications_path, class: "btn btn-primary" %>
     </div>
   </div>
-</div> 
+</div>

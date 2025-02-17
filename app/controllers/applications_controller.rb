@@ -1,44 +1,85 @@
+# app/controllers/applications_controller.rb
 class ApplicationsController < ApplicationController
-    before_action :set_application, only: [:show]
+  before_action :set_application, only: [:show]
+
+  # GET /applications
   def index
-    @applications = Application.all.order(created_at: :desc)
+    @applications = Application.order(created_at: :desc)
   end
 
-  def new
-    @application = Application.new
-  end
-
+  # GET /applications/:id
   def show
   end
 
- 
+  # GET /applications/new
+  def new
+    @application = Application.new
+    @sectors = Sector.all
+  end
+
+  # POST /applications
   def create
+    puts "PARAMS RECIBIDOS: #{params[:application].inspect}"
+    puts "AGROQUIMICOS RECIBIDOS: #{params[:application][:agroquimicos]}"
     @application = Application.new(application_params)
     if @application.save
-      redirect_to applications_path, notice: "Aplicación creada exitosamente."
+      redirect_to @application, notice: "La aplicación se creó exitosamente."
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  private
+  # GET /applications/:id/edit
+  def edit
+  end
 
-  def set_application
-    @application = Application.find_by(id: params[:id])
-    unless @application
-      redirect_to applications_path, alert: "Aplicación no encontrada." and return
+  # PATCH/PUT /applications/:id
+  def update
+    if @application.update(application_params)
+      redirect_to @application, notice: "La aplicación se actualizó correctamente."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
+  # DELETE /applications/:id
+  def destroy
+    @application.destroy
+    redirect_to applications_path, notice: "La aplicación fue eliminada."
+  end
+
+  private
+
+  # Busca el registro para las acciones que lo requieren
+  def set_application
+    @application = Application.find(params[:id])
+  end
+
+  # Strong parameters: se permite un array nativo para los campos que lo requieren
   def application_params
     params.require(:application).permit(
-      :fecha_aplicacion, :sector, :operador_tractor, :motivo,
-      :uso_de_proteccion, :observaciones, :maquinaria, :mojamiento_relativo,
-      :hectareas, :encargado_aplicacion, :lavado_de_equipo,
-      :temperature, :humidity, :nubosidad, :viento, :hora_inicio, :hora_fin,
-      :agroquimicos, # si es una cadena con nombres combinados
-      aplicadores: [], # Especifica que este campo es un arreglo
-      dosis_en_100_l: []  # Permitir un arreglo de floats para las dosis
+      :fecha_aplicacion,
+      :fecha_de_liberacion,
+      :operador_tractor,
+      :sector,
+      :hectareas,
+      :motivo,
+      :observaciones,
+      :maquinaria,
+      :uso_de_proteccion,
+      :lavado_de_equipo,
+      :mojamiento_relativo,
+      :mojamiento_real,
+      :temperature,
+      :humidity,
+      :nubosidad,
+      :viento,
+      :hora_inicio,
+      :hora_fin,
+      :encargado_aplicacion,
+      aplicadores: [],   # <-- Array de strings
+      agroquimicos: [],  # <-- Array de strings
+      dosis_en_100_l: [] # <-- Array de floats
     )
   end
-end 
+end

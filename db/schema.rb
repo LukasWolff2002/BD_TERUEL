@@ -83,26 +83,27 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
 
   create_table "applications", force: :cascade do |t|
     t.date "fecha_aplicacion"
-    t.string "operador_tractor"
-    t.string "aplicadores"
-    t.string "sector"
-    t.string "motivo"
-    t.boolean "uso_de_proteccion", default: false
-    t.text "observaciones"
-    t.string "agroquimicos"
-    t.string "dosis_en_100_l"
-    t.string "maquinaria"
     t.date "fecha_de_liberacion"
+    t.string "operador_tractor"
+    t.string "aplicadores", default: [], array: true
+    t.string "sector"
+    t.float "hectareas"
+    t.string "motivo"
+    t.text "observaciones"
+    t.string "maquinaria"
+    t.string "agroquimicos", default: [], array: true
+    t.float "dosis_en_100_l", default: [], array: true
+    t.boolean "uso_de_proteccion", default: false
+    t.boolean "lavado_de_equipo", default: false
     t.float "mojamiento_relativo"
     t.float "mojamiento_real"
-    t.string "encargado_aplicacion"
-    t.boolean "lavado_de_equipo", default: false
     t.float "temperature"
     t.float "humidity"
     t.float "nubosidad"
     t.float "viento"
     t.datetime "hora_inicio"
     t.datetime "hora_fin"
+    t.string "encargado_aplicacion"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
