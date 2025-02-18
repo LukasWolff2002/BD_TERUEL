@@ -52,9 +52,8 @@
           <%= f.hidden_field :user_id, value: current_user.id %>
         </div>
          <div class="mb-3">
+          <%= f.label :guia_despacho, "Imagen de Guía de Despacho", class: "form-label fw-bold text-warning" %>
           <%= f.file_field :image, class: "form-control", accept: "image/*", capture: "environment" %>
-
-          <%= f.file_field :image, class: "form-control" %>
         </div>
       </div>
     </div>
