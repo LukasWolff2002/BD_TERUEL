@@ -10,10 +10,18 @@
         <div class="col-12 mb-4">
           <h4 class="fw-bold text-primary border-bottom pb-2">Información General</h4>
           <div class="row">
-            <div class="col-md-3"><p><strong>Fecha:</strong> <%= @irrigation.fecha.strftime("%d/%m/%Y") %></p></div>
-            <div class="col-md-3"><p><strong>Hora:</strong> <%= @irrigation.hora.strftime("%H:%M") %></p></div>
-            <div class="col-md-3"><p><strong>Sector:</strong> <%= @irrigation.sector.nombre %></p></div>
-            <div class="col-md-3"><p><strong>Encargado:</strong> <%= "#{@irrigation.user.nombre} #{@irrigation.user.apellido}" %></p></div>
+            <div class="col-md-3">
+              <p><strong>Fecha:</strong> <%= @irrigation.fecha.strftime("%d/%m/%Y") %></p>
+            </div>
+            <div class="col-md-3">
+              <p><strong>Hora:</strong> <%= @irrigation.hora.strftime("%H:%M") %></p>
+            </div>
+            <div class="col-md-3">
+              <p><strong>Sector:</strong> <%= @irrigation.sector_nombre %></p>
+            </div>
+            <div class="col-md-3">
+              <p><strong>Encargado:</strong> <%= @irrigation.evaluador %></p>
+            </div>
           </div>
         </div>
 
@@ -21,30 +29,51 @@
         <div class="col-12 mb-4">
           <h4 class="fw-bold text-primary border-bottom pb-2">Información de Pulsos</h4>
           <div class="row">
-            <div class="col-md-4"><p><strong>Número de Pulsos:</strong> <%= @irrigation.nro_pulsos %></p></div>
-            <div class="col-md-4"><p><strong>Tiempo por Pulso:</strong> <%= number_with_precision(@irrigation.tiempo_pulso, precision: 2) %> min</p></div>
-            <div class="col-md-4"><p><strong>Porcentaje Drenaje:</strong> <%= number_with_precision(@irrigation.porcentaje_drenaje, precision: 2) %>%</p></div>
+            <div class="col-md-4">
+              <p><strong>Número de Pulsos:</strong> <%= @irrigation.nro_pulsos %></p>
+            </div>
+            <div class="col-md-4">
+              <p><strong>Tiempo por Pulso:</strong> <%= number_with_precision(@irrigation.tiempo_pulso, precision: 2) %> min</p>
+            </div>
+            <div class="col-md-4">
+              <p><strong>% Drenaje:</strong> <%= number_with_precision(@irrigation.porcentaje_drenaje, precision: 2) %>%</p>
+            </div>
           </div>
         </div>
 
-        <!-- Riego de entrada y drenaje -->
+        <!-- Riego de entrada -->
         <div class="col-md-6 mb-4">
           <h4 class="fw-bold text-primary border-bottom pb-2">Riego de Entrada</h4>
           <table class="table table-bordered table-sm">
             <tbody>
-              <% [["MM", @irrigation.riego_entrada_mm], ["PH", @irrigation.riego_entrada_ph], ["CE", @irrigation.riego_entrada_ce], ["Nitratos", @irrigation.riego_entrada_nitratos], ["Potasio", @irrigation.riego_entrada_potasio]].each do |label, value| %>
-                <tr><th><%= label %>:</th><td><%= number_with_precision(value, precision: 2) %></td></tr>
+              <% [["MM", @irrigation.riego_entrada_mm],
+                  ["PH", @irrigation.riego_entrada_ph],
+                  ["CE", @irrigation.riego_entrada_ce],
+                  ["Nitratos", @irrigation.riego_entrada_nitratos],
+                  ["Potasio", @irrigation.riego_entrada_potasio]].each do |label, value| %>
+                <tr>
+                  <th><%= label %>:</th>
+                  <td><%= number_with_precision(value, precision: 2) %></td>
+                </tr>
               <% end %>
             </tbody>
           </table>
         </div>
 
+        <!-- Drenaje de riego -->
         <div class="col-md-6 mb-4">
           <h4 class="fw-bold text-primary border-bottom pb-2">Drenaje de Riego</h4>
           <table class="table table-bordered table-sm">
             <tbody>
-              <% [["MM", @irrigation.drenaje_riego_mm], ["PH", @irrigation.drenaje_riego_ph], ["CE", @irrigation.drenaje_riego_ce], ["Nitratos", @irrigation.drenaje_riego_nitratos], ["Potasio", @irrigation.drenaje_riego_potasio]].each do |label, value| %>
-                <tr><th><%= label %>:</th><td><%= number_with_precision(value, precision: 2) %></td></tr>
+              <% [["MM", @irrigation.drenaje_riego_mm],
+                  ["PH", @irrigation.drenaje_riego_ph],
+                  ["CE", @irrigation.drenaje_riego_ce],
+                  ["Nitratos", @irrigation.drenaje_riego_nitratos],
+                  ["Potasio", @irrigation.drenaje_riego_potasio]].each do |label, value| %>
+                <tr>
+                  <th><%= label %>:</th>
+                  <td><%= number_with_precision(value, precision: 2) %></td>
+                </tr>
               <% end %>
             </tbody>
           </table>
@@ -71,8 +100,12 @@
         <div class="col-12 mb-4">
           <h4 class="fw-bold text-primary border-bottom pb-2">Pulsos con Agua</h4>
           <div class="row">
-            <div class="col-md-6"><p><strong>Número de Pulsos:</strong> <%= @irrigation.pulsos_agua %></p></div>
-            <div class="col-md-6"><p><strong>Tiempo:</strong> <%= number_with_precision(@irrigation.tiempo_pulsos_agua, precision: 2) %> min</p></div>
+            <div class="col-md-6">
+              <p><strong>Número de Pulsos:</strong> <%= @irrigation.pulsos_agua %></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Tiempo:</strong> <%= number_with_precision(@irrigation.tiempo_pulsos_agua, precision: 2) %> min</p>
+            </div>
           </div>
         </div>
 
@@ -80,8 +113,12 @@
         <div class="col-12 mb-4">
           <h4 class="fw-bold text-primary border-bottom pb-2">Mediciones Hoja</h4>
           <div class="row">
-            <div class="col-md-6"><p><strong>Potasio:</strong> <%= number_with_precision(@irrigation.potasio_hoja, precision: 2) %></p></div>
-            <div class="col-md-6"><p><strong>Nitratos:</strong> <%= number_with_precision(@irrigation.nitratos_hoja, precision: 2) %></p></div>
+            <div class="col-md-6">
+              <p><strong>Potasio:</strong> <%= number_with_precision(@irrigation.potasio_hoja, precision: 2) %></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Nitratos:</strong> <%= number_with_precision(@irrigation.nitratos_hoja, precision: 2) %></p>
+            </div>
           </div>
         </div>
 
@@ -89,7 +126,9 @@
         <div class="col-12">
           <h4 class="fw-bold text-primary border-bottom pb-2">Otros Datos</h4>
           <div class="row">
-            <div class="col-md-6"><p><strong>Número de Muestras:</strong> <%= @irrigation.muestras %></p></div>
+            <div class="col-md-6">
+              <p><strong>Número de Muestras:</strong> <%= @irrigation.muestras %></p>
+            </div>
           </div>
         </div>
       </div>

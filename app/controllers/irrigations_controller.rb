@@ -19,7 +19,7 @@ class IrrigationsController < ApplicationController
     @irrigation = Irrigation.new(irrigation_params)
     
     if @irrigation.save
-      redirect_to irrigations_path, notice: 'Registro de riego creado exitosamente.'
+      redirect_to @irrigation, notice: 'Registro de riego creado exitosamente.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -30,7 +30,7 @@ class IrrigationsController < ApplicationController
 
   def update
     if @irrigation.update(irrigation_params)
-      redirect_to irrigations_path, notice: 'Registro de riego actualizado exitosamente.'
+      redirect_to @irrigation, notice: 'Registro de riego actualizado exitosamente.'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -49,7 +49,7 @@ class IrrigationsController < ApplicationController
 
   def irrigation_params
     params.require(:irrigation).permit(
-      :fecha, :hora, :user_id, :sector_id, :nro_pulsos, :tiempo_pulso,
+      :fecha, :hora, :user, :sector, :nro_pulsos, :tiempo_pulso,
       :riego_entrada_mm, :riego_entrada_ph, :riego_entrada_ce, :riego_entrada_nitratos,
       :riego_entrada_potasio, :drenaje_riego_mm, :drenaje_riego_ph, :drenaje_riego_ce, 
       :drenaje_riego_nitratos, :drenaje_riego_potasio, :humedad_inicial, :ce_inicial, 

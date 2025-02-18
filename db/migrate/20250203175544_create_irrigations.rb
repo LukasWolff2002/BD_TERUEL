@@ -3,8 +3,8 @@ class CreateIrrigations < ActiveRecord::Migration[7.1]
     create_table :irrigations do |t|
       t.date :fecha #Obligatorio
       t.time :hora #Obligatorio
-      t.references :user, null: false, foreign_key: true #Obligatorio
-      t.references :sector, foreign_key: true  #Obligatorio
+      t.string :user #Obligatorio
+      t.string :sector #Obligatorio
       t.integer :nro_pulsos #Obligatorio
       t.decimal :tiempo_pulso, precision: 5, scale: 2  #Obligatorio
       

@@ -170,8 +170,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
   create_table "irrigations", force: :cascade do |t|
     t.date "fecha"
     t.time "hora"
-    t.bigint "user_id", null: false
-    t.bigint "sector_id"
+    t.string "user"
+    t.string "sector"
     t.integer "nro_pulsos"
     t.decimal "tiempo_pulso", precision: 5, scale: 2
     t.decimal "riego_entrada_mm", precision: 5, scale: 2
@@ -196,8 +196,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
     t.integer "muestras"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["sector_id"], name: "index_irrigations_on_sector_id"
-    t.index ["user_id"], name: "index_irrigations_on_user_id"
   end
 
   create_table "receptions", force: :cascade do |t|
@@ -299,8 +297,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
   add_foreign_key "agrochemicals", "agrochemical_divisions"
   add_foreign_key "fertilizer_histories", "fertilizers"
   add_foreign_key "images", "receptions"
-  add_foreign_key "irrigations", "sectors"
-  add_foreign_key "irrigations", "users"
   add_foreign_key "sector_varieties", "sectors"
   add_foreign_key "sector_varieties", "varieties"
   add_foreign_key "sector_variety_colors", "colors"

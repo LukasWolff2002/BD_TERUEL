@@ -33,16 +33,17 @@
             <%= f.time_field :hora, class: "form-control shadow-sm border-0", readonly: true, value: Time.now.strftime("%H:%M") %>
           </div>
 
-          <div class="col-md-4">
-            <%= f.label :evaluador, "Encargado de Riego", class: "form-label fw-bold text-primary"  %>
+         <div class="col-md-4">
+            <%= f.label :evaluador, "Encargado de Riego", class: "form-label fw-bold text-primary" %>
             <p><strong><%= current_user.nombre_completo %></strong></p>
-            <%= f.hidden_field :user_id, value: current_user.id %>
+            <%= f.hidden_field :user, value: current_user.id %>
           </div>
 
           <div class="col-md-4">
-            <%= f.label :sector_id, "Sector", class: "form-label fw-bold text-primary" %>
-            <%= f.collection_select :sector_id, Sector.all, :id, :nombre, { prompt: "Seleccionar sector" }, { class: "form-select shadow-sm border-0", required: true } %>
+            <%= f.label :sector, "Sector", class: "form-label fw-bold text-primary" %>
+            <%= f.collection_select :sector, Sector.all, :id, :nombre, { prompt: "Seleccionar sector" }, { class: "form-select shadow-sm border-0", required: true } %>
           </div>
+
 
           <div class="col-md-6">
             <%= f.label :nro_pulsos, "Número de Pulsos", class: "form-label fw-bold text-primary" %>

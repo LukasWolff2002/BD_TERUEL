@@ -1,54 +1,49 @@
-
-
-    <div class="container mt-4">
-      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h3 class="fw-bold text-primary mb-3 mb-md-0">Historial de Riegos</h3>
-        <%= link_to new_irrigation_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #cfe2ff;" do %>
-          <i class="bi bi-plus-circle me-2"></i> Nuevo Registro
-        <% end %>
-      </div>
-
-      <% if @irrigations.any? %>
-        <div class="table-responsive shadow-sm rounded">
-          <table class="table table-hover align-middle table-sm" style="background-color: #cfe2ff;">
-            <thead class="table-primary text-center">
-              <tr>
-                <th>Fecha</th>
-                <th>Encargado</th>
-                <th>Sector</th>
-                <th>Pulsos</th>
-                <th>Tiempo/Pulso</th>
-                <th>% Drenaje</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @irrigations.each do |irrigation| %>
-                <tr>
-                  <td class="text-center"><%= irrigation.created_at.strftime("%d/%m/%Y %H:%M") %></td>
-                  <td class="text-center"><%= "#{irrigation.user.nombre} #{irrigation.user.apellido}" %></td>
-                  <td class="text-center"><%= irrigation.sector_id %></td>
-                  <td class="text-center"><%= irrigation.nro_pulsos %></td>
-                  <td class="text-center"><%= number_with_precision(irrigation.tiempo_pulso, precision: 2) %> min</td>
-                  <td class="text-center"><%= number_with_precision(irrigation.porcentaje_drenaje, precision: 2) %>%</td>
-                  <td class="text-center">
-                    <%= link_to irrigation_path(irrigation), class: "btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" do %>
-                      <i class="bi bi-eye"></i>
-                      <span class="d-none d-md-inline ms-1">Ver</span>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      <% else %>
-        <div class="alert alert-info text-center p-4 shadow-sm border-0">
-          <i class="bi bi-info-circle fs-4"></i>
-          <p class="mt-2 mb-0 fw-bold">No hay registros de riego.</p>
-        </div>
-      <% end %>
-    </div>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h3 class="fw-bold text-primary mb-3 mb-md-0">Historial de Riegos</h3>
+    <%= link_to new_irrigation_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #cfe2ff;" do %>
+      <i class="bi bi-plus-circle me-2"></i> Nuevo Registro
+    <% end %>
   </div>
-</div>
 
+  <% if @irrigations.any? %>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm" style="background-color: #cfe2ff;">
+        <thead class="table-primary text-center">
+          <tr>
+            <th>Fecha</th>
+            <th>Encargado</th>
+            <th>Sector</th>
+            <th>Pulsos</th>
+            <th>Tiempo/Pulso</th>
+            <th>% Drenaje</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @irrigations.each do |irrigation| %>
+            <tr>
+              <td class="text-center"><%= irrigation.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+              <td class="text-center"><%= irrigation.evaluador %></td>
+              <td class="text-center"><%= irrigation.sector_nombre %></td>
+              <td class="text-center"><%= irrigation.nro_pulsos %></td>
+              <td class="text-center"><%= number_with_precision(irrigation.tiempo_pulso, precision: 2) %> min</td>
+              <td class="text-center"><%= number_with_precision(irrigation.porcentaje_drenaje, precision: 2) %>%</td>
+              <td class="text-center">
+                <%= link_to irrigation_path(irrigation), class: "btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-eye"></i>
+                  <span class="d-none d-md-inline ms-1">Ver</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No hay registros de riego.</p>
+    </div>
+  <% end %>
+</div>
