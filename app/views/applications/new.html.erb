@@ -80,17 +80,18 @@
             <hr>
 
             <div class="md-6">
-                <div class="mb-3">
-                  <%= f.label :aplicadores, "Aplicadores (al menos 4)", class: "form-label fw-bold text-success" %>
-                  <div class="border p-2 rounded bg-light">
-                    <%= f.collection_check_boxes :aplicadores, User.all, :nombre, :nombre, {}, include_hidden: false do |b| %>
-                      <div class="form-check form-check-inline">
-                        <%= b.check_box(class: "form-check-input") %>
-                        <%= b.label(class: "form-check-label") %>
-                      </div>
-                    <% end %>
-                  </div>
+              <div class="mb-3">
+                <%= f.label :aplicadores, "Aplicadores (al menos 4)", class: "form-label fw-bold text-success" %>
+                <div class="border p-2 rounded bg-light">
+                  <%= f.collection_check_boxes :aplicadores, User.where(cargo: 'Volante'), :nombre, :nombre, {}, include_hidden: false do |b| %>
+                    <div class="form-check form-check-inline">
+                      <%= b.check_box(class: "form-check-input") %>
+                      <%= b.label(class: "form-check-label") %>
+                    </div>
+                  <% end %>
                 </div>
+              </div>
+
 
                 <div class="mb-3 form-check">
                   <%= f.check_box :uso_de_proteccion, class: "form-check-input" %>
@@ -113,11 +114,11 @@
             <!-- MAQUINARIA -->
             <h5 class="fw-bold text-success">Maquinaria</h5>
 
-            <div class="mb-3">
-                  <%= f.label :operador_tractor, "Operador de Tractor", class: "form-label fw-bold text-success" %>
-                  <%= f.select :operador_tractor, options_from_collection_for_select(User.all, "nombre", "nombre"), 
-                      { include_blank: 'Seleccione un operador' }, class: "form-select shadow-sm border-0" %>
-                </div>
+            <div class="col-md-4">
+  <%= f.label :operador_tractor, "Operador de Tractor", class: "form-label fw-bold text-success" %>
+  <%= f.select :operador_tractor, options_from_collection_for_select(User.where(cargo: 'Jefe Volante'), "nombre", "nombre"), { include_blank: 'Seleccione un operador' }, class: "form-control" %>
+</div>
+
             <div class="mb-3">
               <%= f.label :operador_tractor, "Tipo de maquinaria", class: "form-label fw-bold text-success" %>
               <%= f.select :maquinaria, options_for_select(Application::MAQUINARIA_OPCIONES), 
