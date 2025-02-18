@@ -24,8 +24,8 @@
           <% @irrigations.each do |irrigation| %>
             <tr>
               <td class="text-center"><%= irrigation.created_at.strftime("%d/%m/%Y %H:%M") %></td>
-              <td class="text-center"><%= irrigation.evaluador %></td>
-              <td class="text-center"><%= irrigation.sector_nombre %></td>
+              <td class="text-center"><%= irrigation.user %></td>
+              <td class="text-center"><%= irrigation.sector %></td>
               <td class="text-center"><%= irrigation.nro_pulsos %></td>
               <td class="text-center"><%= number_with_precision(irrigation.tiempo_pulso, precision: 2) %> min</td>
               <td class="text-center"><%= number_with_precision(irrigation.porcentaje_drenaje, precision: 2) %>%</td>

@@ -34,14 +34,14 @@
           </div>
 
          <div class="col-md-4">
-            <%= f.label :evaluador, "Encargado de Riego", class: "form-label fw-bold text-primary" %>
+            <%= f.label :user, "Encargado de Riego", class: "form-label" %>
             <p><strong><%= current_user.nombre_completo %></strong></p>
-            <%= f.hidden_field :user, value: current_user.id %>
+            <%= f.hidden_field :user, value: current_user.nombre_completo %>
           </div>
 
           <div class="col-md-4">
-            <%= f.label :sector, "Sector", class: "form-label fw-bold text-primary" %>
-            <%= f.collection_select :sector, Sector.all, :id, :nombre, { prompt: "Seleccionar sector" }, { class: "form-select shadow-sm border-0", required: true } %>
+            <%= f.label :sector, "Sector", class: "form-label" %>
+            <%= f.collection_select :sector, Sector.all, :nombre, :nombre, { prompt: "Seleccione un sector" }, { class: "form-select" } %>
           </div>
 
 
