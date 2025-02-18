@@ -31,14 +31,15 @@
         </div>
         <div class="mb-3">
           <%= f.label :hora, class: "form-label fw-bold text-warning" %>
-          <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.current.strftime("%H:%M") %>
+          <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.zone.now.strftime("%H:%M") %>
         </div>
         <div class="mb-3">
               <%= f.label :supplier_id, "Proveedor", class: "form-label fw-bold text-warning" %>
               <%= f.select :supplier_id, 
-                           options_from_collection_for_select(@suppliers, "id", "nombre", @reception.supplier_id), 
-                           { include_blank: "Seleccione un proveedor" },
-                           { id: "supplier-select", class: "form-select shadow-sm border-0" } %>
+             options_from_collection_for_select(@suppliers, "id", "nombre", @reception.supplier&.id), 
+             { include_blank: "Seleccione un proveedor" },
+             { id: "supplier-select", class: "form-select shadow-sm border-0" } %>
+
             </div>
         <div class="mb-3">
           <%= f.label :nro_guia_despacho, "Número de Guía de Despacho ", class: "form-label fw-bold text-warning" %>

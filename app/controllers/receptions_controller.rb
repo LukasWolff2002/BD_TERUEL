@@ -13,7 +13,7 @@ class ReceptionsController < ApplicationController
   def new
     @reception = Reception.new
     @reception.fecha = Date.today
-    @reception.hora  = Time.current
+    @reception.hora  = Time.zone.now
   end
 
   def create
