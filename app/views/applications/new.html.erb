@@ -1,235 +1,189 @@
-<!-- app/views/applications/new.html.erb -->
 <div class="container mt-4">
-  <h1>Nueva Aplicación</h1>
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top" style="background-color: #d1e7dd;">
+          <h2 class="fw-bold mb-0">Nueva Aplicación - Datos Base</h2>
+        </div>
 
-  <%= form_with(model: @application, local: true) do |f| %>
-    <% if @application.errors.any? %>
-      <div class="alert alert-danger">
-        <h4>Se encontraron errores:</h4>
-        <ul>
-          <% @application.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
+        <div class="card-body p-4">
+          <!-- En este formulario se envían los datos base a la acción "preview" -->
+          <%= form_with(model: @application, url: preview_applications_path, method: :post, local: true) do |f| %>
+            <% if @application && @application.errors.any? %>
+              <div class="alert alert-danger">
+                <ul>
+                  <% @application.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <!-- Campos base, todos anidados bajo "application" -->
+            <div class="mb-3">
+              <%= f.label :fecha_aplicacion, "Fecha de Aplicación", class: "form-label" %>
+              <%= f.date_field :fecha_aplicacion, class: "form-control" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :encargado_aplicacion, "Encargado de la Aplicación", class: "form-label" %>
+              <%= f.text_field :encargado_aplicacion, class: "form-control", value: current_user.nombre_completo, readonly: true %>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <%= f.label :hora_inicio, "Hora de Inicio", class: "form-label" %>
+                <%= f.time_field :hora_inicio, class: "form-control" %>
+              </div>
+              <div class="col-md-6 mb-3">
+                <%= f.label :hora_fin, "Hora de Fin", class: "form-label" %>
+                <%= f.time_field :hora_fin, class: "form-control" %>
+              </div>
+            </div>
+
+            <div class="row">
+              
+                <div class="col-md-6">
+                  <%= f.label :sector, "Sector", class: "form-label fw-bold text-success"  %>
+                  <select name="application[sector]" id="application_sector" class="form-control">
+                    <option value="">Seleccione un sector</option>
+                    <% @sectors.each do |sector| %>
+                      <option value="<%= sector.nombre %>" data-hectareas="<%= sector.hectareas %>">
+                        <%= sector.nombre %>
+                      </option>
+                    <% end %>
+                  </select>
+                </div>
+
+
+                <div class="col-md-6">
+                  <%= f.label :hectareas, "Hectáreas", class: "form-label fw-bold text-success"  %>
+                  <%= f.number_field :hectareas, 
+                                    class: "form-control", 
+                                    step: :any, 
+                                    id: "application_hectareas", 
+                                    readonly: true,
+                                    value: @application.hectareas %>
+                </div>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :motivo, "Motivo de Aplicación", class: "form-label" %>
+              <%= f.text_field :motivo, class: "form-control" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :mojamiento_relativo, "Mojamiento Relativo", class: "form-label" %>
+              <%= f.number_field :mojamiento_relativo, step: :any, class: "form-control" %>
+            </div>
+
+            <hr>
+
+            <div class="md-6">
+                <div class="mb-3">
+                  <%= f.label :aplicadores, "Aplicadores (al menos 4)", class: "form-label fw-bold text-success" %>
+                  <div class="border p-2 rounded bg-light">
+                    <%= f.collection_check_boxes :aplicadores, User.all, :nombre, :nombre, {}, include_hidden: false do |b| %>
+                      <div class="form-check form-check-inline">
+                        <%= b.check_box(class: "form-check-input") %>
+                        <%= b.label(class: "form-check-label") %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                  <%= f.check_box :uso_de_proteccion, class: "form-check-input" %>
+                  <%= f.label :uso_de_proteccion, "Uso de Protección", class: "form-check-label fw-bold text-success" %>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :observaciones, "Observaciones", class: "form-label fw-bold text-success" %>
+                  <%= f.text_area :observaciones, class: "form-control shadow-sm border-0", rows: 3,
+                    value: (@application.observaciones.presence || "Indicar quien o que no se cumplió con el uso de seguridad"),
+                    onfocus: "if(this.value == 'Indicar quien o que no se cumplió con el uso de seguridad') this.value=''",
+                    onblur: "if(this.value == '') this.value='Indicar quien o que no se cumplió con el uso de seguridad'" %>
+
+                </div>
+              </div>
+            
+
+            <hr>
+
+            <!-- MAQUINARIA -->
+            <h5 class="fw-bold text-success">Maquinaria</h5>
+
+            <div class="mb-3">
+                  <%= f.label :operador_tractor, "Operador de Tractor", class: "form-label fw-bold text-success" %>
+                  <%= f.select :operador_tractor, options_from_collection_for_select(User.all, "nombre", "nombre"), 
+                      { include_blank: 'Seleccione un operador' }, class: "form-select shadow-sm border-0" %>
+                </div>
+            <div class="mb-3">
+              <%= f.label :operador_tractor, "Tipo de maquinaria", class: "form-label fw-bold text-success" %>
+              <%= f.select :maquinaria, options_for_select(Application::MAQUINARIA_OPCIONES), 
+                  { include_blank: 'Seleccione la maquinaria' }, class: "form-select shadow-sm border-0" %>
+            </div>
+
+            <!-- PROTECCIÓN Y LAVADO -->
+
+            <div class="mb-3 form-check">
+              <%= f.check_box :lavado_de_equipo, class: "form-check-input" %>
+              <%= f.label :lavado_de_equipo, "Lavado de Equipo", class: "form-check-label fw-bold text-success" %>
+            </div>
+
+            <hr>
+
+            <!-- DATOS AMBIENTALES -->
+            <h5 class="fw-bold text-success">Datos Ambientales</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <%= f.label :temperature, "Temperatura (°C)", class: "form-label fw-bold text-success" %>
+                <%= f.number_field :temperature, step: :any, class: "form-control shadow-sm border-0" %>
+              </div>
+              <div class="col-md-6">
+                <%= f.label :humidity, "Humedad (%)", class: "form-label fw-bold text-success" %>
+                <%= f.number_field :humidity, step: :any, class: "form-control shadow-sm border-0" %>
+              </div>
+            </div>
+
+            <div class="row">
+  
+              <div class="col-md-6">
+                <%= f.label :nubosidad, "Nubosidad (%)", class: "form-label fw-bold text-success" %>
+                <%= f.number_field :nubosidad, step: :any, class: "form-control shadow-sm border-0" %>
+              </div>
+              <div class="col-md-6">
+                <%= f.label :viento, "Viento (km/h)", class: "form-label fw-bold text-success"%>
+                <%= f.number_field :viento, step: :any, class: "form-control shadow-sm border-0" %>
+              </div>
+            </div>
+
+
+            <div class="mt-3 d-grid gap-3">
+              <%= f.submit "Siguiente: Agregar Agroquímicos", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;"%>
+              <%= link_to "Cancelar", applications_path, class: "btn btn-outline-success btn-lg shadow-sm w-100" %>
+            </div>
+
+            
+          <% end %> 
+
+        </div>
       </div>
-    <% end %>
-
-    <!-- FECHA DE APLICACIÓN -->
-    <div class="form-group">
-      <%= f.label :fecha_aplicacion, "Fecha de Aplicación" %>
-      <%= f.date_field :fecha_aplicacion, class: "form-control" %>
     </div>
-    
-    <!-- OPERADOR TRACTOR -->
-    <div class="form-group">
-      <%= f.label :operador_tractor, "Operador de Tractor" %>
-      <%= f.select :operador_tractor, 
-            options_from_collection_for_select(User.all, "nombre", "nombre"), 
-            { include_blank: 'Seleccione un operador' }, 
-            class: "form-control" %>
-    </div>
-
-    <!-- APLICADORES (ARRAY) -->
-    <div class="form-group">
-      <%= f.label :aplicadores, "Aplicadores" %>
-      <div class="border p-2">
-        <!-- `include_hidden: false` para evitar el "" inicial en el array -->
-        <%= f.collection_check_boxes :aplicadores, User.all, :nombre, :nombre, {}, include_hidden: false do |b| %>
-          <div class="form-check form-check-inline">
-            <%= b.check_box(class: "form-check-input") %>
-            <%= b.label(class: "form-check-label") %>
-          </div>
-        <% end %>
-      </div>
-      <small class="form-text text-muted">Seleccione al menos 4 aplicadores.</small>
-    </div>
-
-    <!-- SECTOR -->
-    <div class="form-group">
-      <%= f.label :sector, "Sector" %>
-      <select name="application[sector]" id="application_sector" class="form-control">
-        <option value="">Seleccione un sector</option>
-        <% @sectors.each do |sector| %>
-          <option value="<%= sector.nombre %>" data-hectareas="<%= sector.hectareas %>">
-            <%= sector.nombre %>
-          </option>
-        <% end %>
-      </select>
-    </div>
-
-    <!-- Hectáreas: se autocompleta según sector seleccionado -->
-    <div class="form-group">
-      <%= f.label :hectareas, "Hectáreas" %>
-      <%= f.number_field :hectareas, 
-                         class: "form-control", 
-                         step: :any, 
-                         id: "application_hectareas", 
-                         readonly: true,
-                         value: @application.hectareas %>
-    </div>
-
-    <!-- MOTIVO -->
-    <div class="form-group">
-      <%= f.label :motivo, "Motivo" %>
-      <%= f.text_field :motivo, class: "form-control" %>
-    </div>
-
-    <!-- OBSERVACIONES (text) -->
-    <div class="form-group">
-      <%= f.label :observaciones, "Observaciones" %>
-      <%= f.text_area :observaciones, class: "form-control", rows: 3 %>
-    </div>
-
-    <!-- AGROQUÍMICOS Y DOSIS EN 100 L -->
-  <div class="form-group">
-    <label>Agroquímicos Usados y sus Dosis en 100 L</label>
-
-    <div id="agrochemicals-container">
-      <!-- Aquí se agregarán dinámicamente las filas de agroquímicos -->
-    </div>
-
-    <button type="button" id="add-agrochemical" class="btn btn-secondary mt-2">
-      Agregar Agroquímico
-    </button>
-
-    <small class="form-text text-muted">
-      Seleccione agroquímicos de la lista y asigne la dosis en 100 L correspondiente.
-    </small>
   </div>
-
-  <!-- Plantilla oculta para agregar un agroquímico -->
-  <template id="agrochemical-template">
-    <div class="form-row align-items-end agrochemical-row mb-2">
-      <div class="col">
-        <label>Agroquímico</label>
-        <select name="application[agroquimicos][]" class="form-control agrochemical-select">
-          <option value="">Seleccione</option>
-          <% Agrochemical.all.each do |agro| %>
-            <option value="<%= agro.nombre %>"><%= agro.nombre %></option>
-          <% end %>
-        </select>
-      </div>
-      <div class="col">
-        <label>Dosis en 100 L</label>
-        <input type="number" step="any" name="application[dosis_en_100_l][]" class="form-control agrochemical-dose" placeholder="Dosis">
-      </div>
-      <div class="col-auto">
-        <button type="button" class="btn btn-danger remove-agrochemical">Quitar</button>
-      </div>
-    </div>
-  </template>
-
-
-    <!-- MAQUINARIA -->
-    <div class="form-group">
-      <%= f.select :maquinaria, options_for_select(Application::MAQUINARIA_OPCIONES), { include_blank: 'Seleccione la maquinaria' }, class: "form-control" %>
-    </div>
-
-    <!-- USO DE PROTECCIÓN (BOOLEAN) -->
-    <div class="form-check">
-      <%= f.check_box :uso_de_proteccion, class: "form-check-input" %>
-      <%= f.label :uso_de_proteccion, "Uso de Protección", class: "form-check-label" %>
-    </div>
-
-    <!-- LAVADO DE EQUIPO (BOOLEAN) -->
-    <div class="form-check mb-3">
-      <%= f.check_box :lavado_de_equipo, class: "form-check-input" %>
-      <%= f.label :lavado_de_equipo, "Lavado de Equipo", class: "form-check-label" %>
-    </div>
-
-    <!-- MOJAMIENTO RELATIVO Y REAL (FLOAT) -->
-    <div class="form-group">
-      <%= f.label :mojamiento_relativo, "Mojamiento Relativo" %>
-      <%= f.number_field :mojamiento_relativo, step: :any, class: "form-control" %>
-    </div>
-    
-
-    <!-- DATOS AMBIENTALES -->
-    <div class="form-group">
-      <%= f.label :temperature, "Temperatura (°C)" %>
-      <%= f.number_field :temperature, step: :any, class: "form-control" %>
-    </div>
-    <div class="form-group">
-      <%= f.label :humidity, "Humedad (%)" %>
-      <%= f.number_field :humidity, step: :any, class: "form-control" %>
-    </div>
-    <div class="form-group">
-      <%= f.label :nubosidad, "Nubosidad (%)" %>
-      <%= f.number_field :nubosidad, step: :any, class: "form-control" %>
-    </div>
-    <div class="form-group">
-      <%= f.label :viento, "Viento (km/h)" %>
-      <%= f.number_field :viento, step: :any, class: "form-control" %>
-    </div>
-
-    <!-- HORAS DE INICIO Y FIN (DATETIME) -->
-    <div class="form-group">
-      <%= f.label :hora_inicio, "Hora de Inicio" %>
-      <%= f.time_field :hora_inicio, class: "form-control" %>
-    </div>
-    <div class="form-group">
-      <%= f.label :hora_fin, "Hora de Fin" %>
-      <%= f.time_field :hora_fin, class: "form-control" %>
-    </div>
-
-    <!-- ENCARGADO DE APLICACIÓN -->
-    <div class="form-group">
-      <%= f.label :encargado_aplicacion, "Encargado de la Aplicación" %>
-      <%= f.text_field :encargado_aplicacion, class: "form-control" %>
-    </div>
-
-    <!-- SUBMIT Y CANCELAR -->
-    <div class="mt-3">
-      <%= f.submit "Crear Aplicación", class: "btn btn-primary" %>
-      <%= link_to "Cancelar", applications_path, class: "btn btn-secondary ml-2" %>
-    </div>
-  <% end %>
 </div>
 
-
-<!-- JavaScript para gestión de sector y agroquímicos -->
+<!-- JavaScript para sector y hectáreas -->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-  console.log("DOMContentLoaded disparado");
-
-  // --- Lógica para sector y hectáreas ---
-  const sectorSelect = document.getElementById("application_sector");
-  const hectareasField = document.getElementById("application_hectareas");
-
-  sectorSelect.addEventListener("change", function() {
-    const selectedOption = sectorSelect.options[sectorSelect.selectedIndex];
-    const hectareas = selectedOption.getAttribute("data-hectareas");
-    hectareasField.value = hectareas || "";
-  });
-// --- Lógica para Agregar Agroquímicos dinámicamente ---
-  const addButton = document.getElementById("add-agrochemical");
-  const agrochemicalsContainer = document.getElementById("agrochemicals-container");
-  const agrochemicalTemplate = document.getElementById("agrochemical-template").content;
-
-  addButton.addEventListener("click", function () {
-    const newAgrochemical = document.importNode(agrochemicalTemplate, true);
-    agrochemicalsContainer.appendChild(newAgrochemical);
-    console.log("Agregado agroquímico al DOM");
-  });
-
-  // Permitir "Quitar" agroquímico
-  agrochemicalsContainer.addEventListener("click", function (e) {
-    if (e.target && e.target.classList.contains("remove-agrochemical")) {
-      e.target.closest(".agrochemical-row").remove();
-      console.log("Agroquímico eliminado del DOM");
+    const sectorSelect = document.getElementById("application_sector");
+    const hectareasField = document.getElementById("application_hectareas");
+    if(sectorSelect) {
+      sectorSelect.addEventListener("change", function() {
+        const selectedOption = sectorSelect.options[sectorSelect.selectedIndex];
+        const hectareas = selectedOption.getAttribute("data-hectareas");
+        hectareasField.value = hectareas || "";
+      });
     }
   });
-
-  // Verificar antes de enviar que al menos un agroquímico esté agregado
-  document.querySelector("form").addEventListener("submit", function (event) {
-    const agroSelects = document.querySelectorAll(".agrochemical-select");
-    const validAgro = [...agroSelects].some(select => select.value.trim() !== "");
-
-    if (!validAgro) {
-      event.preventDefault();
-      alert("Debe agregar al menos un agroquímico antes de enviar.");
-    }
-  });
-});
-
 </script>

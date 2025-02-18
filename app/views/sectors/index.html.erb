@@ -13,6 +13,7 @@
           <tr>
             <th>Nombre</th>
             <th>Hectáreas</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -21,6 +22,18 @@
             <tr>
               <td class="text-center"><%= sector.nombre %></td>
               <td class="text-center"><%= sector.hectareas %></td>
+              <td class="text-center">
+                <% aplicaciones_restringidas = Application.where(sector: sector.nombre)
+                                                        .where("fecha_de_liberacion > ?", Date.today) %>
+                <% if aplicaciones_restringidas.exists? %>
+                  <% # Se obtiene la fecha máxima (la más lejana) de liberación entre las restricciones activas %>
+                  <% fecha_restringida = aplicaciones_restringidas.maximum(:fecha_de_liberacion) %>
+                  <span class="badge bg-danger">Restringido hasta <%= fecha_restringida.strftime("%d/%m/%Y") %></span>
+                <% else %>
+                  <span class="badge bg-success">Liberado</span>
+                <% end %>
+              </td>
+
               <td class="text-center d-flex justify-content-center gap-2">
                 <%= link_to edit_sector_path(sector), class: "btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center" do %>
                   <i class="bi bi-pencil-square"></i>

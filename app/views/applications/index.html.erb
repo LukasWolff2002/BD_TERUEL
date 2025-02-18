@@ -1,43 +1,73 @@
 <div class="container mt-4">
-  <h1>Listado de Aplicaciones</h1>
-  <div class="mb-3">
-    <%= link_to 'Nueva Aplicación', new_application_path, class: "btn btn-primary" %>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="fw-bold text-success mb-3 mb-md-0">Listado de Aplicaciones</h1>
+    <%= link_to new_application_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7dd;" do %>
+      <i class="bi bi-plus-circle me-2"></i> Nueva Aplicación
+    <% end %>
   </div>
-  
+
   <% if @applications.any? %>
-    <table class="table table-bordered table-striped">
-      <thead class="thead-light">
-        <tr>
-          <th>Fecha de Aplicación</th>
-          <th>Sector</th>
-          <th>Operador Tractor</th>
-          <th>Aplicadores</th>
-          <th>Agroquímicos</th>
-          <th>Mojamiento Real</th>
-          <th>Fecha de Liberación</th>
-          <th>Dosis en 100 L</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @applications.each do |app| %>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle table-sm" style="background-color: #d1e7dd;">
+        <thead class="text-center table-success ">
           <tr>
-            <td><%= app.fecha_aplicacion %></td>
-            <td><%= app.sector %></td>
-            <td><%= app.operador_tractor %></td>
-            <td><%= app.aplicadores %></td>
-            <td><%= app.agroquimicos %></td>
-            <td><%= app.mojamiento_real %></td>
-            <td><%= app.fecha_de_liberacion %></td>
-            <td><%= app.dosis_en_100_l if app.dosis_en_100_l.present? %></td>
-            <td>
-              <%= link_to "Ver", application_path(app), class: "btn btn-sm btn-info" %>
-            </td>
+            <th>Fecha de Aplicación</th>
+            <th>Sector</th>
+            <th class="d-none d-md-table-cell">Operador Tractor</th>
+            <th>Aplicadores</th>
+            <th class="d-none d-md-table-cell">Agroquímicos</th>
+            <th class="d-none d-md-table-cell">Fecha de Liberación</th>
+            <th>Acciones</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @applications.each do |app| %>
+            <tr>
+              <td class="text-center"><%= app.fecha_aplicacion.strftime("%d/%m/%Y") %></td>
+              <td class="text-center"><%= app.sector %></td>
+              <td class="text-center d-none d-md-table-cell"><%= app.operador_tractor.presence || "No especificado" %></td>
+              <!-- Aplicadores en lista -->
+              <td class="text-center">
+                <% if app.aplicadores.present? %>
+                  <ul class="list-unstyled mb-0">
+                    <% app.aplicadores.each do |aplicador| %>
+                      <%= aplicador %></li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <em>No especificado</em>
+                <% end %>
+              </td>
+              
+              <!-- Agroquímicos en lista -->
+              <td class="text-center d-none d-md-table-cell">
+                <% if app.agroquimicos.present? %>
+                  <ul class="list-unstyled mb-0">
+                    <% app.agroquimicos.each do |agro| %>
+                      <li> <%= agro %></li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <em>No especificado</em>
+                <% end %>
+              </td>
+              <td class="text-center d-none d-md-table-cell"><%= app.fecha_de_liberacion&.strftime("%d/%m/%Y") || "No especificado" %></td>
+
+              <td class="text-center">
+                <%= link_to application_path(app), class: "btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" do %>
+                  <i class="bi bi-eye"></i>
+                  <span class="d-none d-md-inline ms-1">Ver</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   <% else %>
-    <p>No se encontró ninguna aplicación.</p>
+    <div class="alert alert-warning text-center p-4 shadow-sm border-0">
+      <i class="bi bi-info-circle fs-4"></i>
+      <p class="mt-2 mb-0 fw-bold">No se encontró ninguna aplicación.</p>
+    </div>
   <% end %>
-</div> 
+</div>

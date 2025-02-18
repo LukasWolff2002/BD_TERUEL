@@ -1,0 +1,63 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Detalle del Registro de Cosecha</h1>
+    <%= link_to harvests_path, class: 'btn btn-secondary' do %>
+      <i class="bi bi-arrow-left"></i> Volver
+    <% end %>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header text-white bg-success">
+      <h5 class="mb-0">Información de la Cosecha</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Fecha y Hora -->
+        <div class="col-md-6">
+          <p><strong>Fecha:</strong> <%= @harvest.fecha.strftime("%d/%m/%Y") %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Hora:</strong> <%= @harvest.hora.strftime("%H:%M") %></p>
+        </div>
+
+        <!-- Sector y Variedad -->
+        <div class="col-md-6">
+          <p><strong>Sector:</strong> <%= @harvest.sector %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Variedad:</strong> <%= @harvest.variety %></p>
+        </div>
+
+        <!-- Responsable y Cosechero -->
+        <div class="col-md-6">
+          <p><strong>Encargado de Cosecha:</strong> <%= @harvest.user %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Cosechero:</strong> <%= @harvest.cosechero_nombre %></p>
+        </div>
+
+        <!-- Volante -->
+        <div class="col-md-6">
+          <p><strong>Volante:</strong> <%= @harvest.volante_nombre.presence || "N/A" %></p>
+        </div>
+
+        <!-- Cantidades y Calidad -->
+        <div class="col-md-6">
+          <p><strong>Cajas:</strong> <%= @harvest.cajas %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Kilos por Caja:</strong> <%= number_with_precision(@harvest.kilos_por_caja, precision: 2) %> kg</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Kilos Totales:</strong> <%= number_with_precision(@harvest.kilos_tomates, precision: 2) %> kg</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Calidad:</strong> <span class="badge bg-primary"><%= @harvest.calidad %></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  
+</div>

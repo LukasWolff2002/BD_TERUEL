@@ -38,7 +38,13 @@ Rails.application.routes.draw do
   resources :irrigations
   resources :harvests
   resources :colors
-  resources :applications
+
+  resources :applications do
+    collection do
+      post :preview
+    end
+  end
+
   resources :suppliers
   resources :agrochemical_divisions
   resources :tools do

@@ -2,7 +2,7 @@ class ToolHistory < ApplicationRecord
   belongs_to :tool
 
   validates :usuario, presence: true
-  validates :cantidad_cambiada, presence: true, numericality: { only_integer: true }
+  validates :cantidad_cambiada, presence: true
 
   # Callback para actualizar la cantidad de la herramienta después de guardar un historial.
   after_create :update_tool_quantity

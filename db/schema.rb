@@ -134,26 +134,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
   create_table "harvests", force: :cascade do |t|
     t.date "fecha"
     t.time "hora"
-    t.bigint "user_id", null: false
-    t.bigint "sector_id", null: false
-    t.bigint "variety_id", null: false
-    t.string "volante_rut"
+    t.string "user"
+    t.string "sector"
+    t.string "variety"
+    t.string "color"
     t.string "volante_nombre"
-    t.string "encargado_cosecha"
-    t.string "cosechero_rut"
     t.string "cosechero_nombre"
-    t.integer "cajas"
+    t.integer "cajas", default: 0, null: false
     t.decimal "kilos_por_caja", precision: 5, scale: 2
     t.string "calidad"
     t.decimal "kilos_tomates", precision: 8, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["cosechero_rut"], name: "index_harvests_on_cosechero_rut"
     t.index ["fecha"], name: "index_harvests_on_fecha"
-    t.index ["sector_id"], name: "index_harvests_on_sector_id"
-    t.index ["user_id"], name: "index_harvests_on_user_id"
-    t.index ["variety_id"], name: "index_harvests_on_variety_id"
-    t.index ["volante_rut"], name: "index_harvests_on_volante_rut"
   end
 
   create_table "images", force: :cascade do |t|
@@ -305,9 +298,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
   add_foreign_key "agrochemical_histories", "agrochemicals"
   add_foreign_key "agrochemicals", "agrochemical_divisions"
   add_foreign_key "fertilizer_histories", "fertilizers"
-  add_foreign_key "harvests", "sectors"
-  add_foreign_key "harvests", "users"
-  add_foreign_key "harvests", "varieties"
   add_foreign_key "images", "receptions"
   add_foreign_key "irrigations", "sectors"
   add_foreign_key "irrigations", "users"

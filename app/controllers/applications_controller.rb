@@ -13,6 +13,12 @@ class ApplicationsController < ApplicationController
   def show
   end
 
+  def preview
+    @application = Application.new(application_params)
+    # Aquí podrías validar o almacenar temporalmente los datos base si es necesario
+  end
+  
+
   # GET /applications/new
   def new
     @application = Application.new
@@ -23,6 +29,8 @@ class ApplicationsController < ApplicationController
   def create
     puts "PARAMS RECIBIDOS: #{params[:application].inspect}"
     puts "AGROQUIMICOS RECIBIDOS: #{params[:application][:agroquimicos]}"
+    puts "DOSIS RECIBIDAS: #{params[:application][:dosis_en_100_l]}"
+    
     @application = Application.new(application_params)
     if @application.save
       redirect_to @application, notice: "La aplicación se creó exitosamente."

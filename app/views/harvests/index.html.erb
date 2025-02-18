@@ -21,7 +21,7 @@
             <th>Kilos/Caja</th>
             <th>Kilos Total</th>
             <th>Calidad</th>
-            <th>Evaluador</th>
+            <th>Volante</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -30,31 +30,23 @@
             <tr>
               <td><%= harvest.fecha.strftime("%d/%m/%Y") %></td>
               <td><%= harvest.hora.strftime("%H:%M") %></td>
-              <td><%= harvest.sector %></td>
-              <td><%= harvest.variedad %></td>
-              <td><%= harvest.encargado_cosecha %></td>
-              <td><%= "#{harvest.cosechero_nombre} (#{harvest.cosechero_rut})" %></td>
+              <td><%= harvest.sector %></td> <!-- Nombre del sector -->
+              <td><%= harvest.variety %></td> <!-- Nombre de la variedad -->
+              <td><%= harvest.user %></td>
+              <td><%= harvest.cosechero_nombre %></td> <!-- Solo el nombre del cosechero -->
               <td><%= harvest.cajas %></td>
               <td><%= number_with_precision(harvest.kilos_por_caja, precision: 2) %></td>
-              <td><%= number_with_precision(harvest.kilos_tomates, precision: 2) %></td>
+              <td><%= number_with_precision(harvest.cajas * harvest.kilos_por_caja, precision: 2) %></td> <!-- Kilos Total calculado -->
               <td><%= harvest.calidad %></td>
-              <td><%= harvest.evaluador %></td>
+              <td><%= harvest.volante_nombre.presence || "N/A" %></td>
               <td>
                 <div class="btn-group btn-group-sm">
                   <%= link_to harvest_path(harvest), class: "btn btn-info" do %>
                     <i class="bi bi-eye"></i>
                   <% end %>
+                
                   
-                  <%= link_to edit_harvest_path(harvest), class: "btn btn-warning" do %>
-                    <i class="bi bi-pencil"></i>
-                  <% end %>
-                  
-                  <%= button_to harvest_path(harvest), 
-                      method: :delete, 
-                      class: "btn btn-danger",
-                      form: { data: { turbo_confirm: "¿Estás seguro?" } } do %>
-                    <i class="bi bi-trash"></i>
-                  <% end %>
+                
                 </div>
               </td>
             </tr>
@@ -67,4 +59,4 @@
       <i class="bi bi-info-circle"></i> No hay registros de cosecha.
     </div>
   <% end %>
-</div> 
+</div>

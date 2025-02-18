@@ -1,37 +1,35 @@
 class Harvest < ApplicationRecord
-  belongs_to :sector
-  belongs_to :variety
-  belongs_to :user
-  
+  CALIDAD_OPCIONES = ['Primera', 'Segunda', 'Tercera'].freeze
+
   # Validaciones
+  validates :calidad, presence: true, inclusion: { in: CALIDAD_OPCIONES }
   validates :fecha, presence: true
   validates :hora, presence: true
   validates :sector, presence: true
-  validates :volante_rut, presence: true
   validates :volante_nombre, presence: true
-  validates :encargado_cosecha, presence: true
-  validates :cosechero_rut, presence: true
   validates :cosechero_nombre, presence: true
   validates :variety, presence: true
-  validates :cajas, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :cajas, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :kilos_por_caja, presence: true, numericality: { greater_than: 0 }
-  validates :calidad, presence: true
-  
-  
-  # Validación de formato RUT chileno (XX.XXX.XXX-X)
-  validates :volante_rut, :cosechero_rut, format: { 
-    with: /\A\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}\z/, 
-    message: "debe tener formato válido (XX.XXX.XXX-X)" 
-  }
 
-  # Callback para calcular kilos_tomates antes de guardar
+  # Callbacks para convertir IDs a nombres antes de guardar
+  before_save :convert_sector_variety_to_name
   before_save :calcular_kilos_tomates
 
   private
 
+  # Método para convertir IDs de sector y variedad en nombres
+  def convert_sector_variety_to_name
+    self.sector = Sector.find_by(id: sector)&.nombre || sector
+    self.variety = Variety.find_by(id: variety)&.nombre || variety
+  end
+
+  # Método para calcular kilos_tomates antes de guardar
   def calcular_kilos_tomates
-    if cajas.present? && kilos_por_caja.present?
+    if cajas.to_i >= 0 && kilos_por_caja.to_f > 0
       self.kilos_tomates = cajas * kilos_por_caja
+    else
+      self.kilos_tomates = 0 # Evita valores nulos o erróneos
     end
   end
-end 
+end

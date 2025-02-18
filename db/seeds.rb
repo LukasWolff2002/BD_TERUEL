@@ -110,9 +110,9 @@ divisions = AgrochemicalDivision.create!([
   { division: "Reguladores de Crecimiento" }
 ])
 
-Fertilizer.create!(nombre: "Nitrogen", cantidad: 50)
-Fertilizer.create!(nombre: "Phosphorus", cantidad: 30)
-Fertilizer.create!(nombre: "Potassium", cantidad: 20)
+Fertilizer.create!(nombre: "Nitrogen", cantidad: 50.0)
+Fertilizer.create!(nombre: "Phosphorus", cantidad: 30.0)
+Fertilizer.create!(nombre: "Potassium", cantidad: 20.0)
 
 # Creamos los agroquímicos con todos los atributos requeridos
 Agrochemical.create!([

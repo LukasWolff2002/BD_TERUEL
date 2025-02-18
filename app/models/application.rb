@@ -67,10 +67,6 @@ class Application < ApplicationRecord
   
       # Actualizar stock del agroquímico
       nuevo_stock = agroquimico.cantidad - cantidad_a_descontar
-      if nuevo_stock < 0
-        puts "❌ ERROR: No hay suficiente stock de #{agroquimico.nombre}."
-        raise ActiveRecord::Rollback, "Stock insuficiente para #{agroquimico.nombre}."
-      end
   
       agroquimico.update!(cantidad: nuevo_stock)
       puts "✅ Nuevo stock de #{agroquimico.nombre}: #{agroquimico.cantidad}L"

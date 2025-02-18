@@ -1,120 +1,90 @@
 <div class="container mt-4">
-  <h1 class="mb-4">Detalle de la Aplicación</h1>
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #d1e7dd;">
+          <h2 class="fw-bold mb-0">Detalles de la Aplicación</h2>
+        </div>
 
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0">Aplicación ID: <%= @application.id %></h5>
-    </div>
-    <div class="card-body">
-      <table class="table table-bordered">
-        <tbody>
-          <tr>
-            <th class="bg-light">Fecha de Aplicación</th>
-            <td><%= @application.fecha_aplicacion || "No definida" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Operador Tractor</th>
-            <td><%= @application.operador_tractor.presence || "No definido" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Aplicadores</th>
-            <td>
-              <% if @application.aplicadores.present? %>
-                <ul class="list-unstyled mb-0">
-                  <% @application.aplicadores.each do |aplicador| %>
-                    <li><%= aplicador %></li>
+        <div class="card-body p-4">
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <th class="bg-light">Fecha de Aplicación</th>
+                <td><%= @application.fecha_aplicacion.strftime("%d/%m/%Y") %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">Sector</th>
+                <td><%= @application.sector.presence || "No definido" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">Operador Tractor</th>
+                <td><%= @application.operador_tractor.presence || "No definido" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">Aplicadores</th>
+                <td>
+                  <% if @application.aplicadores.present? %>
+                    <ul class="list-unstyled mb-0">
+                      <% @application.aplicadores.each do |aplicador| %>
+                        <li> <%= aplicador %></li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <span class="text-muted">No definido</span>
                   <% end %>
-                </ul>
-              <% else %>
-                <span class="text-muted">No definido</span>
-              <% end %>
-            </td>
-          </tr>
-          <tr>
-            <th class="bg-light">Sector</th>
-            <td><%= @application.sector.presence || "No definido" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Motivo</th>
-            <td><%= @application.motivo.presence || "No definido" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Uso de Protección</th>
-            <td><%= @application.uso_de_proteccion ? "Sí" : "No" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Observaciones</th>
-            <td><%= @application.observaciones.presence || "No hay observaciones" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Agroquímicos y Dosis</th>
-            <td>
-              <% if @application.agroquimicos.present? %>
-                <ul class="list-unstyled mb-0">
-                  <% @application.agroquimicos.each_with_index do |agro, index| %>
-                    <li><strong><%= agro %></strong> - <span class="text-primary">
-                      <%= @application.dosis_en_100_l[index] %> L/100L
-                    </span></li>
+                </td>
+              </tr>
+              <tr>
+                <th class="bg-light">Agroquímicos y Dosis</th>
+                <td>
+                  <% if @application.agroquimicos.present? %>
+                    <ul class="list-unstyled mb-0">
+                      <% @application.agroquimicos.each_with_index do |agro, index| %>
+                        <li><strong><%= agro %></strong> - <span class="text-success"><%= @application.dosis_en_100_l[index] %> L/100L</span></li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <span class="text-muted">No definidos</span>
                   <% end %>
-                </ul>
-              <% else %>
-                <span class="text-muted">No definidos</span>
-              <% end %>
-            </td>
-          </tr>
-          <tr>
-            <th class="bg-light">Maquinaria</th>
-            <td><%= @application.maquinaria.presence || "No definida" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Fecha de Liberación</th>
-            <td><%= @application.fecha_de_liberacion || "No definida" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Mojamiento Relativo</th>
-            <td><%= @application.mojamiento_relativo.presence || "No definido" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Mojamiento Real</th>
-            <td><%= @application.mojamiento_real.presence || "No definido" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Encargado de Aplicación</th>
-            <td><%= @application.encargado_aplicacion.presence || "No definido" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Lavado de Equipo</th>
-            <td><%= @application.lavado_de_equipo ? "Sí" : "No" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Temperatura</th>
-            <td><%= @application.temperature.presence || "No definida" %> °C</td>
-          </tr>
-          <tr>
-            <th class="bg-light">Humedad</th>
-            <td><%= @application.humidity.presence || "No definida" %> %</td>
-          </tr>
-          <tr>
-            <th class="bg-light">Nubosidad</th>
-            <td><%= @application.nubosidad.presence || "No definida" %> %</td>
-          </tr>
-          <tr>
-            <th class="bg-light">Viento</th>
-            <td><%= @application.viento.presence || "No definido" %> km/h</td>
-          </tr>
-          <tr>
-            <th class="bg-light">Hora de Inicio</th>
-            <td><%= @application.hora_inicio&.strftime("%H:%M") || "No definida" %></td>
-          </tr>
-          <tr>
-            <th class="bg-light">Hora de Fin</th>
-            <td><%= @application.hora_fin&.strftime("%H:%M") || "No definida" %></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card-footer text-right">
-      <%= link_to "Volver", applications_path, class: "btn btn-primary" %>
+                </td>
+              </tr>
+              <tr>
+                <th class="bg-light">Fecha de Liberación</th>
+                <td><%= @application.fecha_de_liberacion&.strftime("%d/%m/%Y") || "No definida" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">Mojamiento Real</th>
+                <td><%= @application.mojamiento_real.presence || "No definido" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">Encargado de Aplicación</th>
+                <td><%= @application.encargado_aplicacion.presence || "No definido" %></td>
+              </tr>
+              <tr>
+                <th class="bg-light">Condiciones Climáticas</th>
+                <td>
+                  <strong>Temperatura:</strong> <%= @application.temperature.presence || "No definida" %> °C <br>
+                  <strong>Humedad:</strong> <%= @application.humidity.presence || "No definida" %> % <br>
+                  <strong>Nubosidad:</strong> <%= @application.nubosidad.presence || "No definida" %> % <br>
+                  <strong>Viento:</strong> <%= @application.viento.presence || "No definido" %> km/h
+                </td>
+              </tr>
+              <tr>
+                <th class="bg-light">Horas de Aplicación</th>
+                <td>
+                   <strong>Inicio:</strong> <%= @application.hora_inicio&.strftime("%H:%M") || "No definida" %> <br>
+                   <strong>Fin:</strong> <%= @application.hora_fin&.strftime("%H:%M") || "No definida" %>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-footer text-center">
+          <%= link_to "Volver", applications_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
+        </div>
+      </div>
     </div>
   </div>
 </div>

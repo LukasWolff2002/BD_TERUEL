@@ -21,10 +21,7 @@
         <% end %>
 
         <div class="row g-3">
-          <!-- Sección: Datos Generales -->
-          <div class="col-12">
-            <h5 class="mb-3">Datos Generales</h5>
-          </div>
+          <!-- Datos Generales -->
           <div class="col-md-4">
             <%= f.label :fecha, "Fecha", class: "form-label" %>
             <%= f.date_field :fecha, class: "form-control", readonly: true %>
@@ -34,88 +31,68 @@
             <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
           </div>
           <div class="col-md-4">
-            <%= f.label :evaluador, "Encargado de Cosecha", class: "form-label" %>
+            <%= f.label :user, "Encargado de Cosecha", class: "form-label" %>
             <p><strong><%= current_user.nombre_completo %></strong></p>
-            <%= f.hidden_field :user_id, value: current_user.id %>
+            <%= f.hidden_field :user, value: current_user.nombre_completo %>
           </div>
 
-          <!-- Sección: Ubicación y Variedad -->
-          <div class="col-12">
-            <h5 class="mb-3">Ubicación y Variedad</h5>
-          </div>
+          <!-- Ubicación y Variedad -->
           <div class="col-md-6">
-            <%= f.label :sector_id, "Sector", class: "form-label" %>
-            <%= f.collection_select :sector_id, Sector.all, :id, :nombre, { prompt: "Seleccione un sector" }, { class: "form-select", id: "sector-select" } %>
+            <%= f.label :sector, "Sector", class: "form-label" %>
+            <%= f.collection_select :sector, Sector.all, :id, :nombre, { prompt: "Seleccione un sector" }, { class: "form-select", id: "sector-select" } %>
           </div>
+
           <div class="col-md-6">
-            <%= f.label :variety_id, "Variedad", class: "form-label" %>
-            <%= f.collection_select :variety_id, [], :id, :nombre, { prompt: "Primero seleccione un sector" }, { class: "form-select", id: "variety-select", required: true, disabled: true } %>
+            <%= f.label :variety, "Variedad", class: "form-label" %>
+            <%= f.select :variety, [], { prompt: "Primero seleccione un sector" }, { class: "form-select", id: "variety-select", disabled: true } %>
           </div>
+
           <div class="col-md-6">
             <%= f.label :color, "Color", class: "form-label" %>
-            <%= f.text_field :color, class: "form-control", readonly: true, id: "color-field" %>
+            <%= f.select :color, [], { prompt: "Seleccione un color" }, { class: "form-select", id: "color-select", disabled: true } %>
           </div>
 
-          <!-- Sección: Datos del Volante -->
-          <div class="col-12">
-            <h5 class="mb-3">Datos del Volante</h5>
-          </div>
+
+          <!-- Datos del Volante -->
           <div class="col-md-6">
-            <%= f.label :volante_rut, "RUT Volante", class: "form-label" %>
-            <%= f.collection_select :volante_rut,
+            <%= f.label :volante_nombre, "Volante", class: "form-label" %>
+            <%= f.collection_select :volante_nombre,
                                     User.where(cargo: 'Volante'),
-                                    :rut,
+                                    :nombre_completo,  # Guardar el nombre en lugar del RUT
                                     :nombre_completo,
                                     { prompt: "Seleccione un volante" },
-                                    { class: "form-select" } %>
+                                    { class: "form-select", id: "volante-select" } %>
           </div>
-          <!-- Opcional: Si no requieres que el usuario lo ingrese manualmente,
-               puedes eliminar este campo o hacerlo readonly para que se autocomplemente. -->
-          <!--
-          <div class="col-md-6">
-            <%= f.label :volante_nombre, "Nombre Volante", class: "form-label" %>
-            <%= f.text_field :volante_nombre, class: "form-control", readonly: true %>
-          </div>
-          -->
 
-          <!-- Sección: Datos del Cosechero -->
-          <div class="col-12">
-            <h5 class="mb-3">Datos del Cosechero</h5>
-          </div>
+          <!-- Datos del Cosechero -->
           <div class="col-md-6">
-            <%= f.label :cosechero_rut, "RUT Cosechero", class: "form-label" %>
-            <%= f.collection_select :cosechero_rut,
+            <%= f.label :cosechero_nombre, "Cosechero", class: "form-label" %>
+            <%= f.collection_select :cosechero_nombre,
                                     User.where(cargo: 'Cosechador'),
-                                    :rut,
+                                    :nombre_completo,  # Guardar el nombre en lugar del RUT
                                     :nombre_completo,
                                     { prompt: "Seleccione un cosechero" },
-                                    { class: "form-select" } %>
+                                    { class: "form-select", id: "cosechero-select" } %>
           </div>
-          <!-- Opcional: Si deseas también el nombre: -->
-          <!--
-          <div class="col-md-6">
-            <%= f.label :cosechero_nombre, "Nombre Cosechero", class: "form-label" %>
-            <%= f.text_field :cosechero_nombre, class: "form-control", readonly: true %>
-          </div>
-          -->
 
-          <!-- Sección: Datos de Cosecha -->
-          <div class="col-12">
-            <h5 class="mb-3">Datos de Cosecha</h5>
-          </div>
+
+          <!-- Datos de Cosecha -->
           <div class="col-md-6">
             <%= f.label :cajas, "Cajas", class: "form-label" %>
-            <%= f.number_field :cajas, class: "form-control", required: true, min: 1 %>
+            <%= f.number_field :cajas, class: "form-control", required: true, min: 0 %>
           </div>
           <div class="col-md-6">
             <%= f.label :kilos_por_caja, "Kilos por Caja", class: "form-label" %>
             <%= f.number_field :kilos_por_caja, class: "form-control", required: true, step: "0.01", min: 0 %>
           </div>
-          <div class="col-md-6">
-            <%= f.label :calidad, "Calidad", class: "form-label" %>
-            <%= f.text_field :calidad, class: "form-control", required: true %>
-          </div>
         </div>
+        <div class="col-md-6">
+  <%= f.label :calidad, "Calidad del Producto", class: "form-label" %>
+  <%= f.select :calidad, options_for_select(Harvest::CALIDAD_OPCIONES), 
+      { prompt: "Seleccione la calidad" }, 
+      { class: "form-select" } %>
+</div>
+
 
         <div class="mt-4">
           <%= f.submit "Guardar Registro", class: "btn btn-primary" %>
@@ -126,56 +103,91 @@
   </div>
 </div>
 
-<!-- Se mantiene el JavaScript para el select dinámico de Sector y Variedad -->
 <script>
-  // Precargamos la variable con las variedades agrupadas por sector
+  // Precargamos la variable con las variedades y colores agrupados por sector
   window.varietiesBySector = <%= raw @varieties_by_sector.to_json %>;
 
   function onSectorChange() {
     const sectorId = this.value;
-    if (!sectorId) {
+    const varietySelect = document.getElementById("variety-select");
+    const colorSelect = document.getElementById("color-select");
+
+    if (!sectorId || !window.varietiesBySector[sectorId]) {
       clearVarieties();
+      setColorPlaceholder("Primero seleccione un sector"); // Resetear color
       return;
     }
+
+    // Obtener variedades del sector seleccionado
     const varieties = window.varietiesBySector[sectorId] || [];
     updateVarieties(varieties);
+    setColorPlaceholder("Primero seleccione una variedad"); // Resetear color
   }
 
   function onVarietyChange() {
+    const sectorId = document.getElementById("sector-select").value;
     const varietyId = this.value;
-    const colorField = document.getElementById("color-field");
-    if (!varietyId) {
-      colorField.value = "";
+
+    if (!sectorId || !varietyId) {
+      setColorPlaceholder("Primero seleccione una variedad");
       return;
     }
-    const sectorId = document.getElementById("sector-select").value;
+
+    // Buscar la variedad dentro del sector
     const variety = (window.varietiesBySector[sectorId] || []).find(v => v.id == varietyId);
-    colorField.value = variety ? variety.color : "";
+
+    if (variety && variety.colors.length > 0) {
+      updateColors(variety.colors);
+    } else {
+      setColorPlaceholder("Sin colores disponibles");
+    }
+  }
+
+  function updateColors(colors) {
+    const colorSelect = document.getElementById("color-select");
+    colorSelect.innerHTML = '<option value="">Seleccione un color</option>';
+
+    colors.forEach(function(color) {
+      const option = document.createElement("option");
+      option.value = color;
+      option.textContent = color;
+      colorSelect.appendChild(option);
+    });
+
+    colorSelect.disabled = false;
+  }
+
+  function setColorPlaceholder(text) {
+    const colorSelect = document.getElementById("color-select");
+    colorSelect.innerHTML = `<option value="">${text}</option>`;
+    colorSelect.disabled = true;
   }
 
   function updateVarieties(varieties) {
     const varietySelect = document.getElementById("variety-select");
     varietySelect.innerHTML = '<option value="">Seleccione una variedad</option>';
+
     varieties.forEach(function(variety) {
       const option = document.createElement("option");
       option.value = variety.id;
       option.textContent = variety.nombre;
       varietySelect.appendChild(option);
     });
+
     varietySelect.disabled = varieties.length === 0;
   }
 
   function clearVarieties() {
     const varietySelect = document.getElementById("variety-select");
-    const colorField = document.getElementById("color-field");
     varietySelect.innerHTML = '<option value="">Primero seleccione un sector</option>';
     varietySelect.disabled = true;
-    colorField.value = "";
+    setColorPlaceholder("Primero seleccione un sector"); // También resetear el color
   }
 
   document.addEventListener("DOMContentLoaded", function () {
     const sectorSelect = document.getElementById("sector-select");
     const varietySelect = document.getElementById("variety-select");
+
     if (sectorSelect) sectorSelect.addEventListener("change", onSectorChange);
     if (varietySelect) varietySelect.addEventListener("change", onVarietyChange);
   });
@@ -183,7 +195,13 @@
   document.addEventListener("turbo:load", function () {
     const sectorSelect = document.getElementById("sector-select");
     const varietySelect = document.getElementById("variety-select");
+
     if (sectorSelect) sectorSelect.addEventListener("change", onSectorChange);
     if (varietySelect) varietySelect.addEventListener("change", onVarietyChange);
+  });
+
+  // Inicializar el estado correcto del select de color
+  document.addEventListener("DOMContentLoaded", function () {
+    setColorPlaceholder("Primero seleccione un sector");
   });
 </script>

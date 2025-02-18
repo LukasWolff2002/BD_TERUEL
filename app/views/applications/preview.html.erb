@@ -1,0 +1,113 @@
+<div class="container mt-4">
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-black text-center py-3 rounded-top" style="background-color: #d1e7dd;">
+      <h2 class="fw-bold mb-0">Agregar Agroquímicos</h2>
+    </div>
+    <div class="card-body p-4">
+      <!-- Este formulario creará la aplicación final con los agroquímicos -->
+      <%= form_with(model: @application, local: true) do |f| %>
+        <!-- Campos ocultos con los datos base -->
+        <%= f.hidden_field :fecha_aplicacion %>
+        <%= f.hidden_field :operador_tractor %>
+        <%= f.hidden_field :sector %>
+        <%= f.hidden_field :hectareas %>
+        <%= f.hidden_field :motivo %>
+        <%= f.hidden_field :observaciones %>
+        <%= f.hidden_field :maquinaria %>
+        <%= f.hidden_field :uso_de_proteccion %>
+        <%= f.hidden_field :lavado_de_equipo %>
+        <%= f.hidden_field :mojamiento_relativo %>
+        <%= f.hidden_field :temperature %>
+        <%= f.hidden_field :humidity %>
+        <%= f.hidden_field :viento %>
+        <%= f.hidden_field :hora_inicio %>
+        <%= f.hidden_field :hora_fin %>
+        <%= f.hidden_field :encargado_aplicacion %>
+        <% if @application.aplicadores.present? %>
+            <% @application.aplicadores.each do |aplicador| %>
+                <%= hidden_field_tag "application[aplicadores][]", aplicador %>
+            <% end %>
+        <% end %>
+
+
+
+        <!-- Agrega otros campos base necesarios -->
+
+        <!-- Sección para agroquímicos -->
+        <div class="form-group mb-3">
+          <label>Agroquímicos Usados y sus Dosis en 100 L</label>
+          <div id="agrochemicals-container">
+            <!-- Aquí se agregarán las filas dinámicas -->
+          </div>
+          <button type="button" id="add-agrochemical" class="btn btn-secondary mt-2">
+            Agregar Agroquímico
+          </button>
+          <small class="form-text text-muted">
+            Seleccione agroquímicos y asigne la dosis en 100 L correspondiente.
+          </small>
+        </div>
+
+        <!-- Otros campos (si fueran necesarios) -->
+
+        <div class="mt-3">
+          <%= f.submit "Crear Aplicación", class: "btn btn-primary" %>
+          <%= link_to "Cancelar", applications_path, class: "btn btn-secondary ms-2" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Plantilla oculta para agregar un agroquímico -->
+<template id="agrochemical-template">
+  <div class="form-row align-items-end agrochemical-row mb-2">
+    <div class="col">
+      <label>Agroquímico</label>
+      <select name="application[agroquimicos][]" class="form-control agrochemical-select">
+        <option value="">Seleccione</option>
+        <% Agrochemical.all.each do |agro| %>
+          <option value="<%= agro.nombre %>"><%= agro.nombre %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="col">
+      <label>Dosis en 100 L</label>
+      <input type="number" step="any" name="application[dosis_en_100_l][]" class="form-control agrochemical-dose" placeholder="Dosis">
+    </div>
+    <div class="col-auto">
+      <button type="button" class="btn btn-danger remove-agrochemical">Quitar</button>
+    </div>
+  </div>
+</template>
+
+<!-- JavaScript para gestionar la adición de agroquímicos -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const addButton = document.getElementById("add-agrochemical");
+    const agrochemicalsContainer = document.getElementById("agrochemicals-container");
+    const agrochemicalTemplate = document.getElementById("agrochemical-template").content;
+
+    addButton.addEventListener("click", function () {
+      const newAgrochemical = document.importNode(agrochemicalTemplate, true);
+      agrochemicalsContainer.appendChild(newAgrochemical);
+      console.log("Agregado agroquímico al DOM");
+    });
+
+    agrochemicalsContainer.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("remove-agrochemical")) {
+        e.target.closest(".agrochemical-row").remove();
+        console.log("Agroquímico eliminado del DOM");
+      }
+    });
+
+    // (Opcional) Verificar antes de enviar que se haya agregado al menos un agroquímico
+    document.querySelector("form").addEventListener("submit", function (event) {
+      const agroSelects = document.querySelectorAll(".agrochemical-select");
+      const validAgro = [...agroSelects].some(select => select.value.trim() !== "");
+      if (!validAgro) {
+        event.preventDefault();
+        alert("Debe agregar al menos un agroquímico antes de enviar.");
+      }
+    });
+  });
+</script>
