@@ -7,7 +7,7 @@
         </div>
 
         <div class="card-body p-4">
-          <%= form_with(model: @variety, local: true) do |f| %>
+          <%= form_with(model: @variety, local: true, id: "variety-form") do |f| %>
 
             <% if @variety.errors.any? %>
               <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
@@ -43,6 +43,24 @@
               </div>
             </div>
 
+            <!-- Campo para porcentaje de Supermercado -->
+            <div class="mb-3">
+              <%= f.label :p_supermercado, "Porcentaje Supermercado (%)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :p_supermercado, step: 0.01, min: 0, max: 100, class: "form-control shadow-sm border-0 percent-input", required: true %>
+            </div>
+
+            <!-- Campo para porcentaje de Feria -->
+            <div class="mb-3">
+              <%= f.label :p_feria, "Porcentaje Feria (%)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :p_feria, step: 0.01, min: 0, max: 100, class: "form-control shadow-sm border-0 percent-input", required: true %>
+            </div>
+
+            <!-- Campo para porcentaje de Descarte (Calculado Automáticamente) -->
+            <div class="mb-3">
+              <%= f.label :p_descarte, "Porcentaje Descarte (%)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :p_descarte, step: 0.01, min: 0, max: 100, class: "form-control shadow-sm border-0 text-left", readonly: true %>
+            </div>
+
             <div class="d-grid gap-3">
               <%= f.submit "Actualizar Variedad", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #f8d7da;" %>
               <%= link_to "Cancelar", varieties_path, class: "btn btn-outline-danger btn-lg shadow-sm w-100" %>
@@ -54,3 +72,24 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const supermarketInput = document.querySelector("[name='variety[p_supermercado]']");
+    const fairInput = document.querySelector("[name='variety[p_feria]']");
+    const discardInput = document.querySelector("[name='variety[p_descarte]']");
+
+    function updateDiscardPercentage() {
+      const supermarket = parseFloat(supermarketInput.value) || 0;
+      const fair = parseFloat(fairInput.value) || 0;
+      let discard = (100 - (supermarket + fair)).toFixed(2);
+      discardInput.value = discard < 0 ? 0 : discard; // Evita valores negativos
+    }
+
+    supermarketInput.addEventListener("input", updateDiscardPercentage);
+    fairInput.addEventListener("input", updateDiscardPercentage);
+
+    // Calcular al cargar la página
+    updateDiscardPercentage();
+  });
+</script>

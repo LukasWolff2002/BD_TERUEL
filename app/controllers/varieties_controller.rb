@@ -1,4 +1,6 @@
 class VarietiesController < ApplicationController
+  before_action :set_variety, only: %i[show edit update destroy]
+
   def index
     @varieties = Variety.all.order(:nombre)
   end
@@ -49,6 +51,10 @@ class VarietiesController < ApplicationController
   private
 
   def variety_params
-    params.require(:variety).permit(:nombre, color_ids: [])
+    params.require(:variety).permit(:nombre, :p_supermercado, :p_feria, :p_descarte, color_ids: [])
+  end
+
+  def set_variety
+    @variety = Variety.find(params[:id])
   end
 end 

@@ -85,23 +85,24 @@ class ReceptionsController < ApplicationController
     @receptions = Reception.activos.where(fecha: @fecha_inicio..@fecha_fin, supplier_id: @supplier_id).order(fecha: :asc)
   
     # Agrupar variedades por fecha con precios únicos
-    @variedades_por_dia = @receptions.each_with_object({}) do |reception, hash|
-      fecha = reception.fecha.to_date
-      hash[fecha] ||= []
-      
-      reception.reception_items.each do |item|
-        variedad = item["variety"].strip
-        precio = item["price_per_kilogram"].to_f
-  
-        if precio == 0.0
-          Rails.logger.warn "⚠ Precio no asignado para #{variedad} en fecha #{fecha}"
+    @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
+      recepciones.flat_map do |reception|
+        reception.reception_items.map do |item|
+          variedad = Variety.find_by(nombre: item["variety"])
+          {
+            variety: item["variety"],
+            firmeza: item["firmeza"],
+            calidad: item["calidad"],
+            p_supermercado: variedad&.p_supermercado || 0,
+            p_feria: variedad&.p_feria || 0,
+            p_descarte: variedad&.p_descarte || 0,
+            price_per_kilogram: item["price_per_kilogram"].to_f
+          }
         end
-  
-        hash[fecha] << { variety: variedad, price_per_kilogram: precio }
-      end
-  
-      hash[fecha].uniq! { |v| v[:variety] }  # Eliminar duplicados por variedad
+      end.uniq { |variedad| [variedad[:variety], variedad[:firmeza], variedad[:calidad]] }
     end
+    
+    
   
     # Si no hay variedades, redirigir con advertencia
     if @variedades_por_dia.empty?

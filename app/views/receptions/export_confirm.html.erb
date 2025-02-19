@@ -27,13 +27,21 @@
                 <thead class="table-warning text-center">
                   <tr>
                     <th>Variedad</th>
+                    <th>Porcentajes</th>
                     <th>Precio por Kilogramo ($)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <% variedades.each do |variedad| %>
                     <tr>
-                      <td class="text-center"><%= variedad[:variety] %></td>
+                      <td class="text-center">
+                        <%= "#{variedad[:variety]} (Firmeza: #{variedad[:firmeza]}, Calidad: #{variedad[:calidad]})" %>
+                      </td>
+                      <td class="text-center">
+                        Supermercado: <strong><%= variedad[:p_supermercado] %>%</strong><br>
+                        Feria: <strong><%= variedad[:p_feria] %>%</strong><br>
+                        Descarte: <strong><%= variedad[:p_descarte] %>%</strong>
+                      </td>
                       <td>
                         <%= number_field_tag "precios[#{variedad[:variety]}_#{fecha}]", variedad[:price_per_kilogram], step: 0.01, min: 0.01, class: "form-control shadow-sm border-0 text-center fw-bold price-input", required: true %>
                         <div class="invalid-feedback text-center">

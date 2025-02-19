@@ -30,6 +30,24 @@
               <%= f.text_field :nombre, class: "form-control shadow-sm border-0", placeholder: "Ingrese el nombre de la variedad" %>
             </div>
 
+             <!-- Campo para porcentaje supermercado -->
+            <div class="mb-3">
+              <%= f.label :p_supermercado, "Porcentaje Supermercado (%)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :p_supermercado, step: 0.1, min: 0, max: 100, class: "form-control shadow-sm border-0 porcentaje-input", required: true %>
+            </div>
+
+            <!-- Campo para porcentaje feria -->
+            <div class="mb-3">
+              <%= f.label :p_feria, "Porcentaje Feria (%)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :p_feria, step: 0.1, min: 0, max: 100, class: "form-control shadow-sm border-0 porcentaje-input", required: true %>
+            </div>
+
+            <!-- Campo calculado para porcentaje descarte -->
+            <div class="mb-3">
+              <label class="form-label fw-bold text-danger">Porcentaje Descarte (%)</label>
+              <input type="text" id="p_descarte" class="form-control shadow-sm border-0 text-left fw-bold text-danger" readonly>
+            </div>
+
             <!-- Sección para agregar colores asociados -->
             <div class="mb-3">
               <%= f.label :color_ids, "Colores disponibles", class: "form-label fw-bold text-danger" %>
@@ -54,3 +72,24 @@
     </div>
   </div>
 </div>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const supermercadoInput = document.querySelector("[name='variety[p_supermercado]']");
+    const feriaInput = document.querySelector("[name='variety[p_feria]']");
+    const descarteInput = document.getElementById("p_descarte");
+
+    function actualizarDescarte() {
+      const supermercado = parseFloat(supermercadoInput.value) || 0;
+      const feria = parseFloat(feriaInput.value) || 0;
+      const descarte = (100 - (supermercado + feria)).toFixed(1);
+      descarteInput.value = descarte < 0 ? "Error" : descarte + " %";
+      descarteInput.classList.toggle("text-danger", descarte < 0);
+    }
+
+    supermercadoInput.addEventListener("input", actualizarDescarte);
+    feriaInput.addEventListener("input", actualizarDescarte);
+  });
+</script>

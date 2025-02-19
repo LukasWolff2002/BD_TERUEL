@@ -13,7 +13,7 @@ class Reception < ApplicationRecord
     validates :fecha, presence: true
     validates :hora, presence: true
     
-    validates :nro_guia_despacho, presence: true
+    validates :nro_guia_despacho, presence: true, uniqueness: true
     validates :kilos_totales, presence: true, numericality: { greater_than: 0 }
     validates :reception_items, presence: true
   

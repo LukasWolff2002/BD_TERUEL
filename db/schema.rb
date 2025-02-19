@@ -276,6 +276,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
 
   create_table "varieties", force: :cascade do |t|
     t.string "nombre"
+    t.decimal "p_supermercado"
+    t.decimal "p_feria"
+    t.decimal "p_descarte"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_varieties_on_nombre", unique: true
