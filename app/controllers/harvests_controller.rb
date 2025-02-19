@@ -31,6 +31,19 @@ class HarvestsController < ApplicationController
     end
   end
 
+  def destroy
+    @harvest = Harvest.find(params[:id])
+  
+    if @harvest.destroy
+      Rails.logger.info "✅ Cosecha eliminada correctamente"
+      redirect_to harvests_path, notice: 'Registro de cosecha eliminado exitosamente.'
+    else
+      Rails.logger.error "❌ Error al eliminar la cosecha: #{@harvest.errors.full_messages.join(', ')}"
+      redirect_to harvests_path, alert: 'No se pudo eliminar el registro de cosecha.'
+    end
+  end
+  
+
   private
 
   def load_collections

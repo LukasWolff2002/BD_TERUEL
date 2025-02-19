@@ -40,12 +40,20 @@
               </td>
               <td class="text-center"><%= reception.supplier&.nombre || "<em>Sin proveedor</em>".html_safe %></td>
               <td class="text-center"><%= reception.user ? "#{reception.user.nombre} #{reception.user.apellido}" : "<em>Sin evaluador</em>".html_safe %></td>
-              <td class="text-center">
-                <%= link_to reception_path(reception), class: "btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center" do %>
-                  <i class="bi bi-eye"></i>
-                  <span class="d-none d-md-inline ms-1">Ver</span>
-                <% end %>
-              </td>
+              <td class="text-center d-flex gap-2 justify-content-center">
+  <!-- Botón de Ver -->
+  <%= link_to reception_path(reception), class: "btn btn-sm btn-outline-warning d-flex align-items-center gap-1" do %>
+    <i class="bi bi-eye"></i>
+    <span class="d-none d-md-inline">Ver</span>
+  <% end %>
+
+  <!-- Botón de Eliminar -->
+  <%= button_to reception_path(reception), method: :delete, class: "btn btn-sm btn-outline-danger d-flex align-items-center gap-1 delete-button", data: { confirm: "¿Estás seguro de que deseas eliminar esta recepción? Esta acción no se puede revertir." } do %>
+    <i class="bi bi-trash"></i>
+    <span class="d-none d-md-inline">Eliminar</span>
+  <% end %>
+</td>
+
             </tr>
           <% end %>
         </tbody>

@@ -53,12 +53,20 @@
               </td>
               <td class="text-center d-none d-md-table-cell"><%= app.fecha_de_liberacion&.strftime("%d/%m/%Y") || "No especificado" %></td>
 
-              <td class="text-center">
-                <%= link_to application_path(app), class: "btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" do %>
+              <td class="text-center"> 
+                <!-- Botón de Ver -->
+                <%= link_to application_path(app), class: "btn btn-sm btn-outline-info d-flex align-items-center gap-1" do %>
                   <i class="bi bi-eye"></i>
                   <span class="d-none d-md-inline ms-1">Ver</span>
                 <% end %>
+
+                <!-- Botón de Eliminar -->
+                <%= button_to application_path(app), method: :delete, class: "btn btn-sm btn-outline-danger d-flex align-items-center gap-1", data: { confirm: "¿Estás seguro de que deseas eliminar esta aplicación? Esta acción no se puede revertir." } do %>
+                  <i class="bi bi-trash"></i>
+                  <span class="d-none d-md-inline ms-1">Eliminar</span>
+                <% end %>
               </td>
+
             </tr>
           <% end %>
         </tbody>

@@ -234,7 +234,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
 
   create_table "sectors", force: :cascade do |t|
     t.string "nombre"
-    t.integer "hectareas"
+    t.decimal "hectareas"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_sectors_on_nombre", unique: true

@@ -5,14 +5,20 @@
     </div>
 
     <div class="card-body p-4">
-      <%= form_with url: export_receptions_path(format: :xlsx), method: :post, local: true do |f| %>
+      <%= form_with url: export_receptions_path(format: :xlsx), method: :post, local: true, id: "export-form" do |f| %>
         <% if @variedades_por_dia.present? && @variedades_por_dia.any? %>
           <p class="fw-bold">Se exportarán las siguientes variedades por día con sus precios por kilogramo. Puedes modificar los precios antes de exportar.</p>
 
-          <!-- Incluir Campos Ocultos para Fecha y Proveedor -->
+          <!-- Campos Ocultos para mantener los filtros -->
           <%= hidden_field_tag :fecha_inicio, params[:fecha_inicio] %>
           <%= hidden_field_tag :fecha_fin, params[:fecha_fin] %>
           <%= hidden_field_tag :supplier_id, params[:supplier_id] %>
+
+          <!-- Mostrar el proveedor seleccionado -->
+          <div class="alert alert-info text-center fw-bold shadow-sm">
+            <i class="bi bi-person-check-fill"></i>  
+            Proveedor seleccionado: <%= Supplier.find(params[:supplier_id]).nombre rescue "No disponible" %>
+          </div>
 
           <% @variedades_por_dia.each do |fecha, variedades| %>
             <h4 class="fw-bold text-warning mt-3">Fecha: <%= l(fecha, format: "%d/%m/%Y (%A)") %></h4>
@@ -29,7 +35,10 @@
                     <tr>
                       <td class="text-center"><%= variedad[:variety] %></td>
                       <td>
-                        <%= number_field_tag "precios[#{variedad[:variety]}]", variedad[:price_per_kilogram], step: 0.01, class: "form-control shadow-sm border-0 text-center fw-bold", required: true %>
+                        <%= number_field_tag "precios[#{variedad[:variety]}_#{fecha}]", variedad[:price_per_kilogram], step: 0.01, min: 0.01, class: "form-control shadow-sm border-0 text-center fw-bold price-input", required: true %>
+                        <div class="invalid-feedback text-center">
+                          Ingrese un precio válido mayor a 0.
+                        </div>
                       </td>
                     </tr>
                   <% end %>
@@ -40,10 +49,12 @@
 
           <div class="d-grid gap-3 mt-4">
             <!-- Botón para confirmar y exportar a Excel -->
-            <%= f.submit "Confirmar y Exportar a Excel", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
+            <%= f.submit "Confirmar y Exportar a Excel", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;", id: "export-btn", disabled: true %>
 
             <!-- Botón para cancelar y regresar -->
-            <%= link_to "Cancelar", informe_receptions_path, class: "btn btn-outline-warning btn-lg shadow-sm w-100" %>
+            <%= link_to informe_receptions_path, class: "btn btn-light btn-lg shadow-sm w-100 fw-bold d-flex align-items-center justify-content-center" do %>
+              <i class="bi bi-arrow-left-circle me-2"></i> Regresar
+            <% end %>
           </div>
         <% else %>
           <div class="alert alert-warning text-center p-4 shadow-sm border-0">
@@ -51,10 +62,43 @@
             <p class="mt-2 mb-0 fw-bold">No se encontraron variedades para exportar con los filtros proporcionados.</p>
           </div>
           <div class="d-grid gap-3 mt-4">
-            <%= link_to "Regresar al Informe", informe_receptions_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
+            <%= link_to informe_receptions_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
           </div>
         <% end %>
       <% end %>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("export-form");
+    const priceInputs = document.querySelectorAll(".price-input");
+    const exportBtn = document.getElementById("export-btn");
+
+    function validatePrices() {
+      let valid = true;
+      priceInputs.forEach(input => {
+        const value = parseFloat(input.value);
+        if (isNaN(value) || value <= 0) {
+          input.classList.add("is-invalid");
+          valid = false;
+        } else {
+          input.classList.remove("is-invalid");
+        }
+      });
+      exportBtn.disabled = !valid;
+    }
+
+    priceInputs.forEach(input => {
+      input.addEventListener("input", validatePrices);
+    });
+
+    form.addEventListener("submit", function() {
+      exportBtn.value = "Exportando...";
+      exportBtn.disabled = true;
+    });
+
+    validatePrices();
+  });
+</script>

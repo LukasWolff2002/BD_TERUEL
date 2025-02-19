@@ -1,107 +1,107 @@
 <div class="container mt-4">
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h1>Nuevo Registro de Cosecha</h1>
-      <%= link_to harvests_path, class: 'btn btn-secondary' do %>
-        <i class="bi bi-arrow-left"></i> Volver
-      <% end %>
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #f8d7da;">
+      <h2 class="fw-bold mb-0">Nuevo Registro de Cosecha</h2>
     </div>
 
     <div class="card-body">
       <%= form_with(model: @harvest, local: true) do |f| %>
         <% if @harvest.errors.any? %>
-          <div class="alert alert-danger">
-            <h4><%= pluralize(@harvest.errors.count, "error") %> impidieron guardar este registro:</h4>
-            <ul>
-              <% @harvest.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
+          <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div>
+              <h6 class="fw-bold mb-1">Se encontraron los siguientes errores:</h6>
+              <ul class="mb-0 ps-3">
+                <% @harvest.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         <% end %>
 
         <div class="row g-3">
           <!-- Datos Generales -->
           <div class="col-md-4">
-            <%= f.label :fecha, "Fecha", class: "form-label" %>
-            <%= f.date_field :fecha, class: "form-control", readonly: true %>
+            <%= f.label :fecha, "Fecha", class: "form-label fw-bold text-danger" %>
+            <%= f.date_field :fecha, class: "form-control shadow-sm border-0", readonly: true %>
           </div>
           <div class="col-md-4">
-            <%= f.label :hora, "Hora", class: "form-label" %>
-            <%= f.time_field :hora, class: "form-control", readonly: true, value: Time.now.strftime("%H:%M") %>
+            <%= f.label :hora, "Hora", class: "form-label fw-bold text-danger" %>
+            <%= f.time_field :hora, class: "form-control shadow-sm border-0", readonly: true, value: Time.now.strftime("%H:%M") %>
           </div>
           <div class="col-md-4">
-            <%= f.label :user, "Encargado de Cosecha", class: "form-label" %>
+            <%= f.label :user, "Encargado de Cosecha", class: "form-label fw-bold text-danger" %>
             <p><strong><%= current_user.nombre_completo %></strong></p>
             <%= f.hidden_field :user, value: current_user.nombre_completo %>
           </div>
 
           <!-- Ubicación y Variedad -->
           <div class="col-md-6">
-            <%= f.label :sector, "Sector", class: "form-label" %>
-            <%= f.collection_select :sector, Sector.all, :id, :nombre, { prompt: "Seleccione un sector" }, { class: "form-select", id: "sector-select" } %>
+            <%= f.label :sector, "Sector", class: "form-label fw-bold text-danger" %>
+            <%= f.collection_select :sector, Sector.all, :id, :nombre, { prompt: "Seleccione un sector" }, { class: "form-select shadow-sm border-0", id: "sector-select" } %>
           </div>
 
           <div class="col-md-6">
-            <%= f.label :variety, "Variedad", class: "form-label" %>
-            <%= f.select :variety, [], { prompt: "Primero seleccione un sector" }, { class: "form-select", id: "variety-select", disabled: true } %>
+            <%= f.label :variety, "Variedad", class: "form-label fw-bold text-danger" %>
+            <%= f.select :variety, [], { prompt: "Primero seleccione un sector" }, { class: "form-select shadow-sm border-0", id: "variety-select", disabled: true } %>
           </div>
 
           <div class="col-md-6">
-            <%= f.label :color, "Color", class: "form-label" %>
-            <%= f.select :color, [], { prompt: "Seleccione un color" }, { class: "form-select", id: "color-select", disabled: true } %>
+            <%= f.label :color, "Color", class: "form-label fw-bold text-danger" %>
+            <%= f.select :color, [], { prompt: "Seleccione un color" }, { class: "form-select shadow-sm border-0", id: "color-select", disabled: true } %>
           </div>
-
 
           <!-- Datos del Volante -->
           <div class="col-md-6">
-            <%= f.label :volante_nombre, "Volante", class: "form-label" %>
+            <%= f.label :volante_nombre, "Volante", class: "form-label fw-bold text-danger" %>
             <%= f.collection_select :volante_nombre,
                                     User.where(cargo: 'Volante'),
-                                    :nombre_completo,  # Guardar el nombre en lugar del RUT
+                                    :nombre_completo,
                                     :nombre_completo,
                                     { prompt: "Seleccione un volante" },
-                                    { class: "form-select", id: "volante-select" } %>
+                                    { class: "form-select shadow-sm border-0", id: "volante-select" } %>
           </div>
 
           <!-- Datos del Cosechero -->
           <div class="col-md-6">
-            <%= f.label :cosechero_nombre, "Cosechero", class: "form-label" %>
+            <%= f.label :cosechero_nombre, "Cosechero", class: "form-label fw-bold text-danger" %>
             <%= f.collection_select :cosechero_nombre,
                                     User.where(cargo: 'Cosechador'),
-                                    :nombre_completo,  # Guardar el nombre en lugar del RUT
+                                    :nombre_completo,
                                     :nombre_completo,
                                     { prompt: "Seleccione un cosechero" },
-                                    { class: "form-select", id: "cosechero-select" } %>
+                                    { class: "form-select shadow-sm border-0", id: "cosechero-select" } %>
           </div>
-
 
           <!-- Datos de Cosecha -->
           <div class="col-md-6">
-            <%= f.label :cajas, "Cajas", class: "form-label" %>
-            <%= f.number_field :cajas, class: "form-control", required: true, min: 0 %>
+            <%= f.label :cajas, "Cajas", class: "form-label fw-bold text-danger" %>
+            <%= f.number_field :cajas, class: "form-control shadow-sm border-0", required: true, min: 0 %>
           </div>
           <div class="col-md-6">
-            <%= f.label :kilos_por_caja, "Kilos por Caja", class: "form-label" %>
-            <%= f.number_field :kilos_por_caja, class: "form-control", required: true, step: "0.01", min: 0 %>
+            <%= f.label :kilos_por_caja, "Kilos por Caja", class: "form-label fw-bold text-danger" %>
+            <%= f.number_field :kilos_por_caja, class: "form-control shadow-sm border-0", required: true, step: "0.01", min: 0 %>
           </div>
         </div>
+
         <div class="col-md-6">
-  <%= f.label :calidad, "Calidad del Producto", class: "form-label" %>
-  <%= f.select :calidad, options_for_select(Harvest::CALIDAD_OPCIONES), 
-      { prompt: "Seleccione la calidad" }, 
-      { class: "form-select" } %>
-</div>
+          <%= f.label :calidad, "Calidad del Producto", class: "form-label fw-bold text-danger" %>
+          <%= f.select :calidad, options_for_select(Harvest::CALIDAD_OPCIONES), 
+              { prompt: "Seleccione la calidad" }, 
+              { class: "form-select shadow-sm border-0" } %>
+        </div>
 
-
-        <div class="mt-4">
-          <%= f.submit "Guardar Registro", class: "btn btn-primary" %>
-          <%= link_to "Cancelar", harvests_path, class: "btn btn-secondary" %>
+        <div class="d-grid gap-3 mt-4">
+          <%= f.submit "Guardar Registro", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #f8d7da;" %>
+          <%= link_to "Cancelar", harvests_path, class: "btn btn-outline-danger btn-lg shadow-sm w-100" %>
         </div>
       <% end %>
     </div>
   </div>
 </div>
+
 
 <script>
   // Precargamos la variable con las variedades y colores agrupados por sector

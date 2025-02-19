@@ -1,30 +1,47 @@
 <div class="container mt-4">
-  <h1>Nueva Herramienta</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-warning">Nueva Herramienta</h1>
+    <%= link_to tools_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #fff3cd;" do %>
+      <i class="bi bi-arrow-left me-2"></i> Volver
+    <% end %>
+  </div>
 
-  <%= form_with model: @tool, local: true do |f| %>
-    <div class="form-group mb-3">
-      <%= f.label :nombre, "Nombre de la Herramienta", class: "form-label" %>
-      <%= f.text_field :nombre, class: "form-control", placeholder: "Ingrese el nombre de la herramienta" %>
-      <% if @tool.errors[:nombre].any? %>
-        <div class="text-danger mt-1">
-          <%= @tool.errors[:nombre].first %>
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-black text-center py-3 rounded-top bg-gradient" style="background-color: #fff3cd;">
+      <h5 class="fw-bold mb-0">Registrar Nueva Herramienta</h5>
+    </div>
+    <div class="card-body p-4">
+      <%= form_with model: @tool, local: true do |f| %>
+
+        <!-- Nombre de la Herramienta -->
+        <div class="mb-3">
+          <%= f.label :nombre, "Nombre de la Herramienta", class: "form-label fw-bold text-warning" %>
+          <%= f.text_field :nombre, class: "form-control shadow-sm border-0", placeholder: "Ingrese el nombre" %>
+          <% if @tool.errors[:nombre].any? %>
+            <div class="text-danger mt-1">
+              <%= @tool.errors[:nombre].first %>
+            </div>
+          <% end %>
         </div>
+
+        <!-- Cantidad -->
+        <div class="mb-3">
+          <%= f.label :cantidad, "Cantidad", class: "form-label fw-bold text-warning" %>
+          <%= f.number_field :cantidad, class: "form-control shadow-sm border-0", placeholder: "Ingrese la cantidad", step: 1 %>
+          <% if @tool.errors[:cantidad].any? %>
+            <div class="text-danger mt-1">
+              <%= @tool.errors[:cantidad].first %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-grid gap-3 mt-4">
+          <%= f.submit "Crear Herramienta", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;" %>
+          <%= link_to "Cancelar", tools_path, class: "btn btn-outline-warning btn-lg shadow-sm w-100" %>
+        </div>
+
       <% end %>
     </div>
-
-    <div class="form-group mb-3">
-      <%= f.label :cantidad, "Cantidad", class: "form-label" %>
-      <%= f.number_field :cantidad, class: "form-control", placeholder: "Ingrese la cantidad", step: 1 %>
-      <% if @tool.errors[:cantidad].any? %>
-        <div class="text-danger mt-1">
-          <%= @tool.errors[:cantidad].first %>
-        </div>
-      <% end %>
-    </div>
-
-    <div class="form-group mt-4">
-      <%= f.submit "Crear Herramienta", class: "btn btn-primary" %>
-      <%= link_to "Cancelar", tools_path, class: "btn btn-secondary ms-2" %>
-    </div>
-  <% end %>
-</div> 
+  </div>
+</div>

@@ -6,6 +6,8 @@
 
     <div class="card-body p-4">
       <%= form_with url: informe_receptions_path, method: :get, local: true do |f| %>
+        <%= hidden_field_tag :commit, "true" %> <!-- Para asegurar que se haga la consulta -->
+
         <div class="row g-3">
           <!-- Filtros obligatorios -->
           <div class="col-md-4">

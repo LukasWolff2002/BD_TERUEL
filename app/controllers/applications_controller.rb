@@ -1,6 +1,6 @@
 # app/controllers/applications_controller.rb
 class ApplicationsController < ApplicationController
-  before_action :set_application, only: [:show]
+  before_action :set_application, only: [:show, :destroy]
   before_action :set_sectors, only: [:new, :create]
 
 
@@ -17,6 +17,18 @@ class ApplicationsController < ApplicationController
     @application = Application.new(application_params)
     # Aquí podrías validar o almacenar temporalmente los datos base si es necesario
   end
+
+  # DELETE /applications/:id
+def destroy
+  if @application.destroy
+    Rails.logger.info "✅ Aplicación eliminada correctamente"
+    redirect_to applications_path, notice: "La aplicación fue eliminada correctamente."
+  else
+    Rails.logger.error "❌ Error al eliminar la aplicación: #{@application.errors.full_messages.join(', ')}"
+    redirect_to applications_path, alert: "No se pudo eliminar la aplicación."
+  end
+end
+
   
 
   # GET /applications/new

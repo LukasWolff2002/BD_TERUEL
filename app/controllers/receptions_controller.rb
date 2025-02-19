@@ -47,108 +47,109 @@ class ReceptionsController < ApplicationController
 
   # Acción para el informe con filtros
   def informe
-    Rails.logger.debug "Accediendo a la acción informe"
     Rails.logger.debug "Parametros recibidos: #{params.inspect}"
   
+    if params[:fecha_inicio].blank? || params[:fecha_fin].blank? || params[:supplier_id].blank?
+      flash.now[:alert] = 'Debe seleccionar un rango de fechas y un proveedor.'
+      @receptions = []
+      return render :informe
+    end
+  
     @receptions = Reception.activos
+                           .where(fecha: params[:fecha_inicio]..params[:fecha_fin])
+                           .where(supplier_id: params[:supplier_id])
+                           .order(fecha: :desc)
   
-    if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
-      Rails.logger.debug "Aplicando filtros de recepción"
-      @receptions = @receptions.where(fecha: params[:fecha_inicio]..params[:fecha_fin])
-      @receptions = @receptions.where(supplier_id: params[:supplier_id])
-      @receptions = @receptions.order(fecha: :desc)
-  
-      respond_to do |format|
-        format.html
-        format.xlsx do
-          if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
-            response.headers["Content-Disposition"] = "attachment; filename=recepciones_#{Time.now.strftime('%Y%m%d%H%M%S')}.xlsx"
-          else
-            redirect_to informe_receptions_path, alert: 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.'
-          end
-        end
-      end
-    else
-      Rails.logger.debug "Faltan parámetros, mostrando formulario sin filtrar"
-      flash.now[:alert] = 'Por favor, complete todos los filtros para generar el informe.' if request.get?
-      respond_to do |format|
-        format.html
-        format.xlsx { redirect_to informe_receptions_path, alert: 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.' }
-      end
+    if @receptions.empty?
+      flash.now[:alert] = 'No se encontraron recepciones con los filtros seleccionados.'
     end
   end
+  
+  
 
   # app/controllers/receptions_controller.rb
   def export_confirm
-    Rails.logger.debug "Parametros recibidos: #{params.inspect}"
+    Rails.logger.debug "📌 Parámetros recibidos: #{params.inspect}"
   
     @fecha_inicio = params[:fecha_inicio]
     @fecha_fin = params[:fecha_fin]
     @supplier_id = params[:supplier_id]
   
-    # Validar la presencia de los parámetros
     unless @fecha_inicio.present? && @fecha_fin.present? && @supplier_id.present?
       flash[:alert] = 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar.'
       redirect_to informe_receptions_path
       return
     end
   
-    # Obtener las recepciones filtradas SIN includes(:reception_items)
-    @receptions = Reception.activos.where(fecha: @fecha_inicio..@fecha_fin, supplier_id: @supplier_id)
-                                 .order(fecha: :asc) # Ordenar por fecha ascendente
+    # Obtener las recepciones filtradas
+    @receptions = Reception.activos.where(fecha: @fecha_inicio..@fecha_fin, supplier_id: @supplier_id).order(fecha: :asc)
   
-    # Agrupar las recepciones por fecha
-    @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
-      recepciones.flat_map do |reception|
-        reception.reception_items.map do |item|
-          { variety: item["variety"], price_per_kilogram: item["price_per_kilogram"].to_f }
+    # Agrupar variedades por fecha con precios únicos
+    @variedades_por_dia = @receptions.each_with_object({}) do |reception, hash|
+      fecha = reception.fecha.to_date
+      hash[fecha] ||= []
+      
+      reception.reception_items.each do |item|
+        variedad = item["variety"].strip
+        precio = item["price_per_kilogram"].to_f
+  
+        if precio == 0.0
+          Rails.logger.warn "⚠ Precio no asignado para #{variedad} en fecha #{fecha}"
         end
-      end.uniq { |variedad| variedad[:variety] } # Eliminar duplicados por variedad
+  
+        hash[fecha] << { variety: variedad, price_per_kilogram: precio }
+      end
+  
+      hash[fecha].uniq! { |v| v[:variety] }  # Eliminar duplicados por variedad
     end
   
-    # Manejar el caso donde no hay variedades
-    if @variedades_por_dia.values.flatten.empty?
-      flash[:alert] = 'No se encontraron variedades para exportar con los filtros proporcionados.'
-      redirect_to informe_receptions_path
+    # Si no hay variedades, redirigir con advertencia
+    if @variedades_por_dia.empty?
+      Rails.logger.warn "⚠ No se encontraron variedades con precios para exportar."
+      redirect_to informe_receptions_path, alert: 'No se encontraron variedades con precios para exportar.'
     end
   end
-
-  def export
-    Rails.logger.debug "Acción 'export' iniciada."
-    @receptions = Reception.activos
   
+  def export
+    Rails.logger.debug "📌 Acción 'export' iniciada."
+    
     if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
-      @receptions = @receptions.where(
+      @receptions = Reception.activos.where(
         fecha: params[:fecha_inicio]..params[:fecha_fin],
         supplier_id: params[:supplier_id]
       ).order(fecha: :desc)
   
-      # Permitir y convertir 'precios' a hash puro
-      modified_prices = params.require(:precios).permit!.to_h
-      Rails.logger.debug "Precios modificados recibidos: #{modified_prices.inspect}"
+      # Procesar los precios con fecha y variedad
+      modified_prices = params.require(:precios).permit!.to_h.transform_keys do |key|
+        variedad, fecha = key.rpartition('_').values_at(0, 2)  # Separar variedad y fecha
+        [variedad.strip, Date.parse(fecha)]
+      end
+  
+      Rails.logger.debug "📌 Precios modificados recibidos: #{modified_prices.inspect}"
   
       # Validar precios positivos
       invalid_prices = modified_prices.select { |_, price| price.to_f < 0 }
       if invalid_prices.any?
-        Rails.logger.debug "Precios inválidos detectados: #{invalid_prices.inspect}"
+        Rails.logger.warn "⚠ Precios inválidos detectados: #{invalid_prices.inspect}"
         flash[:alert] = 'Todos los precios deben ser números positivos.'
         redirect_to export_confirm_receptions_path(fecha_inicio: params[:fecha_inicio], fecha_fin: params[:fecha_fin], supplier_id: params[:supplier_id])
         return
       end
   
+      # Asignar precios a variedades por fecha
       @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
         recepciones.flat_map do |reception|
           reception.reception_items.map do |item|
-            variedad = item["variety"]
-            updated_price = modified_prices[variedad] || item["price_per_kilogram"]
-            { variety: variedad, price_per_kilogram: updated_price.to_f }
+            variedad = item["variety"].strip
+            fecha = reception.fecha.to_date
+            updated_price = modified_prices[[variedad, fecha]] || item["price_per_kilogram"].to_f
+            { variety: variedad, price_per_kilogram: updated_price }
           end
         end.uniq { |variedad| variedad[:variety] }
       end
   
-      Rails.logger.debug "Variedades por día después de actualizar precios: #{@variedades_por_dia.inspect}"
-  
-      # Agregar un chequeo para evitar el error
+      Rails.logger.debug "📌 Variedades con precios actualizados: #{@variedades_por_dia.inspect}"
+    
       if @variedades_por_dia.values.flatten.empty?
         flash[:alert] = 'No se encontraron variedades para exportar con los filtros proporcionados.'
         redirect_to informe_receptions_path
@@ -157,21 +158,24 @@ class ReceptionsController < ApplicationController
   
       respond_to do |format|
         format.xlsx do
-          Rails.logger.debug "Se está intentando renderizar el Excel."
+          Rails.logger.debug "📌 Generando archivo Excel..."
           render xlsx: 'informe', disposition: 'attachment'
         end
       end
   
     else
-      Rails.logger.debug "Parámetros faltantes: fecha_inicio=#{params[:fecha_inicio]}, fecha_fin=#{params[:fecha_fin]}, supplier_id=#{params[:supplier_id]}"
+      Rails.logger.warn "⚠ Parámetros faltantes para exportar."
       flash[:alert] = 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.'
       redirect_to informe_receptions_path
     end
   rescue => e
-    Rails.logger.error "Error en la acción 'export': #{e.message}"
+    Rails.logger.error "❌ Error en la acción 'export': #{e.message}"
     flash[:alert] = 'Ocurrió un error al generar el informe Excel. Por favor, intenta nuevamente.'
     redirect_to informe_receptions_path
   end
+  
+  
+  
 
   private
 
