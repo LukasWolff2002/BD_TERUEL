@@ -29,17 +29,17 @@ User.create!([
     contrato: "interno"
   },
   {
-    nombre: "Pablo",
-    apellido: "Wolff",
-    rut: "22.798.725-1",
+    nombre: "Matias",
+    apellido: "Devia",
+    rut: "20.182.896-1",
     email: "pwolff012@gmail.com",
     cargo: "Administrativo",
     contrato: "interno"
   },
   {
     nombre: "Diego",
-    apellido: "Rojas",
-    rut: "22.799.897-0",
+    apellido: "Ortiz",
+    rut: "17.752.590-1",
     email: "carlos.sanchez@example.com",
     cargo: "Administrativo",
     contrato: "interno"
