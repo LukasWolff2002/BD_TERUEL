@@ -51,7 +51,7 @@ class VarietiesController < ApplicationController
   private
 
   def variety_params
-    params.require(:variety).permit(:nombre, :p_supermercado, :p_feria, :p_descarte, color_ids: [])
+    params.require(:variety).permit(:nombre, :p_supermercado, :p_feria, :p_descarte, :v_supermercado, :v_feria, :v_descarte, color_ids: [])
   end
 
   def set_variety

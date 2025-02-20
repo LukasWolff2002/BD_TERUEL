@@ -32,7 +32,6 @@
                 <tr><th>Color:</th><td><%= item['color'] %></td></tr>
                 <tr><th>Firmeza:</th><td><%= item['firmeza'] %></td></tr>
                 <tr><th>Calidad:</th><td><%= item['calidad'] %></td></tr>
-                <tr><th>Palets:</th><td><%= item['pallets'] %></td></tr>
                 <tr><th>Cajas:</th><td><%= item['cajas'] %></td></tr>
                 <tr><th>Kilos:</th><td><%= number_with_precision(item['kilos'].to_d, precision: 2) %> kg</td></tr>
               </table>
@@ -41,12 +40,12 @@
             <p class="text-muted">No se han agregado detalles del producto.</p>
           <% end %>
 
-          <% total_palets = @reception.reception_items.sum { |item| item['pallets'].to_i } %>
+          
           <% total_cajas = @reception.reception_items.sum { |item| item['cajas'].to_i } %>
 
           <h4 class="fw-bold text-warning mt-4">Totales Globales</h4>
           <table class="table table-warning">
-            <tr><th>Total Palets:</th><td><%= total_palets %></td></tr>
+            <tr><th>Total Palets:</th><td><%= @reception.palets %></td></tr>
             <tr><th>Total Cajas:</th><td><%= total_cajas %></td></tr>
             <tr><th>Kilos Totales:</th><td><%= number_with_precision(@reception.kilos_totales, precision: 2) %> kg</td></tr>
           </table>
@@ -54,15 +53,17 @@
 
         <div class="col-md-6">
           <h4 class="fw-bold text-warning">Guía de Despacho</h4>
-          <% if @reception.images.any? %>
-            <div class="text-center">
-              <% @reception.images.each do |image| %>
-                <%= image_tag "data:image/png;base64,#{Base64.strict_encode64(image.image)}", class: "img-fluid img-thumbnail border rounded shadow-sm mb-2", style: "max-width: 300px;" %>
-              <% end %>
-            </div>
-          <% else %>
-            <p class="text-muted">No hay imagen de guía de despacho adjunta.</p>
-          <% end %>
+         
+            <% if @reception.image_record.present? %>
+  <div class="text-center">
+    <%= image_tag "data:image/png;base64,#{Base64.strict_encode64(@reception.image_record.image)}",
+                  class: "img-fluid img-thumbnail border rounded shadow-sm mb-2",
+                  style: "max-width: 300px;" %>
+  </div>
+<% else %>
+  <p>No hay imagen disponible.</p>
+<% end %>
+
         </div>
       </div>
     </div>

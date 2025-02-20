@@ -203,6 +203,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
     t.time "hora", null: false
     t.string "nro_guia_despacho", null: false
     t.decimal "kilos_totales", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "palets"
     t.jsonb "reception_items", default: [], null: false
     t.integer "supplier_id"
     t.string "supplier_nombre"
@@ -279,6 +280,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_05_141549) do
     t.decimal "p_supermercado"
     t.decimal "p_feria"
     t.decimal "p_descarte"
+    t.decimal "v_supermercado"
+    t.decimal "v_feria"
+    t.decimal "v_descarte"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_varieties_on_nombre", unique: true

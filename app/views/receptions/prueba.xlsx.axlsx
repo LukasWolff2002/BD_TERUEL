@@ -1,0 +1,75 @@
+wb = xlsx_package.workbook
+
+@receptions.each do |reception|
+  wb.add_worksheet(name: "Recepción #{reception.id}") do |sheet|
+
+    # Definir estilos
+    bold_style = sheet.styles.add_style(b: true)
+    title_style = sheet.styles.add_style(b: true, sz: 14, alignment: { horizontal: :center, vertical: :center })
+    text_style = sheet.styles.add_style(sz: 10, alignment: { horizontal: :center })
+    bold_text_style = sheet.styles.add_style(b: true, sz: 10, alignment: { horizontal: :center })
+
+    # Cabecera del informe
+    sheet.add_row [nil, "INFORME PROCESO FRUTA PACKING"], style: title_style
+    sheet.merge_cells("B1:J1")
+
+    sheet.add_row []
+    sheet.add_row [nil, "Fecha de proceso", nil, reception.fecha.strftime("%d/%m/%Y"), nil, nil, "Proveedor", nil, reception.supplier.nombre], style: bold_text_style
+    sheet.merge_cells("B3:C3")
+    sheet.merge_cells("D3:F3")
+    sheet.merge_cells("G3:H3")
+    sheet.merge_cells("I3:J3")
+
+    sheet.add_row [] # Espacio
+
+    # Encabezado de la tabla
+    sheet.add_row [nil, "Variedad - Color - Calidad - Firmeza", "Kilos", "Precio/Kg", "Supermercado (%)", "Feria (%)", "Descarte (%)"], style: bold_text_style
+
+    # 🔹 Agrupar items por variedad - color - calidad - firmeza
+    reception.reception_items.group_by { |item| "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}" }.each do |key, items|
+    variety_name, color, calidad, firmeza = key.split("_")
+
+        # 🔹 Clave correcta para buscar en @kilos_por_recepcion
+        key_kilos = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
+
+        # 🔹 Obtener kilos totales asegurando que la clave es correcta
+        kilos_totales = @kilos_por_recepcion.dig(reception.id, key_kilos) || 0.0
+
+
+        # 🔹 Buscar la información de variedad en @variedades_por_dia asegurando la clave correcta
+        fecha_key = reception.fecha.strftime("%Y-%m-%d") # Formato estándar
+
+        # Asegurar que la búsqueda se haga con la clave exacta
+        variedad_info = @variedades_por_dia[fecha_key]&.find { |v| v[:key] == "#{key}_#{fecha_key}" }
+
+        
+        precio = variedad_info[:price_per_kilogram].to_f
+        p_supermercado = variedad_info[:p_supermercado].to_f
+        p_feria = variedad_info[:p_feria].to_f
+        p_descarte = 100.0 - (p_supermercado + p_feria)
+
+        #Ahora agrego las columnas de SUPERMERCADO
+
+
+
+
+        sheet.add_row [
+            nil,
+            "#{variety_name} - #{color} - #{calidad} - #{firmeza}"
+            ,
+        ]
+
+
+        sheet.add_row [
+            nil,
+            "#{variety_name} - #{color} - #{calidad} - #{firmeza}",
+            kilos_totales.round(2),
+            precio.round(2),
+            p_supermercado.round(2),
+            p_feria.round(2),
+            p_descarte.round(2)
+        ], style: text_style
+  
+    end
+  end
+end

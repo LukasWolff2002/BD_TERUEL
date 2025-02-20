@@ -5,6 +5,9 @@ class CreateVarieties < ActiveRecord::Migration[7.1]
       t.decimal :p_supermercado
       t.decimal :p_feria
       t.decimal :p_descarte
+      t.decimal :v_supermercado
+      t.decimal :v_feria
+      t.decimal :v_descarte
 
       t.timestamps
     end

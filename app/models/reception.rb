@@ -3,7 +3,10 @@ class Reception < ApplicationRecord
     belongs_to :user, optional: true
     belongs_to :supplier, optional: true
     has_one_attached :guia_despacho
-    has_many :images, dependent: :destroy
+
+    has_one :image_record, class_name: 'Image', dependent: :destroy
+
+    
   
     # Definimos las opciones válidas de firmeza y calidad
     FIRMEZA_OPCIONES = ['Blanda', 'Media', 'Firme'].freeze 
@@ -12,6 +15,7 @@ class Reception < ApplicationRecord
     # Validaciones
     validates :fecha, presence: true
     validates :hora, presence: true
+    validates :palets, presence: true
     
     validates :nro_guia_despacho, presence: true, uniqueness: true
     validates :kilos_totales, presence: true, numericality: { greater_than: 0 }
@@ -78,6 +82,10 @@ class Reception < ApplicationRecord
       else
         errors.add(:reception_items, "Debe haber al menos un item de recepción.")
       end
+    end
+
+    def purge_image
+      image.purge if image.attached?  # ✅ Elimina la imagen antes de borrar la recepción
     end
     
   end

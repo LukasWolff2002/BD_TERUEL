@@ -82,27 +82,70 @@ class ReceptionsController < ApplicationController
     end
   
     # Obtener las recepciones filtradas
-    @receptions = Reception.activos.where(fecha: @fecha_inicio..@fecha_fin, supplier_id: @supplier_id).order(fecha: :asc)
+    @receptions = Reception.activos
+                           .where(fecha: @fecha_inicio..@fecha_fin, supplier_id: @supplier_id)
+                           .order(fecha: :asc)
   
-    # Agrupar variedades por fecha con precios únicos
-    @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
-      recepciones.flat_map do |reception|
-        reception.reception_items.map do |item|
-          variedad = Variety.find_by(nombre: item["variety"])
-          {
-            variety: item["variety"],
-            firmeza: item["firmeza"],
-            calidad: item["calidad"],
-            p_supermercado: variedad&.p_supermercado || 0,
-            p_feria: variedad&.p_feria || 0,
-            p_descarte: variedad&.p_descarte || 0,
-            price_per_kilogram: item["price_per_kilogram"].to_f
-          }
-        end
-      end.uniq { |variedad| [variedad[:variety], variedad[:firmeza], variedad[:calidad]] }
+    # Cargar todas las variedades disponibles y mapearlas correctamente
+    variedades_data = Variety.pluck(:nombre, :p_supermercado, :p_feria, :p_descarte, :v_supermercado, :v_feria, :v_descarte).each_with_object({}) do |(nombre, p_supermercado, p_feria, p_descarte, v_supermercado, v_feria, v_descarte), hash|
+      hash[nombre] = { p_supermercado: p_supermercado, p_feria: p_feria, p_descarte: p_descarte, v_supermercado: v_supermercado, v_feria: v_feria, v_descarte: v_descarte }
+    end
+  
+    # 🔹 Agrupar recepciones por fecha y luego variedades únicas dentro de cada fecha
+    @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |receptions|
+      receptions.flat_map(&:reception_items).group_by do |item|
+        "#{item['variety']}__#{item['color']}__#{item['calidad']}__#{item['firmeza']}"
+      end.map do |key, items|
+        variety_name, color, calidad, firmeza = key.split("__")
+    
+        # Buscar los porcentajes en el hash `variedades_data`
+        variedad_data = variedades_data[variety_name] || { p_supermercado: 0.0, p_feria: 0.0, p_descarte: 100.0, v_supermercado: 0.0, v_feria: 0.0, v_descarte: 0.0 }
+    
+        Rails.logger.info "✅ Procesando variedad: #{key}"
+        Rails.logger.info "🔹 Porcentajes obtenidos desde Variety: #{variedad_data.inspect}"
+    
+        {
+          key: key,
+          variety: variety_name,
+          color: color,
+          calidad: calidad,
+          firmeza: firmeza,
+          p_supermercado: variedad_data[:p_supermercado].to_f,
+          p_feria: variedad_data[:p_feria].to_f,
+          p_descarte: 100 - (variedad_data[:p_supermercado].to_f + variedad_data[:p_feria].to_f), # 🔹 Ajustado dinámicamente
+          v_supermercado: variedad_data[:v_supermercado].to_f,
+          v_feria: variedad_data[:v_feria].to_f,
+          v_descarte: variedad_data[:v_descarte].to_f
+        }
+      end.uniq { |v| v[:key] } # 🔹 Asegurar que cada combinación aparezca solo una vez por fecha
+    end
+    
+    # 🔹 Agrupar los kilos por recepción y variedad
+    @kilos_por_recepcion = @receptions.index_by(&:id).transform_values do |reception|
+      reception.reception_items.group_by do |item|
+        "#{item['variety']}__#{item['color']}__#{item['calidad']}__#{item['firmeza']}"
+      end.transform_values do |items|
+        kilos_totales = items.sum { |item| item["kilos"].to_f }
+        Rails.logger.info "📦 Recepción #{reception.id} - Variedad #{items.first['variety']}: #{kilos_totales} kg"
+    
+        kilos_totales
+      end
+    end
+
+    @cajas_por_recepcion = @receptions.index_by(&:id).transform_values do |reception|
+      reception.reception_items.group_by do |item|
+        "#{item['variety']}__#{item['color']}__#{item['calidad']}__#{item['firmeza']}"
+      end.transform_values do |items|
+        cajas_totales = items.sum { |item| item["cajas"].to_f } # 🔹 Sumar las cajas
+        Rails.logger.info "📦 Recepción #{reception.id} - Variedad #{items.first['variety']}: #{cajas_totales} cajas"
+    
+        cajas_totales
+      end
     end
     
     
+    Rails.logger.info "📌 Kilos por recepción generados: #{@kilos_por_recepcion.inspect}"
+    Rails.logger.info "📌 Cajas por recepción generados: #{@cajas_por_recepcion.inspect}"
   
     # Si no hay variedades, redirigir con advertencia
     if @variedades_por_dia.empty?
@@ -111,61 +154,118 @@ class ReceptionsController < ApplicationController
     end
   end
   
+  
   def export
     Rails.logger.debug "📌 Acción 'export' iniciada."
-    
-    if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
-      @receptions = Reception.activos.where(
-        fecha: params[:fecha_inicio]..params[:fecha_fin],
-        supplier_id: params[:supplier_id]
-      ).order(fecha: :desc)
   
-      # Procesar los precios con fecha y variedad
-      modified_prices = params.require(:precios).permit!.to_h.transform_keys do |key|
-        variedad, fecha = key.rpartition('_').values_at(0, 2)  # Separar variedad y fecha
-        [variedad.strip, Date.parse(fecha)]
-      end
+    if params[:fecha_inicio].present? && params[:fecha_fin].present? && params[:supplier_id].present?
+      # 🔹 Tomar los valores enviados desde `export_confirm`
+      modified_percentages = params[:porcentajes].permit!.to_h
+      modified_prices = params[:precios].permit!.to_h
+      
   
       Rails.logger.debug "📌 Precios modificados recibidos: #{modified_prices.inspect}"
+      Rails.logger.debug "📌 Porcentajes modificados recibidos: #{modified_percentages.inspect}"
   
-      # Validar precios positivos
-      invalid_prices = modified_prices.select { |_, price| price.to_f < 0 }
-      if invalid_prices.any?
-        Rails.logger.warn "⚠ Precios inválidos detectados: #{invalid_prices.inspect}"
-        flash[:alert] = 'Todos los precios deben ser números positivos.'
-        redirect_to export_confirm_receptions_path(fecha_inicio: params[:fecha_inicio], fecha_fin: params[:fecha_fin], supplier_id: params[:supplier_id])
-        return
+      # 🔹 Obtener las recepciones del rango de fechas y proveedor
+      @receptions = Reception.where(activo: true, fecha: params[:fecha_inicio]..params[:fecha_fin], supplier_id: params[:supplier_id]).order(fecha: :asc)
+  
+      unless @receptions.exists?
+        Rails.logger.error "❌ No se encontraron recepciones para los parámetros dados."
+        flash[:alert] = 'No se encontraron datos para exportar con los filtros proporcionados.'
+        redirect_to informe_receptions_path and return
       end
   
-      # Asignar precios a variedades por fecha
-      @variedades_por_dia = @receptions.group_by(&:fecha).transform_values do |recepciones|
-        recepciones.flat_map do |reception|
-          reception.reception_items.map do |item|
-            variedad = item["variety"].strip
-            fecha = reception.fecha.to_date
-            updated_price = modified_prices[[variedad, fecha]] || item["price_per_kilogram"].to_f
-            { variety: variedad, price_per_kilogram: updated_price }
-          end
-        end.uniq { |variedad| variedad[:variety] }
-      end
+      Rails.logger.info "📦 Total de recepciones encontradas: #{@receptions.count}"
   
-      Rails.logger.debug "📌 Variedades con precios actualizados: #{@variedades_por_dia.inspect}"
-    
+      # 🔹 Agrupar las variedades
+      @variedades_por_dia = modified_percentages.keys.group_by { |key| key.split("_").last }.transform_values do |keys|
+        keys.map do |key|
+          variety_data = key.rpartition("_")  # Separar el nombre de la fecha
+          fecha = variety_data.last           # Última parte es la fecha
+          variety_info = variety_data.first.split("_")  # Separar la variedad y características
+      
+          # Extraer desde el final los valores fijos: firmeza, calidad
+          firmeza = variety_info.pop
+          calidad = variety_info.pop
+      
+          # Extraer el color (puede contener espacios si el nombre de la variedad es más de una palabra)
+          color = variety_info.pop
+      
+          # Lo que queda en variety_info es el nombre de la variedad
+          variety_name = variety_info.join("_")
+      
+          # 🔹 Tomar precio directamente de `export_confirm`
+          
+          porcentajes = modified_percentages[key] || {}
+          precios = modified_prices[key] || {}
+      
+          p_supermercado = porcentajes["p_supermercado"].to_f
+          p_feria = porcentajes["p_feria"].to_f
+          p_descarte = porcentajes["p_descarte"].to_f
+
+          v_supermercado = precios["v_supermercado"].to_f
+          v_feria = precios["v_feria"].to_f
+          v_descarte = precios["v_descarte"].to_f
+      
+          Rails.logger.info "✅ Procesando variedad export: #{key}"
+          Rails.logger.info "🔹 Nombre: #{variety_name}, Color: #{color}, Calidad: #{calidad}, Firmeza: #{firmeza}"
+          Rails.logger.info "🔹 Porcentajes en export: #{porcentajes}"
+          Rails.logger.info "🔹 Precios en export: #{precios}"
+      
+          {
+            key: key,
+            variety: variety_name,
+            color: color,
+            calidad: calidad,
+            firmeza: firmeza,
+            fecha: fecha,
+            p_supermercado: p_supermercado,
+            p_feria: p_feria,
+            p_descarte: p_descarte,
+            v_supermercado: v_supermercado,
+            v_feria: v_feria,
+            v_descarte: v_descarte
+          }
+        end
+      end
+      
+  
+      # 🔹 Agrupar los kilos por recepción y variedad
+      @kilos_por_recepcion = @receptions.each_with_object({}) do |reception, hash|
+        hash[reception.id] = reception.reception_items.group_by do |item|
+          "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}"
+        end.transform_values { |items| items.sum { |item| item["kilos"].to_f } }
+      end
+
+      @cajas_por_recepcion = @receptions.each_with_object({}) do |reception, hash|
+        hash[reception.id] = reception.reception_items.group_by do |item|
+          "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}"
+        end.transform_values { |items| items.sum { |item| item["cajas"].to_f } }
+      end
+      
+  
+      Rails.logger.debug "📦 Kilos por recepción generados: #{@kilos_por_recepcion.inspect}"
+      Rails.logger.debug "📦 Cajas por recepción generados: #{@cajas_por_recepcion}"
+
       if @variedades_por_dia.values.flatten.empty?
         flash[:alert] = 'No se encontraron variedades para exportar con los filtros proporcionados.'
-        redirect_to informe_receptions_path
-        return
+        redirect_to informe_receptions_path and return
       end
+  
+      Rails.logger.debug "📊 Datos en @variedades_por_dia: #{@variedades_por_dia.inspect}"
+  
+      # 🔹 Verificar coincidencia de claves
+      Rails.logger.debug "📌 Claves en @variedades_por_dia: #{@variedades_por_dia.keys}"
+      Rails.logger.debug "📌 Claves en @kilos_por_recepcion: #{@kilos_por_recepcion.keys}"
   
       respond_to do |format|
         format.xlsx do
-          Rails.logger.debug "📌 Generando archivo Excel..."
+          Rails.logger.debug "📄 Se está intentando renderizar el Excel."
           render xlsx: 'informe', disposition: 'attachment'
         end
       end
-  
     else
-      Rails.logger.warn "⚠ Parámetros faltantes para exportar."
       flash[:alert] = 'Debe proporcionar fecha de inicio, fecha de fin y proveedor para exportar a Excel.'
       redirect_to informe_receptions_path
     end
@@ -174,6 +274,22 @@ class ReceptionsController < ApplicationController
     flash[:alert] = 'Ocurrió un error al generar el informe Excel. Por favor, intenta nuevamente.'
     redirect_to informe_receptions_path
   end
+  
+  def destroy
+    @reception = Reception.find(params[:id])
+    
+    if @reception.image_record.present?
+      @reception.image_record.destroy  # Esto elimina la imagen asociada
+    end
+    
+    @reception.destroy
+    flash[:notice] = "Recepción eliminada exitosamente."
+    redirect_to receptions_path
+  end
+  
+  
+  
+  
   
   
   
@@ -209,7 +325,6 @@ class ReceptionsController < ApplicationController
     raw_params = params.require(:reception).to_unsafe_h
     raw_params["reception_items"] = Array.wrap(raw_params["reception_items"]).map do |item|
       item = item.to_h.stringify_keys
-      item["pallets"] = "0" if item["pallets"].blank?
       item["cajas"]   = "0" if item["cajas"].blank?
       item["kilos"]   = "0" if item["kilos"].blank?
       item
@@ -222,7 +337,8 @@ class ReceptionsController < ApplicationController
       :nro_guia_despacho,
       :guia_despacho,
       :supplier_id,
-      reception_items: [:sector, :variety, :color, :firmeza, :calidad, :pallets, :cajas, :kilos]
+      :palets,
+      reception_items: [:sector, :variety, :color, :firmeza, :calidad, :cajas, :kilos]
     )
   end
 end

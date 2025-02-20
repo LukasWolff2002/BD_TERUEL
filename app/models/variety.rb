@@ -15,6 +15,10 @@ class Variety < ApplicationRecord
   validates :p_feria, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :p_descarte, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
 
+  validates :v_supermercado, presence: true, numericality: { greater_than_or_equal_to: 0}
+  validates :v_feria, presence: true, numericality: { greater_than_or_equal_to: 0}
+  validates :v_descarte, numericality: { greater_than_or_equal_to: 0}, allow_nil: true
+
   # Callback para calcular p_descarte antes de guardar
   before_validation :calcular_p_descarte
 

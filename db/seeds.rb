@@ -208,9 +208,9 @@ Tool.create!(nombre: "Wrench", cantidad: 7)
 Tool.create!(nombre: "Drill", cantidad: 4)
 
 puts "Creando variedades..."
-variety1 = Variety.create!(nombre: "Variedad 1", p_supermercado: 40, p_feria: 30, p_descarte: 30)
-variety2 = Variety.create!(nombre: "Variedad 2", p_supermercado: 20, p_feria: 50, p_descarte: 30)
-variety3 = Variety.create!(nombre: "Variedad 3", p_supermercado: 10, p_feria: 20, p_descarte: 70)
+variety1 = Variety.create!(nombre: "Variedad 1", p_supermercado: 40, p_feria: 30, p_descarte: 30, v_supermercado: 100, v_feria: 50, v_descarte: 50)
+variety2 = Variety.create!(nombre: "Variedad 2", p_supermercado: 20, p_feria: 50, p_descarte: 30, v_supermercado: 80, v_feria: 60, v_descarte: 40)
+variety3 = Variety.create!(nombre: "Variedad 3", p_supermercado: 10, p_feria: 20, p_descarte: 70, v_supermercado: 70, v_feria: 30, v_descarte: 60)
 
 puts "Creando colores..."
 color_rojo     = Color.create!(nombre: "Rojo")

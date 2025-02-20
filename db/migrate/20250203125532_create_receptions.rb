@@ -9,6 +9,7 @@ class CreateReceptions < ActiveRecord::Migration[7.1]
       # Ahora estos datos se guardarán dentro de cada item en el campo JSONB.
       
       t.decimal :kilos_totales,      precision: 10, scale: 2, null: false, default: 0.0
+      t.integer :palets
       t.jsonb   :reception_items,    default: [], null: false
 
       # Datos del proveedor (denormalizados)

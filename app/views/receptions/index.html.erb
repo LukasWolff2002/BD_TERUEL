@@ -48,10 +48,38 @@
   <% end %>
 
   <!-- Botón de Eliminar -->
-  <%= button_to reception_path(reception), method: :delete, class: "btn btn-sm btn-outline-danger d-flex align-items-center gap-1 delete-button", data: { confirm: "¿Estás seguro de que deseas eliminar esta recepción? Esta acción no se puede revertir." } do %>
-    <i class="bi bi-trash"></i>
-    <span class="d-none d-md-inline">Eliminar</span>
-  <% end %>
+  <!-- Botón para abrir el modal de confirmación -->
+<button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 delete-button"
+        data-bs-toggle="modal" data-bs-target="#deleteModal" 
+        data-url="<%= reception_path(reception) %>">
+  <i class="bi bi-trash"></i>
+  <span class="d-none d-md-inline">Eliminar</span>
+</button>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar esta recepción? Esta acción no se puede revertir.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form id="deleteForm" method="post" action="">
+          <input type="hidden" name="_method" value="delete">
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </td>
 
             </tr>
@@ -66,3 +94,19 @@
     </div>
   <% end %>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const deleteModal = document.getElementById("deleteModal");
+  deleteModal.addEventListener("show.bs.modal", function (event) {
+    let button = event.relatedTarget; // Botón que activó el modal
+    let url = button.getAttribute("data-url"); // URL de eliminación
+
+    // Modificar la acción del formulario de eliminación
+    let deleteForm = document.getElementById("deleteForm");
+    deleteForm.setAttribute("action", url);
+  });
+});
+
+
+</script>

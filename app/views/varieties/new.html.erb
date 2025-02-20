@@ -48,6 +48,26 @@
               <input type="text" id="p_descarte" class="form-control shadow-sm border-0 text-left fw-bold text-danger" readonly>
             </div>
 
+            <hr>
+
+             <!-- Campo para porcentaje supermercado -->
+            <div class="mb-3">
+              <%= f.label :v_supermercado, "Precio Supermercado ($)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :v_supermercado, step: 0.1, min: 0, class: "form-control shadow-sm border-0 porcentaje-input", required: true %>
+            </div>
+
+            <!-- Campo para porcentaje feria -->
+            <div class="mb-3">
+              <%= f.label :v_feria, "Precio Feria ($)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :v_feria, step: 0.1, min: 0, class: "form-control shadow-sm border-0 porcentaje-input", required: true %>
+            </div>
+
+            <!-- Campo calculado para porcentaje descarte -->
+            <div class="mb-3">
+              <%= f.label :v_descarte, "Precio Descarte ($)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :v_descarte, step: 0.1, min: 0, class: "form-control shadow-sm border-0 porcentaje-input", required: true %>
+            </div>
+
             <!-- Sección para agregar colores asociados -->
             <div class="mb-3">
               <%= f.label :color_ids, "Colores disponibles", class: "form-label fw-bold text-danger" %>

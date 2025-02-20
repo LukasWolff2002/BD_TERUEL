@@ -7,7 +7,7 @@
     <div class="card-body p-4">
       <%= form_with url: export_receptions_path(format: :xlsx), method: :post, local: true, id: "export-form" do |f| %>
         <% if @variedades_por_dia.present? && @variedades_por_dia.any? %>
-          <p class="fw-bold">Se exportarán las siguientes variedades por día con sus precios por kilogramo. Puedes modificar los precios antes de exportar.</p>
+          <p class="fw-bold">Se exportarán las siguientes variedades por día con sus precios y porcentajes. Puedes modificar estos valores antes de exportar.</p>
 
           <!-- Campos Ocultos para mantener los filtros -->
           <%= hidden_field_tag :fecha_inicio, params[:fecha_inicio] %>
@@ -33,21 +33,47 @@
                 </thead>
                 <tbody>
                   <% variedades.each do |variedad| %>
+                    <% key = "#{variedad[:variety]}_#{variedad[:color]}_#{variedad[:calidad]}_#{variedad[:firmeza]}_#{fecha}" %>
                     <tr>
                       <td class="text-center">
-                        <%= "#{variedad[:variety]} (Firmeza: #{variedad[:firmeza]}, Calidad: #{variedad[:calidad]})" %>
+                        <%= "#{variedad[:variety]} - #{variedad[:color]} - #{variedad[:calidad]} - #{variedad[:firmeza]}" %>
                       </td>
                       <td class="text-center">
-                        Supermercado: <strong><%= variedad[:p_supermercado] %>%</strong><br>
-                        Feria: <strong><%= variedad[:p_feria] %>%</strong><br>
-                        Descarte: <strong><%= variedad[:p_descarte] %>%</strong>
-                      </td>
-                      <td>
-                        <%= number_field_tag "precios[#{variedad[:variety]}_#{fecha}]", variedad[:price_per_kilogram], step: 0.01, min: 0.01, class: "form-control shadow-sm border-0 text-center fw-bold price-input", required: true %>
-                        <div class="invalid-feedback text-center">
-                          Ingrese un precio válido mayor a 0.
+                        <div class="input-group mb-2">
+                          <span class="input-group-text">Supermercado</span>
+                          <%= number_field_tag "porcentajes[#{key}][p_supermercado]", variedad[:p_supermercado], step: 0.01, min: 0, max: 100, class: "form-control text-center porcentaje-input p-supermercado", data: { key: key }, required: true %>
+                          <span class="input-group-text">%</span>
+                        </div>
+                        <div class="input-group mb-2">
+                          <span class="input-group-text">Feria</span>
+                          <%= number_field_tag "porcentajes[#{key}][p_feria]", variedad[:p_feria], step: 0.01, min: 0, max: 100, class: "form-control text-center porcentaje-input p-feria", data: { key: key }, required: true %>
+                          <span class="input-group-text">%</span>
+                        </div>
+                        <div class="input-group">
+                          <span class="input-group-text">Descarte</span>
+                          <%= number_field_tag "porcentajes[#{key}][p_descarte]", variedad[:p_descarte], step: 0.01, min: 0, max: 100, class: "form-control text-center p-descarte", data: { key: key }, readonly: true %>
+                          <span class="input-group-text">%</span>
                         </div>
                       </td>
+
+                      <td>
+  <div class="input-group mb-2">
+    <span class="input-group-text">Supermercado</span>
+    <%= number_field_tag "precios[#{key}][v_supermercado]", variedad[:v_supermercado], step: 0.01, min: 0, class: "form-control text-center precio-input v-supermercado", data: { key: key }, required: true %>
+    <span class="input-group-text">$</span>
+  </div>
+  <div class="input-group mb-2">
+    <span class="input-group-text">Feria</span>
+    <%= number_field_tag "precios[#{key}][v_feria]", variedad[:v_feria], step: 0.01, min: 0, class: "form-control text-center precio-input v-feria", data: { key: key }, required: true %>
+    <span class="input-group-text">$</span>
+  </div>
+  <div class="input-group mb-2">
+    <span class="input-group-text">Descarte</span>
+    <%= number_field_tag "precios[#{key}][v_descarte]", variedad[:v_descarte], step: 0.01, min: 0, class: "form-control text-center precio-input v-descarte", data: { key: key }, required: true %>
+    <span class="input-group-text">$</span>
+  </div>
+</td>
+
                     </tr>
                   <% end %>
                 </tbody>
@@ -56,10 +82,8 @@
           <% end %>
 
           <div class="d-grid gap-3 mt-4">
-            <!-- Botón para confirmar y exportar a Excel -->
             <%= f.submit "Confirmar y Exportar a Excel", class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #fff3cd;", id: "export-btn", disabled: true %>
 
-            <!-- Botón para cancelar y regresar -->
             <%= link_to informe_receptions_path, class: "btn btn-light btn-lg shadow-sm w-100 fw-bold d-flex align-items-center justify-content-center" do %>
               <i class="bi bi-arrow-left-circle me-2"></i> Regresar
             <% end %>
@@ -81,11 +105,28 @@
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("export-form");
-    const priceInputs = document.querySelectorAll(".price-input");
+    const priceInputs = document.querySelectorAll(".precio-input");
+    const porcentajeInputs = document.querySelectorAll(".porcentaje-input");
+    const descarteInputs = document.querySelectorAll(".p-descarte");
     const exportBtn = document.getElementById("export-btn");
 
-    function validatePrices() {
+    function actualizarDescarte() {
+      porcentajeInputs.forEach(input => {
+        input.addEventListener("input", function() {
+          let key = this.dataset.key;
+          let supermercado = parseFloat(document.querySelector(`.p-supermercado[data-key="${key}"]`).value) || 0;
+          let feria = parseFloat(document.querySelector(`.p-feria[data-key="${key}"]`).value) || 0;
+          let descarteInput = document.querySelector(`.p-descarte[data-key="${key}"]`);
+
+          let descarte = Math.max(0, 100 - (supermercado + feria));
+          descarteInput.value = descarte.toFixed(2);
+        });
+      });
+    }
+
+    function validateInputs() {
       let valid = true;
+
       priceInputs.forEach(input => {
         const value = parseFloat(input.value);
         if (isNaN(value) || value <= 0) {
@@ -95,18 +136,19 @@
           input.classList.remove("is-invalid");
         }
       });
+
       exportBtn.disabled = !valid;
     }
 
-    priceInputs.forEach(input => {
-      input.addEventListener("input", validatePrices);
-    });
+    actualizarDescarte();
+    validateInputs();
+
+    porcentajeInputs.forEach(input => input.addEventListener("input", validateInputs));
+    priceInputs.forEach(input => input.addEventListener("input", validateInputs));
 
     form.addEventListener("submit", function() {
       exportBtn.value = "Exportando...";
       exportBtn.disabled = true;
     });
-
-    validatePrices();
   });
 </script>

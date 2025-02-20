@@ -61,6 +61,25 @@
               <%= f.number_field :p_descarte, step: 0.01, min: 0, max: 100, class: "form-control shadow-sm border-0 text-left", readonly: true %>
             </div>
 
+            <hr>
+
+            <!-- Campo para porcentaje de Supermercado -->
+            <div class="mb-3">
+              <%= f.label :v_supermercado, "Precio Supermercado ($)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :v_supermercado, step: 0.01, min: 0, class: "form-control shadow-sm border-0 percent-input", required: true %>
+            </div>
+
+            <!-- Campo para porcentaje de Feria -->
+            <div class="mb-3">
+              <%= f.label :v_feria, "Precio Feria ($)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :v_feria, step: 0.01, min: 0, class: "form-control shadow-sm border-0 percent-input", required: true %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :v_descarte, "Precio Descarte ($)", class: "form-label fw-bold text-danger" %>
+              <%= f.number_field :v_descarte, step: 0.01, min: 0, class: "form-control shadow-sm border-0 percent-input", required: true %>
+            </div>
+
             <div class="d-grid gap-3">
               <%= f.submit "Actualizar Variedad", class: "btn btn-lg shadow-sm w-100 text-black fw-bold", style: "background-color: #f8d7da;" %>
               <%= link_to "Cancelar", varieties_path, class: "btn btn-outline-danger btn-lg shadow-sm w-100" %>

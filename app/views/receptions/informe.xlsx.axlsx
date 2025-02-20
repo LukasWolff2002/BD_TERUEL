@@ -50,117 +50,178 @@ wb = xlsx_package.workbook
   sheet.add_row [] # Fila 13
   sheet.add_row [] # Fila 14
 
-  sheet.add_row [nil, "DETALLE PRODUCTOS PROCESADOS", nil, nil, nil, nil, "CLIENTE", "CALIBRE", "KILOS", "CAJAS", nil, "PRECIO FACTURACIÓN", nil, "NETO", "IVA", "TOTAL"], style: bold_text_style
+  sheet.add_row [nil, "DETALLE PRODUCTOS PROCESADOS", nil, nil, nil, nil, "CLIENTE", "CALIBRE", "KILOS", "CAJAS", "PORCENTAJE", nil, "PRECIO FACTURACIÓN", nil, "NETO", "IVA", "TOTAL"], style: bold_text_style
   sheet.merge_cells("B15:F15")
 
-  #Ahora debo recorrer el todos los productos dentro de la recepcion
-  reception.reception_items.each do |item|
-    precio = @variedades_por_dia[reception.fecha].find { |v| v[:variety] == item["variety"] }&.dig(:price_per_kilogram) || "N/A"
-    neto = (item["kilos"].to_f * precio.to_f).round(2)
-    iva = (item["kilos"].to_f * precio.to_f).round(2)*0.19
-    total = neto + iva
+  # 🔹 Agrupar items por variedad - color - calidad - firmeza
+  reception.reception_items.group_by { |item| "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}" }.each do |key, items|
+  variety_name, color, calidad, firmeza = key.split("_")
 
-    #SUPERMERCADO
-    sheet.add_row [nil, "#{item['variety']} - #{item['color']}", nil, nil, nil, nil, "SUPERMERCADO", nil, item["kilos"] || 0, item["cajas"] || 0, nil, precio, nil, neto, iva, total], style: text_style
-    sheet.merge_cells("B#{sheet.rows.size}:F#{sheet.rows.size}")
-    sheet.merge_cells("G#{sheet.rows.size}:H#{sheet.rows.size}")
+    # 🔹 Clave correcta para buscar en @kilos_por_recepcion
+    key_kilos = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
+    key_cajas = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
 
-    end
+    # 🔹 Obtener kilos totales asegurando que la clave es correcta
+    kilos_totales = @kilos_por_recepcion.dig(reception.id, key_kilos) || 0.0
+    cajas_totales = @cajas_por_recepcion.dig(reception.id, key_cajas) || 0.0
 
-  #Una vez que termino todo, pongo el total
-  # Inicializar los totales
-  total_kilos = 0
-  total_cajas = 0
-  total_neto = 0
-  total_iva = 0
-  total_total = 0
 
-  reception.reception_items.each do |item|
-    kilos = item["kilos"].to_f
-    cajas = item["cajas"].to_i
-    precio = @variedades_por_dia[reception.fecha].find { |v| v[:variety] == item["variety"] }&.dig(:price_per_kilogram) || "N/A"
-    precio = precio.to_f
-    neto = (kilos * precio).round(2)
-    iva = (neto * 0.19).round(2)
-    total = neto + iva
+    # 🔹 Buscar la información de variedad en @variedades_por_dia asegurando la clave correcta
+    fecha_key = reception.fecha.strftime("%Y-%m-%d") # Formato estándar
 
-    # Acumular en los totales
-    total_kilos += kilos
-    total_cajas += cajas
-    total_neto += neto
-    total_iva += iva
-    total_total += total
-    end
+    # Asegurar que la búsqueda se haga con la clave exacta
+    variedad_info = @variedades_por_dia[fecha_key]&.find { |v| v[:key] == "#{key}_#{fecha_key}" }
 
-  sheet.add_row [nil, nil, nil, nil, nil, nil, nil, "TOTAL", total_kilos, total_cajas, nil, nil, nil, total_neto, total_iva, total_total], style: bold_text_style  
     
-  end
-end
+    precio_supermercado = variedad_info[:v_supermercado].to_f
+    p_supermercado = variedad_info[:p_supermercado].to_f
+    
+    kilos_supermercado = (p_supermercado/100)*kilos_totales
+    cajas_supermercado = (p_supermercado/100)*cajas_totales
 
-# Hoja Resumen
-wb.add_worksheet(name: "Resumen") do |sheet|
+    neto = precio_supermercado*kilos_supermercado
+    iva = neto*0.19
+    total = neto+iva
 
-  # Definir estilos dentro de la hoja de resumen
-  title_style = sheet.styles.add_style(b: true, sz: 14, alignment: { horizontal: :center, vertical: :center })
-  text_style = sheet.styles.add_style(sz: 10, alignment: { horizontal: :center })
-  bold_text_style = sheet.styles.add_style(b: true, sz: 10, alignment: { horizontal: :center })
+    #Ahora agrego los datos de SUPERMERCADO
 
-  sheet.add_row [" "] * 20
-  sheet.add_row []
-  sheet.add_row []
+    sheet.add_row [
+      nil,
+      "#{variety_name} - #{color} - #{calidad} - #{firmeza}",
+      nil,
+      nil,
+      nil,
+      nil,
+      "SUPERMERCADO",
+      nil,
+      kilos_supermercado.round(2),
+      cajas_supermercado.round(2),
+      p_supermercado,
+      nil,
+      precio_supermercado,
+      nil,
+      neto.round(2),
+      iva.round(2),
+      total.round(2)
+    ], style: text_style
 
-  # Título de la hoja resumen
-  sheet.add_row [nil, "RESUMEN PROCESO FRUTA PACKING"], style: title_style
-  sheet.merge_cells("B4:J4")
-
-  sheet.add_row []
-  sheet.add_row [nil, "DETALLE PRODUCTOS PROCESADOS", nil, nil, nil, nil, "CLIENTE", "CALIBRE", "KILOS", "CAJAS"], style: bold_text_style
-  sheet.merge_cells("B6:F6")
-
-  # Inicializar hash para acumular kilos y cajas por variedad y color
-  resumen_hash = Hash.new { |hash, key| hash[key] = { kilos: 0, cajas: 0 } }
-
-  # Inicializar los totales generales
-  kilos_totales = 0
-  cajas_totales = 0
-
-  # Recorrer todas las recepciones y acumular los valores
-  @receptions.each do |reception|
-    reception.reception_items.each do |item|
-      # Clave única combinando variedad y color
-      key = "#{item['variety']} - #{item['color']}".strip
-
-      # Sumar kilos y cajas al hash de resumen
-      resumen_hash[key][:kilos] += item["kilos"].to_f
-      resumen_hash[key][:cajas] += item["cajas"].to_i
-
-      # Sumar a los totales generales
-      kilos_totales += item["kilos"].to_f
-      cajas_totales += item["cajas"].to_i
-    end
-  end
-
-  # Agregar los datos acumulados a la hoja resumen
-  resumen_hash.each do |variety_color, valores|
-    sheet.add_row [nil, variety_color, nil, nil, nil, nil, "SUPERMERCADO", nil, valores[:kilos], valores[:cajas]], style: text_style
     sheet.merge_cells("B#{sheet.rows.size}:F#{sheet.rows.size}")
     sheet.merge_cells("G#{sheet.rows.size}:H#{sheet.rows.size}")
+    end 
+
+  #Ahora voy con feria
+  # 🔹 Agrupar items por variedad - color - calidad - firmeza
+  reception.reception_items.group_by { |item| "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}" }.each do |key, items|
+  variety_name, color, calidad, firmeza = key.split("_")
+
+    # 🔹 Clave correcta para buscar en @kilos_por_recepcion
+    key_kilos = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
+    key_cajas = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
+
+    # 🔹 Obtener kilos totales asegurando que la clave es correcta
+    kilos_totales = @kilos_por_recepcion.dig(reception.id, key_kilos) || 0.0
+    cajas_totales = @cajas_por_recepcion.dig(reception.id, key_cajas) || 0.0
+
+
+    # 🔹 Buscar la información de variedad en @variedades_por_dia asegurando la clave correcta
+    fecha_key = reception.fecha.strftime("%Y-%m-%d") # Formato estándar
+
+    # Asegurar que la búsqueda se haga con la clave exacta
+    variedad_info = @variedades_por_dia[fecha_key]&.find { |v| v[:key] == "#{key}_#{fecha_key}" }
+
+    
+    precio_feria = variedad_info[:v_feria].to_f
+    p_feria = variedad_info[:p_feria].to_f
+    
+    kilos_feria = (p_feria/100)*kilos_totales
+    cajas_feria = (p_feria/100)*cajas_totales
+
+    neto = precio_feria*kilos_feria
+    iva = neto*0.19
+    total = neto+iva
+
+    #Ahora agrego los datos de SUPERMERCADO
+
+    sheet.add_row [
+      nil,
+      "#{variety_name} - #{color} - #{calidad} - #{firmeza}",
+      nil,
+      nil,
+      nil,
+      nil,
+      "FERIA",
+      nil,
+      kilos_feria.round(2),
+      cajas_feria.round(2),
+      p_feria,
+      nil,
+      precio_feria,
+      nil,
+      neto.round(2),
+      iva.round(2),
+      total.round(2)
+    ], style: text_style
+
+    sheet.merge_cells("B#{sheet.rows.size}:F#{sheet.rows.size}")
+    sheet.merge_cells("G#{sheet.rows.size}:H#{sheet.rows.size}")
+    end 
+
+  #Ahora voy con descarte
+  # 🔹 Agrupar items por variedad - color - calidad - firmeza
+  reception.reception_items.group_by { |item| "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}" }.each do |key, items|
+  variety_name, color, calidad, firmeza = key.split("_")
+
+    # 🔹 Clave correcta para buscar en @kilos_por_recepcion
+    key_kilos = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
+    key_cajas = "#{variety_name}_#{color}_#{calidad}_#{firmeza}"
+
+    # 🔹 Obtener kilos totales asegurando que la clave es correcta
+    kilos_totales = @kilos_por_recepcion.dig(reception.id, key_kilos) || 0.0
+    cajas_totales = @cajas_por_recepcion.dig(reception.id, key_cajas) || 0.0
+
+
+    # 🔹 Buscar la información de variedad en @variedades_por_dia asegurando la clave correcta
+    fecha_key = reception.fecha.strftime("%Y-%m-%d") # Formato estándar
+
+    # Asegurar que la búsqueda se haga con la clave exacta
+    variedad_info = @variedades_por_dia[fecha_key]&.find { |v| v[:key] == "#{key}_#{fecha_key}" }
+
+    
+    precio_descarte = variedad_info[:v_descarte].to_f
+    p_descarte = variedad_info[:p_descarte].to_f
+    
+    kilos_descarte = (p_descarte/100)*kilos_totales
+    cajas_descarte = (p_descarte/100)*cajas_totales
+
+    neto = precio_descarte*kilos_descarte
+    iva = neto*0.19
+    total = neto+iva
+
+    #Ahora agrego los datos de descarte
+
+    sheet.add_row [
+      nil,
+      "#{variety_name} - #{color} - #{calidad} - #{firmeza}",
+      nil,
+      nil,
+      nil,
+      nil,
+      "DESCARTE",
+      nil,
+      kilos_descarte.round(2),
+      cajas_descarte.round(2),
+      p_descarte,
+      nil,
+      precio_descarte,
+      nil,
+      neto.round(2),
+      iva.round(2),
+      total.round(2)
+    ], style: text_style
+
+    sheet.merge_cells("B#{sheet.rows.size}:F#{sheet.rows.size}")
+    sheet.merge_cells("G#{sheet.rows.size}:H#{sheet.rows.size}")
+    end 
+
   end
-
-  # Agregar una fila en blanco antes del total
-
-  # Agregar la fila con los totales generales
-  sheet.add_row [nil, nil, nil, nil, nil, nil, nil, "TOTAL", kilos_totales, cajas_totales], style: bold_text_style
-
-  sheet.add_row []
-  sheet.add_row []
-
-
-
 end
-
-
-
-
-
-
