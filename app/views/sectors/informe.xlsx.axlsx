@@ -1,0 +1,34 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "Sectores") do |sheet|
+  # Definir estilos
+  bold_style = sheet.styles.add_style(b: true)
+  text_style = sheet.styles.add_style(sz: 10, alignment: { horizontal: :center })
+
+  # Cabecera con nueva columna "Estado"
+  sheet.add_row ["Sector", "Hectáreas", "Estado", "Variedad", "Colores Asociados"], style: bold_style
+
+  @sectors.each do |sector|
+    estado = @sector_status[sector] || "Desconocido"  # Estado del sector
+
+    # Agrupar variedades con sus colores asociados
+    grouped_varieties = sector.sector_variety_colors.group_by(&:variety)
+
+    if grouped_varieties.any?
+      grouped_varieties.each do |variety, svc_records|
+        colors = svc_records.map { |svc| svc.color.nombre }.uniq.join(", ")
+
+        sheet.add_row [
+          sector.nombre,
+          sector.hectareas,
+          estado,  # 🔹 Agregar estado del sector
+          variety.nombre,
+          colors
+        ], style: text_style
+      end
+    else
+      # Si el sector no tiene variedades asociadas, se deja vacío el campo de variedad y color
+      sheet.add_row [sector.nombre, sector.hectareas, estado, "Sin variedades", "Sin colores"], style: text_style
+    end
+  end
+end

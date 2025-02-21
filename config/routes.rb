@@ -33,10 +33,17 @@ Rails.application.routes.draw do
       get :edit_varieties
       patch :update_varieties
     end
+    collection do
+      get :export
+    end
   end
   resources :varieties
   resources :irrigations
-  resources :harvests
+  resources :harvests do
+    collection do
+      get :chart_sectors
+    end
+  end
   resources :colors
 
   resources :applications do

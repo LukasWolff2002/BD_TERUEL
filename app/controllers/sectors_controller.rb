@@ -12,6 +12,8 @@ class SectorsController < ApplicationController
   def new
     @sector = Sector.new
   end
+
+  
   
   def create
     @sector = Sector.new(sector_params)
@@ -88,6 +90,47 @@ class SectorsController < ApplicationController
     @sector.destroy
     redirect_to sectors_path, notice: "Sector eliminado exitosamente."
   end
+
+
+  def export
+    Rails.logger.debug "📌 Acción 'export' iniciada."
+  
+    @sectors = Sector.includes(sector_variety_colors: [:variety, :color])
+                     .order(:nombre)
+  
+    if @sectors.empty?
+      Rails.logger.error "❌ No se encontraron sectores para exportar."
+      flash[:alert] = 'No hay sectores registrados para exportar.'
+      redirect_to sectors_path and return
+    end
+  
+    # 🔹 Obtener estado de liberación de cada sector
+    @sector_status = @sectors.index_with do |sector|
+      aplicaciones_restringidas = Application.where(sector: sector.nombre)
+                                             .where("fecha_de_liberacion > ?", Date.today)
+  
+      if aplicaciones_restringidas.exists?
+        fecha_restringida = aplicaciones_restringidas.maximum(:fecha_de_liberacion)
+        "Restringido hasta #{fecha_restringida.strftime('%d/%m/%Y')}"
+      else
+        "Liberado"
+      end
+    end
+  
+    respond_to do |format|
+      format.xlsx do
+        Rails.logger.debug "📄 Se está intentando renderizar el Excel."
+        render xlsx: 'informe', disposition: 'attachment'
+      end
+    end
+  rescue => e
+    Rails.logger.error "❌ Error en la acción 'export': #{e.message}"
+    flash[:alert] = 'Ocurrió un error al generar el informe Excel. Por favor, intenta nuevamente.'
+    redirect_to sectors_path
+  end
+  
+
+
 
   private
 

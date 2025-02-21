@@ -1,10 +1,15 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
     <h1 class="fw-bold text-danger mb-3 mb-md-0">Variedades</h1>
-    <%= link_to new_variety_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #f8d7da;" do %>
-  <i class="bi bi-plus-circle me-2"></i> Nueva Variedad
-<% end %>
 
+    <!-- Contenedor para alinear los botones a la derecha -->
+    <div class="d-flex gap-2">
+      <%= link_to "Colores", colors_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #f8d7da;" %>
+
+      <%= link_to new_variety_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #f8d7da;" do %>
+        <i class="bi bi-plus-circle me-2"></i> Nueva Variedad
+      <% end %>
+    </div>
   </div>
 
   <% if @varieties.any? %>
@@ -42,8 +47,4 @@
       <p class="mt-2 mb-0 fw-bold">No hay variedades registradas.</p>
     </div>
   <% end %>
-
-  <div class="d-flex justify-content-center mt-4">
-    <%= link_to "Colores", colors_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #f8d7da;" %>
-  </div>
 </div>

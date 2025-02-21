@@ -1,9 +1,16 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
     <h1 class="fw-bold text-success mb-3 mb-md-0">Agroquímicos</h1>
-    <%= link_to new_agrochemical_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7dd;" do %>
-      <i class="bi bi-plus-circle me-2"></i> Nuevo Agroquímico
-    <% end %>
+    
+    <!-- Contenedor para alinear los botones a la derecha -->
+    <div class="d-flex gap-2">
+      <%= link_to "Historial", agrochemical_histories_path, class: "btn btn-lg shadow-sm text-black btn-sm fw-bold", style: "background-color: #d1e7dd;" %>
+      <%= link_to "Divisiones", agrochemical_divisions_path, class: "btn btn-lg shadow-sm  text-black btn-sm fw-bold", style: "background-color: #d1e7dd;" %>
+
+      <%= link_to new_agrochemical_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm text-black fw-bold", style: "background-color: #d1e7dd;" do %>
+        <i class="bi bi-plus-circle me-2"></i> Nuevo Agroquímico
+      <% end %>
+    </div>
   </div>
 
   <% if @agrochemicals.any? %>
@@ -45,10 +52,4 @@
     </div>
   <% end %>
 
-  <div class="d-flex justify-content-center mt-4">
-    <%= link_to "Historial", agrochemical_histories_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
-  </div>
-  <div class="d-flex justify-content-center mt-4">
-    <%= link_to "Diviciones", agrochemical_divisions_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7dd;" %>
-  </div>
 </div>

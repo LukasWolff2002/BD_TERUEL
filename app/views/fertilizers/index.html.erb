@@ -1,9 +1,17 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
     <h1 class="fw-bold text-primary mb-3 mb-md-0">Fertilizantes</h1>
-    <%= link_to new_fertilizer_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7fd;" do %>
-      <i class="bi bi-plus-circle me-2"></i> Nuevo Fertilizante
-    <% end %>
+
+    <!-- Contenedor para alinear los botones a la derecha -->
+    <div class="d-flex gap-2">
+      <%= link_to fertilizer_histories_path, class: "btn btn-lg shadow-sm text-black btn-sm  fw-bold", style: "background-color: #d1e7fd;" do %>
+        <i class="bi bi-clock-history me-2"></i> Historial
+      <% end %>
+
+      <%= link_to new_fertilizer_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm  text-black fw-bold", style: "background-color: #d1e7fd;" do %>
+        <i class="bi bi-plus-circle me-2"></i> Nuevo Fertilizante
+      <% end %>
+    </div>
   </div>
 
   <% if @fertilizers.any? %>
@@ -38,11 +46,4 @@
       <p class="mt-2 mb-0 fw-bold">No hay fertilizantes registrados.</p>
     </div>
   <% end %>
-
-  <!-- Botón de Historial debajo de la tabla -->
-  <div class="d-flex justify-content-center mt-4">
-    <%= link_to fertilizer_histories_path, class: "btn btn-lg shadow-sm text-black fw-bold", style: "background-color: #d1e7fd;" do %>
-      <i class="bi bi-clock-history me-2"></i> Historial de Fertilizantes
-    <% end %>
-  </div>
 </div>

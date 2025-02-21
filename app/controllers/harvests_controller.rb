@@ -16,6 +16,39 @@ class HarvestsController < ApplicationController
     @harvest.hora = Time.current
   end
 
+  def chart_sectors
+    @fecha_inicio = params[:fecha_inicio].present? ? Date.parse(params[:fecha_inicio]) : 7.days.ago.to_date
+    @fecha_fin = params[:fecha_fin].present? ? Date.parse(params[:fecha_fin]) : Date.today
+  
+    Rails.logger.info "📅 Rango de fechas: #{@fecha_inicio} - #{@fecha_fin}"
+  
+    # Obtener kilos cosechados por fecha y sector
+    harvests = Harvest.where(fecha: @fecha_inicio..@fecha_fin)
+                      .group(:sector, :fecha)
+                      .sum("cajas * kilos_por_caja")
+  
+    # Inicializar estructura para acumulación
+    @data = {}
+    sectores = harvests.keys.map(&:first).uniq
+    fechas = (@fecha_inicio..@fecha_fin).to_a
+  
+    # Inicializar la estructura con 0 para cada sector y fecha
+    sectores.each do |sector|
+      @data[sector] = {}
+      acumulado = 0
+  
+      fechas.each do |fecha|
+        kilos_del_dia = harvests[[sector, fecha]] || 0
+        acumulado += kilos_del_dia
+        @data[sector][fecha] = acumulado
+      end
+    end
+  
+    Rails.logger.info "📊 Datos acumulados por sector en el tiempo: #{@data.inspect}"
+  end
+  
+  
+
 
   def create
     @harvest = Harvest.new(harvest_params)

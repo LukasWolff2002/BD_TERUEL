@@ -7,7 +7,10 @@ wb = xlsx_package.workbook
   wb.add_worksheet(name: "Recepción #{reception.id}") do |sheet|
 
   # Definir estilos
-  bold_style = sheet.styles.add_style(b: true)
+  border_style = sheet.styles.add_style(
+    border: { style: :thin, color: "000000" } # Borde grueso y negro
+  )
+
   title_style = sheet.styles.add_style(b: true, sz: 14, alignment: { horizontal: :center, vertical: :center })
   text_style = sheet.styles.add_style(sz: 10, alignment: { horizontal: :center })
   bold_text_style = sheet.styles.add_style(b: true, sz: 10, alignment: { horizontal: :center })
@@ -18,8 +21,9 @@ wb = xlsx_package.workbook
 
   # Fila 4: Fusionamos B4:J4 y aplicamos estilo
 
+  
   sheet.add_row [nil, "INFORME PROCESO FRUTA PACKING"], style: title_style
-  sheet.merge_cells("B4:J4")
+
   
   sheet.add_row [] # Fila 5
 
@@ -48,10 +52,19 @@ wb = xlsx_package.workbook
   sheet.merge_cells("E12:J12")
 
   sheet.add_row [] # Fila 13
-  sheet.add_row [] # Fila 14
+  sheet.add_row [nil, "PALETS", nil, nil, reception.palets.present? ? reception.palets : ""], style: [nil, bold_text_style, nil, nil, text_style]
+  sheet.merge_cells("B14:D14")
+  sheet.merge_cells("E14:J14")
+
+  sheet.add_row [] # Fila 15
+  sheet.add_row [] # Fila 16
 
   sheet.add_row [nil, "DETALLE PRODUCTOS PROCESADOS", nil, nil, nil, nil, "CLIENTE", "CALIBRE", "KILOS", "CAJAS", "PORCENTAJE", nil, "PRECIO FACTURACIÓN", nil, "NETO", "IVA", "TOTAL"], style: bold_text_style
-  sheet.merge_cells("B15:F15")
+  sheet.merge_cells("B17:F17")
+
+  neto_total = 0
+  cajas_total = 0
+  kilos_total = 0
 
   # 🔹 Agrupar items por variedad - color - calidad - firmeza
   reception.reception_items.group_by { |item| "#{item['variety']}_#{item['color']}_#{item['calidad']}_#{item['firmeza']}" }.each do |key, items|
@@ -65,6 +78,8 @@ wb = xlsx_package.workbook
     kilos_totales = @kilos_por_recepcion.dig(reception.id, key_kilos) || 0.0
     cajas_totales = @cajas_por_recepcion.dig(reception.id, key_cajas) || 0.0
 
+    cajas_total = cajas_totales + cajas_total
+    kilos_total = kilos_totales + kilos_total
 
     # 🔹 Buscar la información de variedad en @variedades_por_dia asegurando la clave correcta
     fecha_key = reception.fecha.strftime("%Y-%m-%d") # Formato estándar
@@ -79,7 +94,9 @@ wb = xlsx_package.workbook
     kilos_supermercado = (p_supermercado/100)*kilos_totales
     cajas_supermercado = (p_supermercado/100)*cajas_totales
 
+
     neto = precio_supermercado*kilos_supermercado
+    neto_total = neto_total + neto
     iva = neto*0.19
     total = neto+iva
 
@@ -137,6 +154,7 @@ wb = xlsx_package.workbook
     cajas_feria = (p_feria/100)*cajas_totales
 
     neto = precio_feria*kilos_feria
+    neto_total = neto_total + neto
     iva = neto*0.19
     total = neto+iva
 
@@ -194,6 +212,7 @@ wb = xlsx_package.workbook
     cajas_descarte = (p_descarte/100)*cajas_totales
 
     neto = precio_descarte*kilos_descarte
+    neto_total = neto_total + neto
     iva = neto*0.19
     total = neto+iva
 
@@ -223,5 +242,93 @@ wb = xlsx_package.workbook
     sheet.merge_cells("G#{sheet.rows.size}:H#{sheet.rows.size}")
     end 
 
+  #Ahora voy con total total
+  iva_total = neto_total * 0.19
+  total_total = iva_total + neto_total
+  sheet.add_row [
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    cajas_total,
+    kilos_total,
+    nil,
+    nil,
+    nil,
+    nil,
+    neto_total,
+    iva_total,
+    total_total
+
+  ], style: bold_text_style
+
+
   end
+end
+
+
+# Hoja Resumen
+wb.add_worksheet(name: "Resumen") do |sheet|
+
+  # Definir estilos dentro de la hoja de resumen
+  title_style = sheet.styles.add_style(b: true, sz: 14, alignment: { horizontal: :center, vertical: :center })
+  text_style = sheet.styles.add_style(sz: 10, alignment: { horizontal: :center })
+  bold_text_style = sheet.styles.add_style(b: true, sz: 10, alignment: { horizontal: :center })
+
+  sheet.add_row [" "] * 20
+  sheet.add_row []
+  sheet.add_row []
+
+  # Título de la hoja resumen
+  sheet.add_row [nil, "RESUMEN PROCESO FRUTA PACKING"], style: title_style
+  sheet.merge_cells("B4:J4")
+
+  sheet.add_row []
+  sheet.add_row [nil, "DETALLE PRODUCTOS PROCESADOS", nil, nil, nil, nil, "CLIENTE", "CALIBRE", "KILOS", "CAJAS"], style: bold_text_style
+  sheet.merge_cells("B6:F6")
+
+  # Inicializar hash para acumular kilos y cajas por variedad y color
+  resumen_hash = Hash.new { |hash, key| hash[key] = { kilos: 0, cajas: 0 } }
+
+  # Inicializar los totales generales
+  kilos_totales = 0
+  cajas_totales = 0
+
+  # Recorrer todas las recepciones y acumular los valores
+  @receptions.each do |reception|
+    reception.reception_items.each do |item|
+      # Clave única combinando variedad y color
+      key = "#{item['variety']} - #{item['color']}".strip
+
+      # Sumar kilos y cajas al hash de resumen
+      resumen_hash[key][:kilos] += item["kilos"].to_f
+      resumen_hash[key][:cajas] += item["cajas"].to_i
+
+      # Sumar a los totales generales
+      kilos_totales += item["kilos"].to_f
+      cajas_totales += item["cajas"].to_i
+    end
+  end
+
+  # Agregar los datos acumulados a la hoja resumen
+  resumen_hash.each do |variety_color, valores|
+    sheet.add_row [nil, variety_color, nil, nil, nil, nil, "SUPERMERCADO", nil, valores[:kilos], valores[:cajas]], style: text_style
+    sheet.merge_cells("B#{sheet.rows.size}:F#{sheet.rows.size}")
+    sheet.merge_cells("G#{sheet.rows.size}:H#{sheet.rows.size}")
+  end
+
+  # Agregar una fila en blanco antes del total
+
+  # Agregar la fila con los totales generales
+  sheet.add_row [nil, nil, nil, nil, nil, nil, nil, "TOTAL", kilos_totales, cajas_totales], style: bold_text_style
+
+  sheet.add_row []
+  sheet.add_row []
+
+
+
 end

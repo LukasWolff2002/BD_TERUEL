@@ -1,9 +1,17 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h1 class="fw-bold text-success mb-3 mb-md-0">Sectores</h1>
+    <h1 class="fw-bold  text-success mb-3 mb-md-0">Sectores</h1>
+
+    <div class="ms-auto d-flex gap-2">
+    
+    <%= link_to export_sectors_path(format: :xlsx), class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7dd;" do %>
+      <i class="bi bi-file-earmark-spreadsheet me-2"></i> Exportar Informe
+    <% end %>
+    
     <%= link_to new_sector_path, class: "btn btn-lg shadow-sm d-flex align-items-center btn-sm btn-md text-black fw-bold", style: "background-color: #d1e7dd;" do %>
       <i class="bi bi-plus-circle me-2"></i> Nuevo Sector
     <% end %>
+    </div>
   </div>
 
   <% if @sectors.any? %>
@@ -55,4 +63,7 @@
       <p class="mt-2 mb-0 fw-bold">No hay sectores registrados.</p>
     </div>
   <% end %>
+  
 </div>
+
+

@@ -1,0 +1,83 @@
+<div class="container mt-4">
+  <h2 class="fw-bold text-primary mb-4">Kilos Acumulados por Sector</h2>
+
+  <%= form_with url: chart_sectors_harvests_path, method: :get, local: true, class: "row g-3 mb-4" do |f| %>
+    <div class="col-md-4">
+      <%= label_tag :fecha_inicio, "Fecha de inicio", class: "form-label" %>
+      <%= date_field_tag :fecha_inicio, params[:fecha_inicio], class: "form-control" %>
+    </div>
+    
+    <div class="col-md-4">
+      <%= label_tag :fecha_fin, "Fecha de fin", class: "form-label" %>
+      <%= date_field_tag :fecha_fin, params[:fecha_fin], class: "form-control" %>
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+      <%= submit_tag "Filtrar", class: "btn btn-primary w-100" %>
+    </div>
+  <% end %>
+
+  <% if @data.present? %>
+    <div class="card shadow-sm p-4">
+      <canvas id="harvestChart"></canvas>
+    </div>
+  <% else %>
+    <div class="alert alert-warning text-center">
+      <i class="bi bi-exclamation-circle"></i> No hay datos disponibles para el rango seleccionado.
+    </div>
+  <% end %>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log("📊 Inicializando gráfico...");
+
+    if (typeof Chart === "undefined") {
+      console.error("❌ Chart.js no está definido.");
+      return;
+    }
+
+    const ctx = document.getElementById("harvestChart");
+    if (!ctx) {
+      console.warn("⚠️ No se encontró el elemento 'harvestChart'.");
+      return;
+    }
+
+    const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FF9933"]; // Diferentes colores para cada sector
+
+    // Datos de sectores organizados
+    const data = <%= @data.to_json.html_safe %>;
+    
+    // Extraer etiquetas de fechas (eje X)
+    const labels = Array.from(new Set([].concat(...Object.values(data).map(Object.keys)))).sort();
+
+    // Convertir datos de sectores en datasets de Chart.js
+    const datasets = Object.keys(data).map((sector, index) => ({
+      label: sector,
+      data: labels.map(date => data[sector][date] || 0), // Si no hay datos, asigna 0
+      borderColor: colors[index % colors.length],
+      backgroundColor: colors[index % colors.length] + "50",
+      fill: false,
+      tension: 0.3,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }));
+
+    new Chart(ctx.getContext("2d"), {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true }
+        },
+        scales: {
+          x: { title: { display: true, text: "Fecha" } },
+          y: { title: { display: true, text: "Kilos Acumulados" }, beginAtZero: true }
+        }
+      }
+    });
+
+    console.log("📊 Gráfico generado con datos:", { labels, datasets });
+  });
+</script>
